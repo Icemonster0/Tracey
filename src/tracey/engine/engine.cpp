@@ -12,6 +12,8 @@ namespace trc {
 Engine::Engine() {}
 
 int Engine::run() {
+    scene = Scene {};
+
     window_manager = WindowManager {glm::ivec2 {400, 300}};
     sampler = Sampler {window_manager.get_size()};
     console = Console {2.0f};

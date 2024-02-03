@@ -14,14 +14,18 @@ add_library(main_module STATIC
     src/tracey/engine/sampler.hpp
     src/tracey/engine/window_manager.cpp
     src/tracey/engine/window_manager.hpp
+    src/tracey/geometry/camera.cpp
+    src/tracey/geometry/camera.hpp
     src/tracey/graphics/buffer.hpp
+    src/tracey/scene/scene.cpp
+    src/tracey/scene/scene.hpp
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"))
     message("Darwin Clang detected")
     target_compile_options(main_module BEFORE PUBLIC -Xpreprocessor -fopenmp -O3)
 else()
-    target_compile_options(main_module BEFORE PUBLIC -fopenmp -g)
+    target_compile_options(main_module BEFORE PUBLIC -fopenmp -O3)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")

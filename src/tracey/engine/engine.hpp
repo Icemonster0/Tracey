@@ -4,6 +4,7 @@
 #include "window_manager.hpp"
 #include "sampler.hpp"
 #include "console.hpp"
+#include "../scene/scene.hpp"
 
 namespace trc {
 
@@ -14,6 +15,8 @@ public:
     int run();
 
 private:
+    Scene scene;
+
     WindowManager window_manager;
     Sampler sampler;
     Console console;
