@@ -12,6 +12,8 @@ add_library(main_module STATIC
     src/tracey/engine/engine.hpp
     src/tracey/engine/sampler.cpp
     src/tracey/engine/sampler.hpp
+    src/tracey/engine/viewer.cpp
+    src/tracey/engine/viewer.hpp
     src/tracey/engine/window_manager.cpp
     src/tracey/engine/window_manager.hpp
     src/tracey/geometry/camera.cpp

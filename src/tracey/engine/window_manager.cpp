@@ -11,7 +11,7 @@ WindowManager::WindowManager()
     : running(false) {}
 
 WindowManager::WindowManager(glm::ivec2 window_size)
-    : size(window_size), running(false) {
+    : size(window_size), running(false), is_mouse_captured(false), last_enter_key_press_state(false) {
 
     if(!glfwInit()) {
         fprintf(stderr, "Failed to init glfw\n");
@@ -29,6 +29,10 @@ WindowManager::WindowManager(glm::ivec2 window_size)
 
     glfwSwapInterval(0);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwGetCursorPos(window, &mouse_pos.x, &mouse_pos.y);
+    is_mouse_captured = true;
+
     running = true;
 
     printf("GLFW Info: %s\n", glfwGetVersionString());
@@ -41,7 +45,7 @@ void WindowManager::draw_frame(const Buffer<glm::vec3> *frame) {
     glfwSwapBuffers(window);
 }
 
-void WindowManager::handle_events() {
+InputPackage WindowManager::handle_events() {
     glfwPollEvents();
 
     // window resize
@@ -56,6 +60,41 @@ void WindowManager::handle_events() {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+        if (!last_enter_key_press_state) {
+            last_enter_key_press_state = true;
+            if (is_mouse_captured) {
+                is_mouse_captured = false;
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
+            else {
+                is_mouse_captured = true;
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            }
+        }
+    }
+    else {
+        last_enter_key_press_state = false;
+    }
+
+    // mouse movement
+    glm::dvec2 new_mouse_pos;
+    glfwGetCursorPos(window, &new_mouse_pos.x, &new_mouse_pos.y);
+    glm::vec2 delta_mouse_pos = new_mouse_pos - mouse_pos;
+    mouse_pos = new_mouse_pos;
+
+    // misc input info
+    InputPackage pack;
+    pack.q = (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS);
+    pack.w = (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
+    pack.e = (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS);
+    pack.a = (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS);
+    pack.s = (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS);
+    pack.d = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS);
+    if (is_mouse_captured) pack.delta_mouse = delta_mouse_pos;
+    else pack.delta_mouse = glm::vec2 {0.f};
+
+    return pack;
 }
 
 void WindowManager::close() {

@@ -5,6 +5,7 @@
 #include "sampler.hpp"
 #include "console.hpp"
 #include "../scene/scene.hpp"
+#include "viewer.hpp"
 
 namespace trc {
 
@@ -16,8 +17,8 @@ public:
 
 private:
     Scene scene;
-
     WindowManager window_manager;
+    Viewer viewer;
     Sampler sampler;
     Console console;
 };

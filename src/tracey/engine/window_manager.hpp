@@ -5,8 +5,10 @@
 #include "../../glm.hpp"
 
 #include "../graphics/buffer.hpp"
+#include "input_package.hpp"
 
 namespace trc {
+
 
 class WindowManager {
 public:
@@ -14,7 +16,7 @@ public:
     WindowManager(glm::ivec2 size);
 
     void draw_frame(const Buffer<glm::vec3> *frame);
-    void handle_events();
+    InputPackage handle_events();
     void close();
 
     bool window_should_close();
@@ -27,6 +29,9 @@ private:
     GLFWwindow *window;
     glm::ivec2 size;
     bool running;
+    glm::dvec2 mouse_pos;
+    bool is_mouse_captured;
+    bool last_enter_key_press_state;
 };
 
 } /* trc */
