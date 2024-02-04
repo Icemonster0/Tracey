@@ -25,7 +25,7 @@ public:
     glm::vec3 calc_forward_dir();
     glm::vec3 calc_right_dir();
     glm::vec3 calc_up_dir();
-    glm::vec3 calc_ray_dir_at(glm::vec2 tex_coord);
+    glm::vec3 calc_ray_dir_at(glm::vec2 screen_coord);
 
 private:
     glm::vec3 pos;

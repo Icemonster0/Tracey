@@ -40,10 +40,10 @@ glm::vec3 Camera::calc_up_dir() {
     return rot_mat * glm::vec4 {0.f, 1.f, 0.f, 1.f};
 }
 
-glm::vec3 Camera::calc_ray_dir_at(glm::vec2 tex_coord) {
+glm::vec3 Camera::calc_ray_dir_at(glm::vec2 screen_coord) {
     glm::vec4 dir {
-        tex_coord.x * abs_height * aspect,
-        tex_coord.y * abs_height,
+        screen_coord.x * abs_height * aspect,
+        screen_coord.y * abs_height,
         -1.f,
         1.f
     };
@@ -56,8 +56,8 @@ glm::vec3 Camera::calc_ray_dir_at(glm::vec2 tex_coord) {
 
 void Camera::calc_rot_mat() {
     rot_mat = glm::mat4 {1.f};
-    rot_mat = glm::rotate(rot_mat, glm::radians(yaw), glm::vec3(0.f, 1.f, 0.f));
-    rot_mat = glm::rotate(rot_mat, glm::radians(pitch), glm::vec3(1.f, 0.f, 0.f));
+    rot_mat = glm::rotate(rot_mat, glm::radians(yaw), glm::vec3(0.f, -1.f, 0.f));
+    rot_mat = glm::rotate(rot_mat, glm::radians(pitch), glm::vec3(-1.f, 0.f, 0.f));
 }
 
 void Camera::calc_abs_height() {

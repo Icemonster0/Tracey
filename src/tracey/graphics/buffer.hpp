@@ -76,7 +76,7 @@ public:
     }
 
     T *at(glm::ivec2 index) {
-        return data + (index.y * size.y + index.x);
+        return data + (index.y * size.x + index.x);
     }
 
     const T *get_data() const {

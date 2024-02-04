@@ -1,11 +1,12 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
+#include "scene.hpp"
+#include "accelerator.hpp"
 #include "window_manager.hpp"
+#include "viewer.hpp"
 #include "sampler.hpp"
 #include "console.hpp"
-#include "../scene/scene.hpp"
-#include "viewer.hpp"
 
 namespace trc {
 
@@ -17,6 +18,7 @@ public:
 
 private:
     Scene scene;
+    Accelerator accelerator;
     WindowManager window_manager;
     Viewer viewer;
     Sampler sampler;
