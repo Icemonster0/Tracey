@@ -6,6 +6,7 @@
 
 #include "../../glm.hpp"
 #include "../geometry/shape.hpp"
+#include "../geometry/lights/lights.hpp"
 
 namespace trc {
 
@@ -14,10 +15,14 @@ public:
     Scene();
 
     void add_object(std::unique_ptr<Shape> obj);
+    void add_light(std::unique_ptr<Light> light);
+
     std::list<std::unique_ptr<Shape>> *get_object_list();
+    std::list<std::unique_ptr<Light>> *get_light_list();
 
 private:
     std::list<std::unique_ptr<Shape>> object_list;
+    std::list<std::unique_ptr<Light>> light_list;
 };
 
 } /* trc */

@@ -13,6 +13,7 @@ TRC_DECLARE_SHADER(ShaderTexCoord)
 TRC_DECLARE_SHADER(ShaderBasicClay)
 TRC_DECLARE_SHADER(ShaderChecker)
 TRC_DECLARE_SHADER(ShaderReflect)
+TRC_DECLARE_SHADER(ShaderShadows)
 
 } /* trc */
 

@@ -71,4 +71,9 @@ TRC_DEFINE_SHADER(ShaderReflect) {
     return glm::vec4 {color, 1.f};
 }
 
+TRC_DEFINE_SHADER(ShaderShadows) {
+    glm::vec3 light = shader_data.accelerator->calc_light_influence(shader_data.pos, shader_data.normal);
+    return glm::vec4 {light * 0.9f + 0.1f, 1.f};
+}
+
 } /* trc */

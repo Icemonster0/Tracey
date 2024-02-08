@@ -10,6 +10,7 @@ namespace trc {
 
 enum RayType {
     TRC_CAMERA_RAY,
+    TRC_SHADOW_RAY,
     TRC_COMMON_RAY
 };
 

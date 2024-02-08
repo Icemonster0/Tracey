@@ -22,6 +22,9 @@ add_library(main_module STATIC
     src/tracey/engine/viewer.hpp
     src/tracey/engine/window_manager.cpp
     src/tracey/engine/window_manager.hpp
+    src/tracey/geometry/lights/lights.hpp
+    # src/tracey/geometry/lights/point_light.cpp TODO
+    # src/tracey/geometry/lights/point_light.hpp TODO
     src/tracey/geometry/shapes/ground_plane.cpp
     src/tracey/geometry/shapes/ground_plane.hpp
     src/tracey/geometry/shapes/shapes.hpp
@@ -31,6 +34,8 @@ add_library(main_module STATIC
     src/tracey/geometry/camera.hpp
     src/tracey/geometry/intersection.cpp
     src/tracey/geometry/intersection.hpp
+    src/tracey/geometry/light.cpp
+    src/tracey/geometry/light.hpp
     src/tracey/geometry/ray.cpp
     src/tracey/geometry/ray.hpp
     src/tracey/geometry/shape.cpp

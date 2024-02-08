@@ -16,10 +16,11 @@ namespace trc {
 Engine::Engine() {}
 
 int Engine::run() {
-    scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_reflect.get())));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.f, 1.0f, 0.f}, 1.f, shader_pack.shader_checker.get())));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {3.f, 2.0f, 2.f}, 1.f, shader_pack.shader_reflect.get())));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {2.f, 0.5f, -4.f}, 1.f, shader_pack.shader_normal.get())));
+    scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_shadows.get())));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.f, 1.0f, 0.f}, 1.f, shader_pack.shader_shadows.get())));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {3.f, 2.0f, 2.f}, 1.f, shader_pack.shader_shadows.get())));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {2.f, 0.5f, -4.f}, 1.f, shader_pack.shader_shadows.get())));
+    scene.add_light(std::unique_ptr<Light>(new Light(glm::vec3 {-2.f, 4.0f, 2.f}, glm::vec3 {0.6f, 0.7f, 1.0f}, 10.f)));
 
     accelerator = Accelerator {&scene};
     window_manager = WindowManager {glm::ivec2 {400, 300}};

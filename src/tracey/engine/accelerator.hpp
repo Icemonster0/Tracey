@@ -19,9 +19,11 @@ public:
     Accelerator();
 
     std::optional<Intersection> calc_intersection(Ray ray) const;
+    glm::vec3 calc_light_influence(glm::vec3 shading_point, glm::vec3 normal) const;
 
 private:
     std::list<Shape*> object_ptr_list;
+    std::list<Light*> light_ptr_list;
 };
 
 } /* trc */

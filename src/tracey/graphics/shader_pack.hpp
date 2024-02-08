@@ -18,6 +18,7 @@ struct ShaderPack {
     std::unique_ptr<Shader> shader_basic_clay;
     std::unique_ptr<Shader> shader_checker;
     std::unique_ptr<Shader> shader_reflect;
+    std::unique_ptr<Shader> shader_shadows;
 };
 
 } /* trc */

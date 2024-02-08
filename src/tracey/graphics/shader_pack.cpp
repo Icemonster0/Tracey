@@ -10,6 +10,7 @@ ShaderPack::ShaderPack()
       shader_tex_coord(std::unique_ptr<Shader>(new ShaderTexCoord())),
       shader_basic_clay(std::unique_ptr<Shader>(new ShaderBasicClay())),
       shader_checker(std::unique_ptr<Shader>(new ShaderChecker())),
-      shader_reflect(std::unique_ptr<Shader>(new ShaderReflect())) {}
+      shader_reflect(std::unique_ptr<Shader>(new ShaderReflect())),
+      shader_shadows(std::unique_ptr<Shader>(new ShaderShadows())) {}
 
 } /* trc */
