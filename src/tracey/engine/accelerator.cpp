@@ -13,7 +13,7 @@ Accelerator::Accelerator(Scene *source_scene) {
 
 Accelerator::Accelerator() {}
 
-std::optional<Intersection> Accelerator::calc_intersection(Ray ray) {
+std::optional<Intersection> Accelerator::calc_intersection(Ray ray) const {
     float min_dist = std::numeric_limits<float>::infinity();
     std::optional<Intersection> min_isect;
 

@@ -2,16 +2,12 @@
 #define SHADER_HPP
 
 #include "../../glm.hpp"
+#include "shader_data.hpp"
 
 namespace trc {
 
 struct Shader {
-    virtual glm::vec4 evaluate(
-        glm::vec3 pos,
-        glm::vec3 normal,
-        glm::vec2 tex_coord,
-        float distance
-    );
+    virtual glm::vec4 evaluate(ShaderData shader_data) const;
 };
 
 } /* trc */

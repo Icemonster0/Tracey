@@ -18,7 +18,7 @@ public:
     Accelerator(Scene *source_scene);
     Accelerator();
 
-    std::optional<Intersection> calc_intersection(Ray ray);
+    std::optional<Intersection> calc_intersection(Ray ray) const;
 
 private:
     std::list<Shape*> object_ptr_list;

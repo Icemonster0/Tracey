@@ -2,10 +2,10 @@
 
 namespace trc {
 
-GroundPlane::GroundPlane(float p_height, Shader p_shader)
+GroundPlane::GroundPlane(float p_height, Shader *p_shader)
     : Shape(p_shader), height(p_height) {}
 
-std::optional<Intersection> GroundPlane::calc_ray_intersection(Ray ray) {
+std::optional<Intersection> GroundPlane::calc_ray_intersection(Ray ray) const {
 
     if (ray.direction.y == 0) return std::optional<Intersection>();
 
@@ -19,7 +19,7 @@ std::optional<Intersection> GroundPlane::calc_ray_intersection(Ray ray) {
         glm::vec3 {0.f, 1.f, 0.f}, // normal
         glm::fract(point.xz()), // tex_coord
         t, // distance
-        shader.get() // shader
+        shader // shader
     );
 }
 

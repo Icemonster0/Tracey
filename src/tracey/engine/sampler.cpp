@@ -1,5 +1,7 @@
 #include "sampler.hpp"
 
+#include "../graphics/shader_data.hpp"
+
 namespace trc {
 
 /* public */
@@ -10,7 +12,7 @@ Sampler::Sampler(glm::ivec2 frame_size) {
     fbuf.fill(frame_size, glm::vec3 {0.25f});
 }
 
-void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator) {
+void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack) {
     clear_fbuf(frame_size, glm::vec3 {0.f});
 
     #pragma omp parallel for schedule(static) collapse(2)
@@ -23,17 +25,23 @@ void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *acceler
 
             Ray ray {
                 camera->get_pos(),
-                camera->calc_ray_dir_at(screen_coords)
+                camera->calc_ray_dir_at(screen_coords),
+                TRC_CAMERA_RAY,
+                0
             };
 
             std::optional<Intersection> isect = accelerator->calc_intersection(ray);
             if (isect) {
-                glm::vec3 color = isect.value().shader->evaluate(
+                ShaderData shader_data {
                     isect.value().pos,
                     isect.value().normal,
                     isect.value().tex_coord,
-                    isect.value().distance
-                );
+                    isect.value().distance,
+                    ray,
+                    accelerator,
+                    shader_pack
+                };
+                glm::vec3 color = isect.value().shader->evaluate(shader_data);
                 *fbuf.at({x, y}) = color.rgb();
             }
         }

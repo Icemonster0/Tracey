@@ -6,6 +6,7 @@
 #include "../../glm.hpp"
 #include "../graphics/buffer.hpp"
 #include "../graphics/shader.hpp"
+#include "../graphics/shader_pack.hpp"
 #include "../geometry/camera.hpp"
 #include "../geometry/ray.hpp"
 #include "../geometry/shapes/shapes.hpp"
@@ -19,7 +20,7 @@ public:
     Sampler();
     Sampler(glm::ivec2 frame_size);
 
-    void render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator);
+    void render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack);
 
     Buffer<glm::vec3> *get_frame_buffer();
 

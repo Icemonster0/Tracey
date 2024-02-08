@@ -2,24 +2,19 @@
 
 namespace trc {
 
-Shape::Shape(Shader shader_object) {
-    set_shader(shader_object);
-}
+Shape::Shape(Shader *shader_ptr)
+    : shader(shader_ptr) {}
 
-Shape::Shape() {
-    set_shader(Shader {});
-}
-
-std::optional<Intersection> Shape::calc_ray_intersection(Ray ray) {
+std::optional<Intersection> Shape::calc_ray_intersection(Ray ray) const {
     return std::optional<Intersection>();
 }
 
 Shader *Shape::get_shader() {
-    return shader.get();
+    return shader;
 }
 
-void Shape::set_shader(Shader shader_object) {
-    shader = std::make_unique<Shader>(shader_object);
+void Shape::set_shader(Shader *shader_ptr) {
+    shader = shader_ptr;
 }
 
 } /* trc */

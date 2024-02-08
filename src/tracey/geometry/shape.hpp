@@ -1,7 +1,6 @@
 #ifndef SHAPE_HPP
 #define SHAPE_HPP
 
-#include <memory>
 #include <optional>
 
 #include "../../glm.hpp"
@@ -13,16 +12,15 @@ namespace trc {
 
 class Shape {
 public:
-    Shape(Shader shader_object);
-    Shape();
+    Shape(Shader *shader_ptr);
 
-    virtual std::optional<Intersection> calc_ray_intersection(Ray ray);
+    virtual std::optional<Intersection> calc_ray_intersection(Ray ray) const;
 
     Shader *get_shader();
-    void set_shader(Shader shader_object);
+    void set_shader(Shader *shader_ptr);
 
 protected:
-    std::unique_ptr<Shader> shader;
+    Shader *shader;
 };
 
 } /* trc */

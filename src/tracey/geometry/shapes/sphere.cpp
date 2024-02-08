@@ -2,10 +2,10 @@
 
 namespace trc {
 
-Sphere::Sphere(glm::vec3 p_pos, float p_radius, Shader p_shader)
+Sphere::Sphere(glm::vec3 p_pos, float p_radius, Shader *p_shader)
     : Shape(p_shader), pos(p_pos), radius(p_radius) {}
 
-std::optional<Intersection> Sphere::calc_ray_intersection(Ray ray) {
+std::optional<Intersection> Sphere::calc_ray_intersection(Ray ray) const {
     // translate ray to object space
     ray.origin -= pos;
 
@@ -62,7 +62,7 @@ std::optional<Intersection> Sphere::calc_ray_intersection(Ray ray) {
         normal, // normal
         tex_coord, // tex_coord
         t, // distance
-        shader.get() // shader
+        shader // shader
     );
 }
 

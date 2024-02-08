@@ -35,7 +35,13 @@ add_library(main_module STATIC
     src/tracey/geometry/ray.hpp
     src/tracey/geometry/shape.cpp
     src/tracey/geometry/shape.hpp
+    src/tracey/graphics/shaders/shader_syntax.hpp
+    src/tracey/graphics/shaders/shaders.cpp
+    src/tracey/graphics/shaders/shaders.hpp
     src/tracey/graphics/buffer.hpp
+    src/tracey/graphics/shader_data.hpp
+    src/tracey/graphics/shader_pack.cpp
+    src/tracey/graphics/shader_pack.hpp
     src/tracey/graphics/shader.cpp
     src/tracey/graphics/shader.hpp
 )
