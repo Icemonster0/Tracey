@@ -49,6 +49,9 @@ add_library(main_module STATIC
     src/tracey/graphics/shader_pack.hpp
     src/tracey/graphics/shader.cpp
     src/tracey/graphics/shader.hpp
+    src/tracey/random/random.hpp
+    src/tracey/random/xoshiro256plus.cpp
+    src/tracey/random/xoshiro256plus.hpp
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"))

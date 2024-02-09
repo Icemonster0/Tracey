@@ -1,8 +1,12 @@
-#include "light.hpp"
+#include "point_light.hpp"
 
 namespace trc {
 
-Light(glm::vec3 p_pos)
-    : pos(p_pos) {}
+PointLight(glm::vec3 p_pos, glm::vec3 p_color, float p_intensity, float p_radius)
+    : Light(p_pos, p_color, p_intensity), radius(p_radius) {}
+
+glm::vec3 PointLight::get_sample_point() {
+    // TODO
+}
 
 } /* trc */

@@ -6,7 +6,7 @@ Light::Light(glm::vec3 p_pos, glm::vec3 p_color, float p_intensity)
     : pos(p_pos), color(p_color), intensity(p_intensity) {}
 
 LightSampleData Light::sample(glm::vec3 shading_point) {
-    glm::vec3 ray_vec = pos - shading_point;
+    glm::vec3 ray_vec = get_sample_point() - shading_point;
     float length = glm::length(ray_vec);
     float inv_length = 1.f / length;
     Ray ray {shading_point, ray_vec * inv_length, TRC_SHADOW_RAY};

@@ -14,7 +14,7 @@ struct LightSampleData {
 
 class Light {
 public:
-    Light(glm::vec3 p_pos, glm::vec3 p_color, float p_intensity);
+    Light(glm::vec3 p_pos, glm::vec3 p_color = glm::vec3 {1.f}, float p_intensity = 1.f);
 
     virtual LightSampleData sample(glm::vec3 shading_point);
 

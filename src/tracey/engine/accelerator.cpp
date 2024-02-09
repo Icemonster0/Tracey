@@ -40,9 +40,9 @@ glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 n
         LightSampleData light_data = light->sample(shading_point);
         std::optional<Intersection> isect = calc_intersection(light_data.shadow_ray);
         if (isect && isect.value().distance < light_data.distance) {
-            return glm::vec3 {0.f};
+            continue;
         }
-        light_color += light_data.light * glm::clamp(glm::dot(normal, light_data.shadow_ray.direction), 0.f, 1.f);
+        else light_color += light_data.light * glm::clamp(glm::dot(normal, light_data.shadow_ray.direction), 0.f, 1.f);
     }
 
     return light_color;

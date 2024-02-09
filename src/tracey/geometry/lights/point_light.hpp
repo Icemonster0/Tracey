@@ -1,27 +1,21 @@
-#ifndef LIGHT_HPP
-#define LIGHT_HPP
+#ifndef POINT_LIGHT_HPP
+#define POINT_LIGHT_HPP
 
-#include "../../glm.hpp"
-#include "ray.hpp"
+#include "../light.hpp"
 
 namespace trc {
 
-struct LightSampleData {
-    glm::vec3 pos;
-    glm::vec3 light;
-    Ray shadow_ray;
-};
-
-class Light {
+class PointLight : public Light {
 public:
-    Light(glm::vec3 p_pos);
+    PointLight(glm::vec3 p_pos, glm::vec3 p_color = glm::vec3 {1.f}, float p_intensity = 1.f, float p_radius = 0.1f);
 
-    virtual LightSampleData sample_light(glm::vec3 shading_point);
+protected:
+    glm::vec3 get_sample_point();
 
 private:
-    glm::vec3 pos;
+    flaot radius;
 };
 
 } /* trc */
 
-#endif /* end of include guard: LIGHT_HPP */
+#endif /* end of include guard: POINT_LIGHT_HPP */

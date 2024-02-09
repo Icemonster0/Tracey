@@ -2,6 +2,7 @@
 #define SAMPLER_HPP
 
 #include <optional>
+#include <cstdint>
 
 #include "../../glm.hpp"
 #include "../graphics/buffer.hpp"
@@ -20,7 +21,7 @@ public:
     Sampler();
     Sampler(glm::ivec2 frame_size);
 
-    void render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack);
+    void render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed);
 
     Buffer<glm::vec3> *get_frame_buffer();
 
