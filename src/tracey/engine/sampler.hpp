@@ -21,12 +21,14 @@ public:
     Sampler();
     Sampler(glm::ivec2 frame_size);
 
-    void render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed);
+    void render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset);
 
     Buffer<glm::vec3> *get_frame_buffer();
+    int get_samples();
 
 private:
     Buffer<glm::vec3> fbuf;
+    int samples;
 
     void clear_fbuf(glm::ivec2 frame_size, glm::vec3 color);
 };

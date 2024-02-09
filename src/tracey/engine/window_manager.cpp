@@ -11,7 +11,7 @@ WindowManager::WindowManager()
     : running(false) {}
 
 WindowManager::WindowManager(glm::ivec2 window_size)
-    : size(window_size), running(false), is_mouse_captured(false), last_enter_key_press_state(false) {
+    : size(window_size), running(false), is_mouse_captured(false), last_enter_key_press_state(false), update_required(false) {
 
     if(!glfwInit()) {
         fprintf(stderr, "Failed to init glfw\n");
@@ -50,12 +50,15 @@ void WindowManager::draw_frame(const Buffer<glm::vec3> *frame) {
 InputPackage WindowManager::handle_events() {
     glfwPollEvents();
 
+    update_required = false;
+
     // window resize
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     if (width != size.x || height != size.y) {
         size = glm::ivec2(width, height);
         glViewport(0, 0, width, height);
+        update_required = true;
     }
 
     // keyboard input
@@ -83,7 +86,10 @@ InputPackage WindowManager::handle_events() {
     glm::dvec2 new_mouse_pos;
     glfwGetCursorPos(window, &new_mouse_pos.x, &new_mouse_pos.y);
     glm::vec2 delta_mouse_pos = new_mouse_pos - mouse_pos;
-    mouse_pos = new_mouse_pos;
+    if (delta_mouse_pos.x != 0.f || delta_mouse_pos.y != 0.f) {
+        mouse_pos = new_mouse_pos;
+        update_required = true;
+    }
 
     // misc input info
     InputPackage pack;
@@ -95,6 +101,10 @@ InputPackage WindowManager::handle_events() {
     pack.d = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS);
     if (is_mouse_captured) pack.delta_mouse = delta_mouse_pos;
     else pack.delta_mouse = glm::vec2 {0.f};
+
+    if (pack.q || pack.w || pack.e || pack.a || pack.s || pack.d) {
+        update_required = true;
+    }
 
     return pack;
 }
@@ -116,8 +126,8 @@ bool WindowManager::is_running() {
     return running;
 }
 
-void WindowManager::do_nothing() {
-    printf("nothing\n");
+bool WindowManager::is_update_required() {
+    return update_required;
 }
 
 } /* trc */

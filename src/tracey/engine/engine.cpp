@@ -38,13 +38,14 @@ int Engine::run() {
     float delta_t = 0.f;
 
     while (!window_manager.window_should_close()) {
-        sampler.render(window_manager.get_size(), viewer.get_camera(), &accelerator, &shader_pack, seed_gen());
+        sampler.render(window_manager.get_size(), viewer.get_camera(), &accelerator, &shader_pack, seed_gen(), window_manager.is_update_required());
         window_manager.draw_frame(sampler.get_frame_buffer());
         InputPackage input = window_manager.handle_events();
         viewer.update(input, delta_t, window_manager.get_size());
 
         console.print(
             delta_t,
+            sampler.get_samples(),
             window_manager.get_size(),
             viewer.get_camera()->get_pos(),
             viewer.get_camera()->get_yaw(),

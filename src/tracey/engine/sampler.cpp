@@ -11,14 +11,18 @@ namespace trc {
 
 Sampler::Sampler() {}
 
-Sampler::Sampler(glm::ivec2 frame_size) {
+Sampler::Sampler(glm::ivec2 frame_size) : samples(0) {
     fbuf.fill(frame_size, glm::vec3 {0.25f});
 }
 
-void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed) {
-    clear_fbuf(frame_size, glm::vec3 {0.f});
+void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset) {
+    if (reset) {
+        samples = 0;
+        clear_fbuf(frame_size, glm::vec3 {0.f});
+    }
+    ++samples;
 
-    // #pragma omp parallel
+    #pragma omp parallel
     {
         // seed the rng
         int thread_n = omp_get_thread_num();
@@ -27,7 +31,7 @@ void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *acceler
 
         std::uniform_real_distribution<float> sample_offset_distrib {-0.5f, 0.5f};
 
-        // #pragma omp for schedule(static) collapse(2)
+        #pragma omp for schedule(static) collapse(2)
         for (int x = 0; x < frame_size.x; ++x) {
             for (int y = 0; y < frame_size.y; ++y) {
 
@@ -48,6 +52,8 @@ void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *acceler
                     0
                 };
 
+                glm::vec3 color {0.f};
+
                 std::optional<Intersection> isect = accelerator->calc_intersection(ray);
                 if (isect) {
                     ShaderData shader_data {
@@ -60,9 +66,15 @@ void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *acceler
                         shader_pack,
                         &rng
                     };
-                    glm::vec3 color = isect.value().shader->evaluate(shader_data);
-                    *fbuf.at({x, y}) = color.rgb();
+                    color = isect.value().shader->evaluate(shader_data).rgb();
                 }
+
+                float inv_samples = 1.f / (float)samples;
+                glm::vec3 *pixel = fbuf.at({x, y});
+
+                color *= inv_samples;
+                *pixel *= float(samples - 1) * inv_samples;
+                *pixel += color;
             }
         }
     }
@@ -70,6 +82,10 @@ void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *acceler
 
 Buffer<glm::vec3> *Sampler::get_frame_buffer() {
     return &fbuf;
+}
+
+int Sampler::get_samples() {
+    return samples;
 }
 
 /* private */

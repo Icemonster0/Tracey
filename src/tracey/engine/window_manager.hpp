@@ -22,8 +22,7 @@ public:
     bool window_should_close();
     glm::ivec2 get_size();
     bool is_running();
-
-    void do_nothing();
+    bool is_update_required();
 
 private:
     GLFWwindow *window;
@@ -32,6 +31,7 @@ private:
     glm::dvec2 mouse_pos;
     bool is_mouse_captured;
     bool last_enter_key_press_state;
+    bool update_required;
 };
 
 } /* trc */

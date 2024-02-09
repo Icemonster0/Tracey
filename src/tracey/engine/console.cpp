@@ -12,7 +12,7 @@ Console::Console() {}
 Console::Console(float refresh_rate)
     : frequency(refresh_rate), print_cooldown(0.f) {}
 
-void Console::print(float delta_t, glm::ivec2 window_size, glm::vec3 view_pos, float yaw, float pitch, float fov) {
+void Console::print(float delta_t, int samples, glm::ivec2 window_size, glm::vec3 view_pos, float yaw, float pitch, float fov) {
     if (print_cooldown <= 0.f) {
         std::stringstream s;
 
@@ -24,6 +24,7 @@ void Console::print(float delta_t, glm::ivec2 window_size, glm::vec3 view_pos, f
 
         s << "Info" << '\n';
         s << " fps:          " << PADDED int(1.f / delta_t) << '\n';
+        s << " samples:      " << PADDED samples << '\n';
         s << " frame width:  " << PADDED window_size.x << '\n';
         s << " frame height: " << PADDED window_size.y << '\n';
         s << " camera pos:   " << PADDED DECIMAL view_pos.x << " " << PADDED DECIMAL view_pos.y << " " << PADDED DECIMAL view_pos.z << '\n';
