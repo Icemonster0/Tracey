@@ -23,8 +23,8 @@ add_library(main_module STATIC
     src/tracey/engine/window_manager.cpp
     src/tracey/engine/window_manager.hpp
     src/tracey/geometry/lights/lights.hpp
-    # src/tracey/geometry/lights/point_light.cpp TODO
-    # src/tracey/geometry/lights/point_light.hpp TODO
+    src/tracey/geometry/lights/point_light.cpp
+    src/tracey/geometry/lights/point_light.hpp
     src/tracey/geometry/shapes/ground_plane.cpp
     src/tracey/geometry/shapes/ground_plane.hpp
     src/tracey/geometry/shapes/shapes.hpp

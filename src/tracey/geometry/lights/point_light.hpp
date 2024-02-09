@@ -10,10 +10,11 @@ public:
     PointLight(glm::vec3 p_pos, glm::vec3 p_color = glm::vec3 {1.f}, float p_intensity = 1.f, float p_radius = 0.1f);
 
 protected:
-    glm::vec3 get_sample_point();
+    glm::vec3 get_sample_point(RNG *rng);
 
 private:
-    flaot radius;
+    float radius;
+    std::uniform_real_distribution<float> random_distrib;
 };
 
 } /* trc */

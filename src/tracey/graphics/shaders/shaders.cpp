@@ -60,7 +60,8 @@ TRC_DEFINE_SHADER(ShaderReflect) {
                 shader_data.distance + isect.value().distance,
                 reflect_ray,
                 shader_data.accelerator,
-                shader_data.shader_pack
+                shader_data.shader_pack,
+                shader_data.rng
             };
             color = isect.value().shader->evaluate(reflect_shader_data);
         }
@@ -72,7 +73,7 @@ TRC_DEFINE_SHADER(ShaderReflect) {
 }
 
 TRC_DEFINE_SHADER(ShaderShadows) {
-    glm::vec3 light = shader_data.accelerator->calc_light_influence(shader_data.pos, shader_data.normal);
+    glm::vec3 light = shader_data.accelerator->calc_light_influence(shader_data.pos, shader_data.normal, shader_data.rng);
     return glm::vec4 {light * 0.9f + 0.1f, 1.f};
 }
 

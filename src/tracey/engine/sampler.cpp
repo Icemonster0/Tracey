@@ -18,8 +18,7 @@ Sampler::Sampler(glm::ivec2 frame_size) {
 void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed) {
     clear_fbuf(frame_size, glm::vec3 {0.f});
 
-    // #pragma omp parallel for schedule(static) collapse(2)
-    #pragma omp parallel
+    // #pragma omp parallel
     {
         // seed the rng
         int thread_n = omp_get_thread_num();
@@ -28,12 +27,18 @@ void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *acceler
 
         std::uniform_real_distribution<float> sample_offset_distrib {-0.5f, 0.5f};
 
-        #pragma omp for schedule(static) collapse(2)
+        // #pragma omp for schedule(static) collapse(2)
         for (int x = 0; x < frame_size.x; ++x) {
             for (int y = 0; y < frame_size.y; ++y) {
+
+                glm::vec2 sample_offset {
+                    sample_offset_distrib(rng),
+                    sample_offset_distrib(rng)
+                };
+
                 glm::vec2 screen_coords {
-                    ((float)x + sample_offset_distrib(rng)) * 2.f / (float)frame_size.x - 1.f,
-                    ((float)y + sample_offset_distrib(rng)) * 2.f / (float)frame_size.y - 1.f
+                    ((float)x + sample_offset.x) * 2.f / (float)frame_size.x - 1.f,
+                    ((float)y + sample_offset.y) * 2.f / (float)frame_size.y - 1.f
                 };
 
                 Ray ray {
@@ -52,7 +57,8 @@ void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *acceler
                         isect.value().distance,
                         ray,
                         accelerator,
-                        shader_pack
+                        shader_pack,
+                        &rng
                     };
                     glm::vec3 color = isect.value().shader->evaluate(shader_data);
                     *fbuf.at({x, y}) = color.rgb();

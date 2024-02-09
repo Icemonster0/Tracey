@@ -33,6 +33,8 @@ WindowManager::WindowManager(glm::ivec2 window_size)
     glfwGetCursorPos(window, &mouse_pos.x, &mouse_pos.y);
     is_mouse_captured = true;
 
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+
     running = true;
 
     printf("GLFW Info: %s\n", glfwGetVersionString());

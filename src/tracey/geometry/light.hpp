@@ -3,6 +3,7 @@
 
 #include "../../glm.hpp"
 #include "ray.hpp"
+#include "../random/random.hpp"
 
 namespace trc {
 
@@ -16,12 +17,11 @@ class Light {
 public:
     Light(glm::vec3 p_pos, glm::vec3 p_color = glm::vec3 {1.f}, float p_intensity = 1.f);
 
-    virtual LightSampleData sample(glm::vec3 shading_point);
+    virtual LightSampleData sample(glm::vec3 shading_point, RNG *rng);
 
 protected:
-    virtual glm::vec3 get_sample_point();
+    virtual glm::vec3 get_sample_point(RNG *rng);
 
-private:
     glm::vec3 pos;
     glm::vec3 color;
     float intensity;

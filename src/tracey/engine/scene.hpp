@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "../../glm.hpp"
-#include "../geometry/shape.hpp"
+#include "../geometry/shapes/shapes.hpp"
 #include "../geometry/lights/lights.hpp"
 
 namespace trc {

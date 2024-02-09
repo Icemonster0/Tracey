@@ -3,8 +3,7 @@
 
 #include "../../glm.hpp"
 #include "../geometry/ray.hpp"
-// #include "../engine/accelerator.hpp"
-// #include "shader_pack.hpp"
+#include "../random/random.hpp"
 
 namespace trc {
 
@@ -19,6 +18,7 @@ struct ShaderData {
     Ray ray;
     Accelerator *accelerator;
     ShaderPack *shader_pack;
+    RNG *rng;
 };
 
 } /* trc */

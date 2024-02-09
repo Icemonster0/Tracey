@@ -33,11 +33,11 @@ std::optional<Intersection> Accelerator::calc_intersection(Ray ray) const {
     return min_isect;
 }
 
-glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 normal) const {
+glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 normal, RNG *rng) const {
     glm::vec3 light_color {0.f};
 
     for (auto &light : light_ptr_list) {
-        LightSampleData light_data = light->sample(shading_point);
+        LightSampleData light_data = light->sample(shading_point, rng);
         std::optional<Intersection> isect = calc_intersection(light_data.shadow_ray);
         if (isect && isect.value().distance < light_data.distance) {
             continue;
