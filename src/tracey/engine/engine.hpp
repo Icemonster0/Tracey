@@ -1,6 +1,7 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
+#include "user_config.hpp"
 #include "../graphics/shader_pack.hpp"
 #include "scene.hpp"
 #include "accelerator.hpp"
@@ -13,11 +14,12 @@ namespace trc {
 
 class Engine {
 public:
-    Engine();
+    Engine(UserConfig cfg);
 
     int run();
 
 private:
+    UserConfig cfg;
     ShaderPack shader_pack;
     Scene scene;
     Accelerator accelerator;

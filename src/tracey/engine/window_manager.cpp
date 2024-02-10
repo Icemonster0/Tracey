@@ -86,10 +86,7 @@ InputPackage WindowManager::handle_events() {
     glm::dvec2 new_mouse_pos;
     glfwGetCursorPos(window, &new_mouse_pos.x, &new_mouse_pos.y);
     glm::vec2 delta_mouse_pos = new_mouse_pos - mouse_pos;
-    if (delta_mouse_pos.x != 0.f || delta_mouse_pos.y != 0.f) {
-        mouse_pos = new_mouse_pos;
-        update_required = true;
-    }
+    mouse_pos = new_mouse_pos;
 
     // misc input info
     InputPackage pack;
@@ -102,7 +99,7 @@ InputPackage WindowManager::handle_events() {
     if (is_mouse_captured) pack.delta_mouse = delta_mouse_pos;
     else pack.delta_mouse = glm::vec2 {0.f};
 
-    if (pack.q || pack.w || pack.e || pack.a || pack.s || pack.d) {
+    if (pack.q || pack.w || pack.e || pack.a || pack.s || pack.d || pack.delta_mouse.x != 0.f || pack.delta_mouse.y != 0.f) {
         update_required = true;
     }
 
