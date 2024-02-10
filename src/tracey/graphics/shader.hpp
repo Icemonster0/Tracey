@@ -1,7 +1,7 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 #include "shader_data.hpp"
 
 namespace trc {

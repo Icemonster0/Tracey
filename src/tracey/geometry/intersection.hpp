@@ -1,7 +1,7 @@
 #ifndef INTERSECTION_HPP
 #define INTERSECTION_HPP
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 #include "../graphics/shader.hpp"
 
 namespace trc {

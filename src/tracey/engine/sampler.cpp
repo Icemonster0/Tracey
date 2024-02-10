@@ -15,11 +15,12 @@ Sampler::Sampler(glm::ivec2 frame_size) : samples(0) {
     fbuf.fill(frame_size, glm::vec3 {0.25f});
 }
 
-void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset) {
+void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples) {
     if (reset) {
         samples = 0;
         clear_fbuf(frame_size, glm::vec3 {0.f});
     }
+    if (samples >= max_samples) return;
     ++samples;
 
     #pragma omp parallel

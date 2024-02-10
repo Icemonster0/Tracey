@@ -1,8 +1,8 @@
 #ifndef WINDOW_MANAGER_HPP
 #define WINDOW_MANAGER_HPP
 
-#include "../../glfw.hpp"
-#include "../../glm.hpp"
+#include "../../lib/glfw.hpp"
+#include "../../lib/glm.hpp"
 
 #include "../graphics/buffer.hpp"
 #include "input_package.hpp"

@@ -1,7 +1,7 @@
 #ifndef RAY_HPP
 #define RAY_HPP
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 
 #define TRC_RAY_CLIP_EPSILON 0.01f
 #define TRC_RAY_MAX_BOUNCES 10

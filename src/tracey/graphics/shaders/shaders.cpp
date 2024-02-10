@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "../../../glm.hpp"
+#include "../../../lib/glm.hpp"
 #include "../shader_pack.hpp"
 #include "../../geometry/intersection.hpp"
 #include "../../engine/accelerator.hpp"

@@ -5,8 +5,8 @@
 #include <sstream>
 #include <memory>
 
-#include "../../glm.hpp"
-#include "../../glfw.hpp"
+#include "../../lib/glm.hpp"
+#include "../../lib/glfw.hpp"
 #include "input_package.hpp"
 #include "../geometry/shape.hpp"
 #include "../geometry/shapes/shapes.hpp"
@@ -26,9 +26,8 @@ int Engine::run() {
 
     accelerator = Accelerator {&scene};
     window_manager = WindowManager {cfg.window_size};
-    viewer = Viewer {window_manager.get_size()};
+    viewer = Viewer {window_manager.get_size(), cfg.fov};
     sampler = Sampler {window_manager.get_size()};
-    console = Console {5.0f};
 
     std::random_device rand_dev;
     std::mt19937 seed_gen {rand_dev()};
@@ -38,19 +37,30 @@ int Engine::run() {
     float delta_t = 0.f;
 
     while (!window_manager.window_should_close()) {
-        sampler.render(window_manager.get_size(), viewer.get_camera(), &accelerator, &shader_pack, seed_gen(), window_manager.is_update_required());
+        sampler.render(
+            window_manager.get_size(),
+            viewer.get_camera(),
+            &accelerator,
+            &shader_pack,
+            seed_gen(),
+            window_manager.is_update_required(),
+            cfg.samples
+        );
         window_manager.draw_frame(sampler.get_frame_buffer());
         InputPackage input = window_manager.handle_events();
         viewer.update(input, delta_t, window_manager.get_size());
 
         console.print(
+            cfg.console_frequency,
             delta_t,
             sampler.get_samples(),
+            cfg.samples,
             window_manager.get_size(),
             viewer.get_camera()->get_pos(),
             viewer.get_camera()->get_yaw(),
             viewer.get_camera()->get_pitch(),
-            viewer.get_camera()->get_fov()
+            viewer.get_camera()->get_fov(),
+            viewer.get_speed()
         );
 
         this_frame_t = glfwGetTime();

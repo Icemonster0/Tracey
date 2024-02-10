@@ -4,7 +4,7 @@
 #include <list>
 #include <memory>
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 #include "../geometry/shapes/shapes.hpp"
 #include "../geometry/lights/lights.hpp"
 

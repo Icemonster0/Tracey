@@ -1,20 +1,18 @@
 #ifndef CONSOLE_HPP
 #define CONSOLE_HPP
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 
 namespace trc {
 
 class Console {
 public:
     Console();
-    Console(float refresh_rate);
 
-    void print(float delta_t, int samples, glm::ivec2 window_size, glm::vec3 view_pos, float yaw, float pitch, float fov);
+    void print(float frequency, float delta_t, int samples, int max_samples, glm::ivec2 window_size, glm::vec3 view_pos, float yaw, float pitch, float fov, float speed);
     void close();
 
 private:
-    float frequency;
     float print_cooldown;
 };
 

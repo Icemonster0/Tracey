@@ -1,7 +1,7 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 
 namespace trc {
 

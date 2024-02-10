@@ -1,13 +1,14 @@
 #ifndef INPUT_PACKAGE_HPP
 #define INPUT_PACKAGE_HPP
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 
 namespace trc {
 
 struct InputPackage {
     bool q, w, e, a, s, d;
     glm::vec2 delta_mouse;
+    glm::vec2 delta_scroll;
 };
 
 } /* trc */

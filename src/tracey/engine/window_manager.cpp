@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "../../lib/glfw_callbacks.hpp"
+
 namespace trc {
 
 /* public */
@@ -34,6 +36,8 @@ WindowManager::WindowManager(glm::ivec2 window_size)
     is_mouse_captured = true;
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+
+    glfw_callbacks::init_callbacks(window);
 
     running = true;
 
@@ -98,6 +102,8 @@ InputPackage WindowManager::handle_events() {
     pack.d = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS);
     if (is_mouse_captured) pack.delta_mouse = delta_mouse_pos;
     else pack.delta_mouse = glm::vec2 {0.f};
+    if (is_mouse_captured) pack.delta_scroll = glfw_callbacks::callback_state.get_delta_scroll();
+    else pack.delta_scroll = glm::vec2 {0.f};
 
     if (pack.q || pack.w || pack.e || pack.a || pack.s || pack.d || pack.delta_mouse.x != 0.f || pack.delta_mouse.y != 0.f) {
         update_required = true;

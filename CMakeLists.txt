@@ -6,10 +6,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 add_subdirectory(lib/glfw-3.3.8)
 
 add_library(main_module STATIC
-    src/clom.cpp
-    src/clom.hpp
-    src/glfw.hpp
-    src/glm.hpp
+    src/lib/clom.cpp
+    src/lib/clom.hpp
+    src/lib/glfw_callbacks.cpp
+    src/lib/glfw_callbacks.hpp
+    src/lib/glfw.hpp
+    src/lib/glm.hpp
     src/tracey/engine/accelerator.cpp
     src/tracey/engine/accelerator.hpp
     src/tracey/engine/console.cpp

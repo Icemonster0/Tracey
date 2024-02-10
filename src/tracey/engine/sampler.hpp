@@ -4,7 +4,7 @@
 #include <optional>
 #include <cstdint>
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 #include "../graphics/buffer.hpp"
 #include "../graphics/shader.hpp"
 #include "../graphics/shader_pack.hpp"
@@ -21,7 +21,7 @@ public:
     Sampler();
     Sampler(glm::ivec2 frame_size);
 
-    void render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset);
+    void render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples);
 
     Buffer<glm::vec3> *get_frame_buffer();
     int get_samples();

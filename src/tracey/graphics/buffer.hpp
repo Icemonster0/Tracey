@@ -1,7 +1,7 @@
 #ifndef BUFFER_HPP
 #define BUFFER_HPP
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 
 #include <cstdlib>
 

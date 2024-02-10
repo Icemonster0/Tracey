@@ -5,7 +5,7 @@
 #include <memory>
 #include <optional>
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 #include "../geometry/shape.hpp"
 #include "../geometry/intersection.hpp"
 #include "../geometry/ray.hpp"

@@ -4,13 +4,13 @@
 
 namespace trc {
 
-Viewer::Viewer(glm::ivec2 window_size)
-    : look_sens(0.1f), move_speed(5.0f) {
+Viewer::Viewer(glm::ivec2 window_size, float fov)
+    : look_sens(0.1f), scroll_fac(1.1f), move_speed(5.0f) {
     camera = Camera {
         glm::vec3 {0.f}, // position
         0.f, // pitch
         0.f, // yaw
-        70.f, // fov
+        fov, // fov
         (float)window_size.x / (float)window_size.y // aspect ratio
     };
     window_size_cache = window_size;
@@ -26,6 +26,9 @@ void Viewer::update(InputPackage input, float delta_t, glm::ivec2 window_size) {
 
     camera.set_yaw(camera.get_yaw() + input.delta_mouse.x * look_sens);
     camera.set_pitch(std::clamp(camera.get_pitch() + input.delta_mouse.y * look_sens, -90.f, 90.f));
+
+    move_speed *= powf(scroll_fac, input.delta_scroll.y);
+    move_speed = std::clamp(move_speed, 0.1f, 100.f);
 
     glm::ivec3 move_input {
         (input.d ? 1 : 0) - (input.a ? 1 : 0),
@@ -43,6 +46,10 @@ void Viewer::update(InputPackage input, float delta_t, glm::ivec2 window_size) {
 
 Camera *Viewer::get_camera() {
     return &camera;
+}
+
+float Viewer::get_speed() {
+    return move_speed;
 }
 
 } /* trc */

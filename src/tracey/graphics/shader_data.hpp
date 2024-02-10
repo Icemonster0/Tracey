@@ -1,7 +1,7 @@
 #ifndef SHADER_DATA_HPP
 #define SHADER_DATA_HPP
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 #include "../geometry/ray.hpp"
 #include "../random/random.hpp"
 

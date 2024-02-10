@@ -1,7 +1,7 @@
 #ifndef LIGHT_HPP
 #define LIGHT_HPP
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 #include "ray.hpp"
 #include "../random/random.hpp"
 

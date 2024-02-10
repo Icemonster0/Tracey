@@ -3,7 +3,7 @@
 
 #include <optional>
 
-#include "../../glm.hpp"
+#include "../../lib/glm.hpp"
 #include "../graphics/shader.hpp"
 #include "ray.hpp"
 #include "intersection.hpp"
