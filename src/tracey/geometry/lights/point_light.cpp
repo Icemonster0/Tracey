@@ -47,7 +47,7 @@ glm::vec3 PointLight::get_sample_point(RNG *rng) {
     // offset *= radius;
 
     /* volume; using spiral */
-    const int c = 1000;
+    const int c = 10000;
     float t = random_distrib(*rng);
 
     glm::vec3 offset {
