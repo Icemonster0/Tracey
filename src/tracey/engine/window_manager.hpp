@@ -30,7 +30,6 @@ private:
     bool running;
     glm::dvec2 mouse_pos;
     bool is_mouse_captured;
-    bool last_enter_key_press_state;
     bool update_required;
 };
 

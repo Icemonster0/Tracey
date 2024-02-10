@@ -2,6 +2,8 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <list>
+#include <algorithm>
 
 #include "../../lib/glfw_callbacks.hpp"
 
@@ -13,7 +15,7 @@ WindowManager::WindowManager()
     : running(false) {}
 
 WindowManager::WindowManager(glm::ivec2 window_size)
-    : size(window_size), running(false), is_mouse_captured(false), last_enter_key_press_state(false), update_required(false) {
+    : size(window_size), running(false), is_mouse_captured(false), update_required(false) {
 
     if(!glfwInit()) {
         fprintf(stderr, "Failed to init glfw\n");
@@ -66,24 +68,25 @@ InputPackage WindowManager::handle_events() {
     }
 
     // keyboard input
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    std::list<int> key_history = glfw_callbacks::callback_state.get_key_history();
+    auto key_escape = std::find(key_history.begin(), key_history.end(), GLFW_KEY_ESCAPE);
+    auto key_enter = std::find(key_history.begin(), key_history.end(), GLFW_KEY_ENTER);
+
+#define KEY_FOUND(key) (key != key_history.end())
+
+    if (KEY_FOUND(key_escape)) {
         glfwSetWindowShouldClose(window, true);
     }
-    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
-        if (!last_enter_key_press_state) {
-            last_enter_key_press_state = true;
-            if (is_mouse_captured) {
-                is_mouse_captured = false;
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            }
-            else {
-                is_mouse_captured = true;
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            }
+
+    if (KEY_FOUND(key_enter)) {
+        if (is_mouse_captured) {
+            is_mouse_captured = false;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
-    }
-    else {
-        last_enter_key_press_state = false;
+        else {
+            is_mouse_captured = true;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
     }
 
     // mouse movement
@@ -100,10 +103,17 @@ InputPackage WindowManager::handle_events() {
     pack.a = (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS);
     pack.s = (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS);
     pack.d = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS);
+
     if (is_mouse_captured) pack.delta_mouse = delta_mouse_pos;
     else pack.delta_mouse = glm::vec2 {0.f};
+
     if (is_mouse_captured) pack.delta_scroll = glfw_callbacks::callback_state.get_delta_scroll();
     else pack.delta_scroll = glm::vec2 {0.f};
+
+    auto key_r = std::find(key_history.begin(), key_history.end(), GLFW_KEY_R);
+    pack.r = KEY_FOUND(key_r);
+
+#undef KEY_FOUND
 
     if (pack.q || pack.w || pack.e || pack.a || pack.s || pack.d || pack.delta_mouse.x != 0.f || pack.delta_mouse.y != 0.f) {
         update_required = true;

@@ -1,6 +1,9 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
+#include "../../lib/glm.hpp"
+#include "../random/random.hpp"
+
 #include "user_config.hpp"
 #include "../graphics/shader_pack.hpp"
 #include "scene.hpp"
@@ -27,6 +30,10 @@ private:
     Viewer viewer;
     Sampler sampler;
     Console console;
+
+    int error;
+
+    int render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen);
 };
 
 } /* trc */

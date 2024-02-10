@@ -6,7 +6,7 @@
 namespace trc {
 
 struct InputPackage {
-    bool q, w, e, a, s, d;
+    bool q, w, e, a, s, d, r;
     glm::vec2 delta_mouse;
     glm::vec2 delta_scroll;
 };

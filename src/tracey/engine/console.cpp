@@ -5,6 +5,9 @@
 #include <sstream>
 #include <iomanip>
 
+#define PADDED std::setw(10)
+#define DECIMAL std::fixed<<std::setprecision(2)
+
 namespace trc {
 
 Console::Console() : print_cooldown(0.f) {}
@@ -13,21 +16,17 @@ void Console::print(float frequency, float delta_t, int samples, int max_samples
     if (print_cooldown <= 0.f) {
         std::stringstream s;
 
-#define PADDED std::setw(10)<<
-#define DECIMAL std::fixed<<std::setprecision(2)<<
-
         s << "--- Tracey Engine ---" << '\n';
         s << '\n';
 
         s << "Info" << '\n';
-        s << " fps:          " << PADDED int(1.f / delta_t) << '\n';
-        s << " samples:      " << PADDED samples << " / " << max_samples << '\n';
-        s << " frame width:  " << PADDED window_size.x << '\n';
-        s << " frame height: " << PADDED window_size.y << '\n';
-        s << " camera pos:   " << PADDED DECIMAL view_pos.x << " " << PADDED DECIMAL view_pos.y << " " << PADDED DECIMAL view_pos.z << '\n';
-        s << " camera rot:   " << PADDED DECIMAL yaw << " " << PADDED DECIMAL pitch << '\n';
-        s << " camera fov:   " << PADDED int(fov) << '\n';
-        s << " camera speed: " << PADDED DECIMAL speed << '\n';
+        s << " fps:          " << PADDED << int(1.f / delta_t) << '\n';
+        s << " samples:      " << PADDED << samples << " / " << max_samples << '\n';
+        s << " frame size:   " << PADDED << window_size.x << "x" << window_size.y << '\n';
+        s << " camera pos:   " << PADDED << DECIMAL << view_pos.x << " " << PADDED << DECIMAL << view_pos.y << " " << PADDED << DECIMAL << view_pos.z << '\n';
+        s << " camera rot:   " << PADDED << DECIMAL << yaw << " " << PADDED << DECIMAL << pitch << '\n';
+        s << " camera fov:   " << PADDED << int(fov) << '\n';
+        s << " camera speed: " << PADDED << DECIMAL << speed << '\n';
         s << '\n';
 
         s << "Controls" << '\n';
@@ -37,10 +36,7 @@ void Console::print(float frequency, float delta_t, int samples, int max_samples
         s << " E, Q:         Move up, move down (vertical)" << '\n';
         s << " SCROLL:       Adjust fly speed" << '\n';
 
-#undef PADDED
-#undef DECIMAL
-
-        system("clear");
+        clear();
         printf("%s\n", s.str().c_str());
 
         print_cooldown = 1.f / frequency;
@@ -50,8 +46,60 @@ void Console::print(float frequency, float delta_t, int samples, int max_samples
     }
 }
 
-void Console::close() {
-    system("clear");
+void Console::print_render_info(float frequency, float delta_t, int sample, int max_samples, glm::ivec2 image_size, float time, float sample_rate) {
+    if (print_cooldown <= 0.f) {
+        std::stringstream s;
+
+        float percentage = (float)sample / (float)max_samples * 100.f;
+
+        int t_hours = time / 3600;
+        int t_minutes = (time - t_hours * 3600) / 60;
+        int t_seconds = (time - t_hours * 3600.f) - t_minutes * 60.f;
+
+        float time_left = (max_samples - sample) / sample_rate;
+        int tl_hours = time_left / 3600;
+        int tl_minutes = (time_left - tl_hours * 3600) / 60;
+        int tl_seconds = (time_left - tl_hours * 3600.f) - tl_minutes * 60.f;
+
+        s << "--- Tracey Render ---" << '\n';
+        s << '\n';
+
+        s << "Info" << '\n';
+        s << " image size:   " << PADDED << image_size.x << "x" << image_size.y << '\n';
+        s << " samples:      " << PADDED << sample << " / " << max_samples << " (" << DECIMAL << percentage << "%)" << '\n';
+        s << " time:         " << PADDED;
+        if (t_hours) s << t_hours << "h ";
+        if (t_minutes) s << t_minutes << "m ";
+        if (t_seconds) s << t_seconds << "s";
+        s << '\n';
+        s << " time left:    " << PADDED;
+        if (tl_hours) s << tl_hours << "h ";
+        if (tl_minutes) s << tl_minutes << "m ";
+        if (tl_seconds) s << tl_seconds << "s";
+        s << '\n';
+        s << '\n';
+
+        s << "Controls" << '\n';
+        s << " ESC:          Quit" << '\n';
+        s << " ENTER:        Toggle mouse focus" << '\n';
+        s << " R:            Stop render" << '\n';
+
+        clear();
+        printf("%s\n", s.str().c_str());
+
+        print_cooldown = 1.f / frequency;
+    }
+    else {
+        print_cooldown -= delta_t;
+    }
 }
+
+void Console::clear() {
+    if(system("clear")) {};
+}
+
+#undef PADDED
+#undef TIME
+#undef DECIMAL
 
 } /* trc */

@@ -5,16 +5,15 @@
 #include <sstream>
 #include <memory>
 
-#include "../../lib/glm.hpp"
 #include "../../lib/glfw.hpp"
 #include "input_package.hpp"
 #include "../geometry/shape.hpp"
 #include "../geometry/shapes/shapes.hpp"
-#include "../random/random.hpp"
+#include "../graphics/image_read_write.hpp"
 
 namespace trc {
 
-Engine::Engine(UserConfig cfg) : cfg(cfg) {}
+Engine::Engine(UserConfig cfg) : cfg(cfg), error(0) {}
 
 int Engine::run() {
     scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_shadows.get())));
@@ -38,7 +37,7 @@ int Engine::run() {
     float delta_t = 0.f;
 
     while (!window_manager.window_should_close()) {
-        sampler.render(
+        sampler.render_frame(
             window_manager.get_size(),
             viewer.get_camera(),
             &accelerator,
@@ -50,6 +49,9 @@ int Engine::run() {
         window_manager.draw_frame(sampler.get_frame_buffer());
         InputPackage input = window_manager.handle_events();
         viewer.update(input, delta_t, window_manager.get_size());
+
+        if (input.r) error = render_image(cfg.render_size, cfg.samples, &seed_gen);
+        if (error) break;
 
         console.print(
             cfg.console_frequency,
@@ -70,8 +72,66 @@ int Engine::run() {
     }
 
     window_manager.close();
-    console.close();
-    return 0;
+    console.clear();
+    return error;
+}
+
+int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen) {
+    InputPackage input = window_manager.handle_events();
+
+    int return_code = 0;
+
+    sampler.initialize_image(image_size);
+
+    Camera render_camera = *viewer.get_camera();
+    render_camera.set_aspect((float)image_size.x / (float)image_size.y);
+
+    float start_t = glfwGetTime();
+    float last_t = glfwGetTime();
+    float this_t = glfwGetTime();
+    float delta_t = 0.f;
+    float render_time = 0.f;
+    float sample_rate = 1.f;
+
+    int sample = 0;
+    while (!input.r && !window_manager.window_should_close() && sample < samples) {
+
+        ++sample;
+        sampler.render_image_sample(
+            &render_camera,
+            &accelerator,
+            &shader_pack,
+            seed_gen->operator()(),
+            sample
+        );
+
+        input = window_manager.handle_events();
+
+        console.print_render_info(
+            cfg.console_frequency,
+            delta_t,
+            sample,
+            cfg.samples,
+            image_size,
+            render_time,
+            sample_rate
+        );
+
+        if (sample >= samples) {
+            if (image_rw::write_png(sampler.get_image(), "render_result.png") == 0)
+                return_code = 1;
+        }
+
+        this_t = glfwGetTime();
+        delta_t = this_t - last_t;
+        last_t = this_t;
+        render_time = this_t - start_t;
+        sample_rate = (float)sample / render_time;
+    }
+
+    sampler.destroy_image();
+
+    return return_code;
 }
 
 } /* trc */

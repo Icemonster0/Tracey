@@ -12,6 +12,9 @@ add_library(main_module STATIC
     src/lib/glfw_callbacks.hpp
     src/lib/glfw.hpp
     src/lib/glm.hpp
+    src/lib/stb_image_write.cpp
+    src/lib/stb_image.cpp
+    src/lib/stb.hpp
     src/tracey/engine/accelerator.cpp
     src/tracey/engine/accelerator.hpp
     src/tracey/engine/console.cpp
@@ -52,6 +55,8 @@ add_library(main_module STATIC
     src/tracey/graphics/shaders/shaders.cpp
     src/tracey/graphics/shaders/shaders.hpp
     src/tracey/graphics/buffer.hpp
+    src/tracey/graphics/image_read_write.cpp
+    src/tracey/graphics/image_read_write.hpp
     src/tracey/graphics/shader_data.hpp
     src/tracey/graphics/shader_pack.cpp
     src/tracey/graphics/shader_pack.hpp

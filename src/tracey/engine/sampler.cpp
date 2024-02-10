@@ -15,13 +15,75 @@ Sampler::Sampler(glm::ivec2 frame_size) : samples(0) {
     fbuf.fill(frame_size, glm::vec3 {0.25f});
 }
 
-void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples) {
+void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples) {
     if (reset) {
         samples = 0;
         clear_fbuf(frame_size, glm::vec3 {0.f});
     }
     if (samples >= max_samples) return;
     ++samples;
+
+    Buffer<glm::vec3> new_sample = render_sample(frame_size, camera, accelerator, shader_pack, seed);
+
+    float inv_samples = 1.f / (float)samples;
+    float old_pixel_fac = float(samples - 1) * inv_samples;
+
+    #pragma omp parallel for schedule(static) collapse(2)
+    for (int x = 0; x < frame_size.x; ++x) {
+        for (int y = 0; y < frame_size.y; ++y) {
+
+            glm::vec3 *old_pixel = fbuf.at({x, y});
+            glm::vec3 *new_pixel = new_sample.at({x, y});
+
+            *old_pixel *= old_pixel_fac;
+            *old_pixel += *new_pixel * inv_samples;
+        }
+    }
+}
+
+void Sampler::render_image_sample(Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, int sample) {
+    Buffer<glm::vec3> new_sample = render_sample(image.get_size(), camera, accelerator, shader_pack, seed);
+
+    float inv_sample = 1.f / (float)sample;
+    float old_pixel_fac = float(sample - 1) * inv_sample;
+
+    #pragma omp parallel for schedule(static) collapse(2)
+    for (int x = 0; x < image.get_size().x; ++x) {
+        for (int y = 0; y < image.get_size().y; ++y) {
+
+            glm::vec3 *old_pixel = image.at({x, y});
+            glm::vec3 *new_pixel = new_sample.at({x, y});
+
+            *old_pixel *= old_pixel_fac;
+            *old_pixel += *new_pixel * inv_sample;
+        }
+    }
+}
+
+void Sampler::initialize_image(glm::ivec2 size) {
+    image.fill(size, glm::vec3 {0.f});
+}
+
+void Sampler::destroy_image() {
+    image.fill(glm::ivec2 {0}, glm::vec3 {0.f});
+}
+
+Buffer<glm::vec3> *Sampler::get_frame_buffer() {
+    return &fbuf;
+}
+
+Buffer<glm::vec3> *Sampler::get_image() {
+    return &image;
+}
+
+int Sampler::get_samples() {
+    return samples;
+}
+
+/* private */
+
+Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed) {
+    Buffer<glm::vec3> buf {frame_size, glm::vec3 {0.f}};
 
     #pragma omp parallel
     {
@@ -70,26 +132,13 @@ void Sampler::render(glm::ivec2 frame_size, Camera *camera, Accelerator *acceler
                     color = isect.value().shader->evaluate(shader_data).rgb();
                 }
 
-                float inv_samples = 1.f / (float)samples;
-                glm::vec3 *pixel = fbuf.at({x, y});
-
-                color *= inv_samples;
-                *pixel *= float(samples - 1) * inv_samples;
-                *pixel += color;
+                *buf.at({x, y}) = color;
             }
         }
     }
-}
 
-Buffer<glm::vec3> *Sampler::get_frame_buffer() {
-    return &fbuf;
+    return buf;
 }
-
-int Sampler::get_samples() {
-    return samples;
-}
-
-/* private */
 
 void Sampler::clear_fbuf(glm::ivec2 frame_size, glm::vec3 color) {
     if (frame_size == fbuf.get_size())
