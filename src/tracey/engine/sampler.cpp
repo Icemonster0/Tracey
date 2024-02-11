@@ -3,7 +3,7 @@
 #include <omp.h>
 
 #include "../graphics/shader_data.hpp"
-#include "../random/random.hpp"
+#include "../util/random.hpp"
 
 namespace trc {
 

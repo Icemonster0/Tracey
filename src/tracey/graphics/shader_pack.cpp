@@ -5,6 +5,11 @@ namespace trc {
 ShaderPack::ShaderPack()
     : shader_default(std::unique_ptr<Shader>(new Shader())),
       shader_preview(std::unique_ptr<Shader>(new ShaderPreview())),
+      shader_light_direct(std::unique_ptr<Shader>(new ShaderLightDirect())),
+      shader_diffuse_direct(std::unique_ptr<Shader>(new ShaderDiffuseDirect())),
+      shader_diffuse_indirect(std::unique_ptr<Shader>(new ShaderDiffuseIndirect())),
+      shader_diffuse(std::unique_ptr<Shader>(new ShaderDiffuse())),
+
       shader_red(std::unique_ptr<Shader>(new ShaderRed())),
       shader_normal(std::unique_ptr<Shader>(new ShaderNormal())),
       shader_distance(std::unique_ptr<Shader>(new ShaderDistance())),

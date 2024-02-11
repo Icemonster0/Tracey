@@ -3,7 +3,7 @@
 
 #include "../../lib/glm.hpp"
 
-#define TRC_RAY_CLIP_EPSILON 0.01f
+#define TRC_RAY_CLIP_EPSILON 0.001f
 #define TRC_RAY_MAX_BOUNCES 10
 
 namespace trc {
@@ -11,6 +11,8 @@ namespace trc {
 enum RayType {
     TRC_CAMERA_RAY,
     TRC_SHADOW_RAY,
+    TRC_DIFFUSE_RAY,
+    TRC_SPECULAR_RAY,
     TRC_COMMON_RAY
 };
 

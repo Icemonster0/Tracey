@@ -10,7 +10,7 @@
 #include "../geometry/intersection.hpp"
 #include "../geometry/ray.hpp"
 #include "scene.hpp"
-#include "../random/random.hpp"
+#include "../util/random.hpp"
 
 namespace trc {
 

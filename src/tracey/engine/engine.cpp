@@ -16,13 +16,13 @@ namespace trc {
 Engine::Engine(UserConfig cfg) : cfg(cfg), error(0), preview_mode(true) {}
 
 int Engine::run() {
-    scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_shadows.get())));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.f, 1.0f, 0.f}, 1.f, shader_pack.shader_shadows.get())));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {3.f, 2.0f, 2.f}, 1.f, shader_pack.shader_shadows.get())));
+    scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_diffuse.get())));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.f, 1.0f, 0.f}, 1.f, shader_pack.shader_diffuse.get())));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {3.f, 2.0f, 2.f}, 1.f, shader_pack.shader_diffuse.get())));
     scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {2.f, 0.5f, -4.f}, 1.f, shader_pack.shader_reflect.get())));
     scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {-2.f, 4.0f, 2.f}, glm::vec3 {0.6f, 0.7f, 1.0f}, 10.f, 0.5f)));
     scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {2.f, 3.0f, -2.f}, glm::vec3 {1.0f, 0.3f, 0.4f}, 5.f, 0.1f)));
-    // scene.add_light(std::unique_ptr<Light>(new SunLight(glm::vec3 {-1.f, -1.f, -1.f}, glm::vec3 {1.f, 0.95f, 0.95f}, 0.9f, 2.f)));
+    // scene.add_light(std::unique_ptr<Light>(new SunLight(glm::vec3 {-1.f, -1.f, -1.f}, glm::vec3 {1.f, 0.95f, 0.95f}, 1.0f, 2.f)));
 
     accelerator = Accelerator {&scene};
     window_manager = WindowManager {cfg.window_size};
@@ -98,7 +98,7 @@ int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_
     float sample_rate = 1.f;
 
     int sample = 0;
-    while (!input.r && !window_manager.window_should_close() && sample < samples) {
+    while (!input.i && !window_manager.window_should_close() && sample < samples) {
 
         ++sample;
         sampler.render_image_sample(
@@ -121,9 +121,10 @@ int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_
             sample_rate
         );
 
-        if (sample >= samples) {
+        if (sample >= samples || input.r) {
             if (image_rw::write_png(sampler.get_image(), "render_result.png") == 0)
                 return_code = 1;
+            break;
         }
 
         this_t = glfwGetTime();

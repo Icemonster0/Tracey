@@ -112,6 +112,8 @@ InputPackage WindowManager::handle_events() {
 
     auto key_r = std::find(key_history.begin(), key_history.end(), GLFW_KEY_R);
     pack.r = KEY_FOUND(key_r);
+    auto key_i = std::find(key_history.begin(), key_history.end(), GLFW_KEY_I);
+    pack.i = KEY_FOUND(key_i);
     auto key_p = std::find(key_history.begin(), key_history.end(), GLFW_KEY_P);
     pack.p = KEY_FOUND(key_p);
 

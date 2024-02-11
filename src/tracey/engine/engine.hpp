@@ -2,7 +2,7 @@
 #define ENGINE_HPP
 
 #include "../../lib/glm.hpp"
-#include "../random/random.hpp"
+#include "../util/random.hpp"
 
 #include "user_config.hpp"
 #include "../graphics/shader_pack.hpp"

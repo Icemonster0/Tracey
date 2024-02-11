@@ -85,7 +85,8 @@ void Console::print_render_info(float frequency, float delta_t, int sample, int 
         s << "Controls" << '\n';
         s << " ESC:          Quit" << '\n';
         s << " ENTER:        Toggle mouse focus" << '\n';
-        s << " R:            Stop render" << '\n';
+        s << " R:            Save rendered image" << '\n';
+        s << " I:            Interrupt render without saving" << '\n';
 
         clear();
         printf("%s\n", s.str().c_str());

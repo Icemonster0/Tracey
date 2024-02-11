@@ -3,7 +3,7 @@
 
 #include "../../lib/glm.hpp"
 #include "ray.hpp"
-#include "../random/random.hpp"
+#include "../util/random.hpp"
 
 namespace trc {
 
