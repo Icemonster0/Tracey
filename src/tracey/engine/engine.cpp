@@ -13,7 +13,7 @@
 
 namespace trc {
 
-Engine::Engine(UserConfig cfg) : cfg(cfg), error(0) {}
+Engine::Engine(UserConfig cfg) : cfg(cfg), error(0), preview_mode(true) {}
 
 int Engine::run() {
     scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_shadows.get())));
@@ -44,18 +44,22 @@ int Engine::run() {
             &shader_pack,
             seed_gen(),
             window_manager.is_update_required(),
-            cfg.samples
+            cfg.samples,
+            preview_mode
         );
         window_manager.draw_frame(sampler.get_frame_buffer());
         InputPackage input = window_manager.handle_events();
         viewer.update(input, delta_t, window_manager.get_size());
 
         if (input.r) error = render_image(cfg.render_size, cfg.samples, &seed_gen);
+        if (input.p) preview_mode = !preview_mode;
+
         if (error) break;
 
         console.print(
             cfg.console_frequency,
             delta_t,
+            preview_mode,
             sampler.get_samples(),
             cfg.samples,
             window_manager.get_size(),

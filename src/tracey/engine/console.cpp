@@ -12,7 +12,7 @@ namespace trc {
 
 Console::Console() : print_cooldown(0.f) {}
 
-void Console::print(float frequency, float delta_t, int samples, int max_samples, glm::ivec2 window_size, glm::vec3 view_pos, float yaw, float pitch, float fov, float speed) {
+void Console::print(float frequency, float delta_t, bool preview_mode, int samples, int max_samples, glm::ivec2 window_size, glm::vec3 view_pos, float yaw, float pitch, float fov, float speed) {
     if (print_cooldown <= 0.f) {
         std::stringstream s;
 
@@ -20,6 +20,7 @@ void Console::print(float frequency, float delta_t, int samples, int max_samples
         s << '\n';
 
         s << "Info" << '\n';
+        s << " mode:         " << PADDED << (preview_mode ? "Preview" : "Rendered") << '\n';
         s << " fps:          " << PADDED << int(1.f / delta_t) << '\n';
         s << " samples:      " << PADDED << samples << " / " << max_samples << '\n';
         s << " frame size:   " << PADDED << window_size.x << "x" << window_size.y << '\n';
@@ -35,6 +36,8 @@ void Console::print(float frequency, float delta_t, int samples, int max_samples
         s << " W, A, S, D:   Movement (fly navigation)" << '\n';
         s << " E, Q:         Move up, move down (vertical)" << '\n';
         s << " SCROLL:       Adjust fly speed" << '\n';
+        s << " R:            Render image to output-path" << '\n';
+        s << " P:            Toggle preview / rendered mode" << '\n';
 
         clear();
         printf("%s\n", s.str().c_str());

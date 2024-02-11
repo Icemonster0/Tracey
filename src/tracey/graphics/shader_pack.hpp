@@ -11,6 +11,8 @@ struct ShaderPack {
     ShaderPack();
 
     std::unique_ptr<Shader> shader_default;
+    std::unique_ptr<Shader> shader_preview;
+
     std::unique_ptr<Shader> shader_red;
     std::unique_ptr<Shader> shader_normal;
     std::unique_ptr<Shader> shader_distance;

@@ -112,10 +112,12 @@ InputPackage WindowManager::handle_events() {
 
     auto key_r = std::find(key_history.begin(), key_history.end(), GLFW_KEY_R);
     pack.r = KEY_FOUND(key_r);
+    auto key_p = std::find(key_history.begin(), key_history.end(), GLFW_KEY_P);
+    pack.p = KEY_FOUND(key_p);
 
 #undef KEY_FOUND
 
-    if (pack.q || pack.w || pack.e || pack.a || pack.s || pack.d || pack.delta_mouse.x != 0.f || pack.delta_mouse.y != 0.f) {
+    if (pack.q || pack.w || pack.e || pack.a || pack.s || pack.d || pack.p || pack.delta_mouse.x != 0.f || pack.delta_mouse.y != 0.f) {
         update_required = true;
     }
 

@@ -15,7 +15,7 @@ Sampler::Sampler(glm::ivec2 frame_size) : samples(0) {
     fbuf.fill(frame_size, glm::vec3 {0.25f});
 }
 
-void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples) {
+void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples, bool preview_mode) {
     if (reset) {
         samples = 0;
         clear_fbuf(frame_size, glm::vec3 {0.f});
@@ -23,7 +23,8 @@ void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *a
     if (samples >= max_samples) return;
     ++samples;
 
-    Buffer<glm::vec3> new_sample = render_sample(frame_size, camera, accelerator, shader_pack, seed);
+    Buffer<glm::vec3> new_sample = preview_mode ? render_preview_sample(frame_size, camera, accelerator, shader_pack, seed)
+                                                : render_sample(frame_size, camera, accelerator, shader_pack, seed);
 
     float inv_samples = 1.f / (float)samples;
     float old_pixel_fac = float(samples - 1) * inv_samples;
@@ -134,6 +135,49 @@ Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera, 
 
                 *buf.at({x, y}) = color;
             }
+        }
+    }
+
+    return buf;
+}
+
+Buffer<glm::vec3> Sampler::render_preview_sample(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed) {
+    Buffer<glm::vec3> buf {frame_size, glm::vec3 {0.f}};
+
+    #pragma omp parallel for schedule(static) collapse(2)
+    for (int x = 0; x < frame_size.x; ++x) {
+        for (int y = 0; y < frame_size.y; ++y) {
+
+            glm::vec2 screen_coords {
+                (float)x * 2.f / (float)frame_size.x - 1.f,
+                (float)y * 2.f / (float)frame_size.y - 1.f
+            };
+
+            Ray ray {
+                camera->get_pos(),
+                camera->calc_ray_dir_at(screen_coords),
+                TRC_CAMERA_RAY,
+                0
+            };
+
+            glm::vec3 color {0.f};
+
+            std::optional<Intersection> isect = accelerator->calc_intersection(ray);
+            if (isect) {
+                ShaderData shader_data {
+                    isect.value().pos,
+                    isect.value().normal,
+                    isect.value().tex_coord,
+                    isect.value().distance,
+                    ray,
+                    accelerator,
+                    shader_pack,
+                    nullptr
+                };
+                color = shader_pack->shader_preview->evaluate(shader_data).rgb();
+            }
+
+            *buf.at({x, y}) = color;
         }
     }
 

@@ -6,6 +6,8 @@
 
 namespace trc {
 
+TRC_DECLARE_SHADER(ShaderPreview)
+
 TRC_DECLARE_SHADER(ShaderRed)
 TRC_DECLARE_SHADER(ShaderNormal)
 TRC_DECLARE_SHADER(ShaderDistance)

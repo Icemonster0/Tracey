@@ -21,7 +21,7 @@ public:
     Sampler();
     Sampler(glm::ivec2 frame_size);
 
-    void render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples);
+    void render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples, bool preview_mode);
     void render_image_sample(Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, int sample);
 
     void initialize_image(glm::ivec2 size);
@@ -38,6 +38,7 @@ private:
     Buffer<glm::vec3> image;
 
     Buffer<glm::vec3> render_sample(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed);
+    Buffer<glm::vec3> render_preview_sample(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed);
     void clear_fbuf(glm::ivec2 frame_size, glm::vec3 color);
 };
 

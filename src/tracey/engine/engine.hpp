@@ -31,6 +31,7 @@ private:
     Sampler sampler;
     Console console;
 
+    bool preview_mode;
     int error;
 
     int render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen);

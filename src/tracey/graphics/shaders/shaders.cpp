@@ -1,6 +1,7 @@
 #include "shaders.hpp"
 
 #include <optional>
+#include <algorithm>
 
 #include "../../../lib/glm.hpp"
 #include "../shader_pack.hpp"
@@ -9,6 +10,15 @@
 #include "../shader_data.hpp"
 
 namespace trc {
+
+TRC_DEFINE_SHADER(ShaderPreview) {
+    float ambient = 0.2f;
+    float diffuse = std::abs(glm::dot(shader_data.normal, -shader_data.ray.direction));
+    float specular = diffuse*diffuse;
+    float value = ambient * 0.3f + diffuse * 0.5f + specular * 0.2f;
+
+    return glm::vec4 {glm::vec3 {value}, 1.f};
+}
 
 TRC_DEFINE_SHADER(ShaderRed) {
     return glm::vec4 {1.f, 0.f, 0.f, 1.f};
