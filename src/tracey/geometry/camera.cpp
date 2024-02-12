@@ -1,5 +1,7 @@
 #include "camera.hpp"
 
+#include "../util/math_util.hpp"
+
 namespace trc {
 
 /* public */
@@ -48,7 +50,7 @@ glm::vec3 Camera::calc_ray_dir_at(glm::vec2 screen_coord) {
         1.f
     };
 
-    dir = glm::normalize(dir);
+    dir = glm::vec4 {math::normalize(dir.xyz()), dir.w};
     return rot_mat * dir;
 }
 

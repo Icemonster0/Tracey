@@ -14,7 +14,7 @@ namespace trc {
 
 class Sphere : public Shape {
 public:
-    Sphere(glm::vec3 p_pos, float p_radius, Shader *p_shader);
+    Sphere(glm::vec3 p_pos, float p_radius, Shader *p_shader, std::shared_ptr<Material> p_material);
 
     std::optional<Intersection> calc_ray_intersection(Ray ray) const;
 

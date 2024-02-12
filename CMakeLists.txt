@@ -54,9 +54,14 @@ add_library(main_module STATIC
     src/tracey/graphics/shaders/shader_syntax.hpp
     src/tracey/graphics/shaders/shaders.cpp
     src/tracey/graphics/shaders/shaders.hpp
+    src/tracey/graphics/attribute.hpp
+    src/tracey/graphics/brdfs.cpp
+    src/tracey/graphics/brdfs.hpp
     src/tracey/graphics/buffer.hpp
     src/tracey/graphics/image_read_write.cpp
     src/tracey/graphics/image_read_write.hpp
+    src/tracey/graphics/material.cpp
+    src/tracey/graphics/material.hpp
     src/tracey/graphics/shader_data.hpp
     src/tracey/graphics/shader_pack.cpp
     src/tracey/graphics/shader_pack.hpp
@@ -64,6 +69,8 @@ add_library(main_module STATIC
     src/tracey/graphics/shader.hpp
     src/tracey/util/math_util.cpp
     src/tracey/util/math_util.hpp
+    src/tracey/util/normal_dist.cpp
+    src/tracey/util/normal_dist.hpp
     src/tracey/util/random.hpp
     src/tracey/util/xoshiro256plus.cpp
     src/tracey/util/xoshiro256plus.hpp

@@ -4,7 +4,7 @@
 #include "../../lib/glm.hpp"
 
 #define TRC_RAY_CLIP_EPSILON 0.001f
-#define TRC_RAY_MAX_BOUNCES 10
+#define TRC_RAY_MAX_BOUNCES 3
 
 namespace trc {
 

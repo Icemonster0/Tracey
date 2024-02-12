@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "../util/math_util.hpp"
+
 namespace trc {
 
 Viewer::Viewer(glm::ivec2 window_size, float fov)
@@ -39,7 +41,7 @@ void Viewer::update(InputPackage input, float delta_t, glm::ivec2 window_size) {
                        + move_input.y * glm::vec3(0.f, 1.f, 0.f)
                        + move_input.z * camera.calc_forward_dir();
     if (move_dir.x || move_dir.y || move_dir.z)
-        move_dir = glm::normalize(move_dir);
+        move_dir = math::normalize(move_dir);
 
     camera.set_pos(camera.get_pos() + move_dir * move_speed * delta_t);
 }

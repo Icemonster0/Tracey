@@ -16,13 +16,20 @@ namespace trc {
 Engine::Engine(UserConfig cfg) : cfg(cfg), error(0), preview_mode(true) {}
 
 int Engine::run() {
-    scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_diffuse.get())));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.f, 1.0f, 0.f}, 1.f, shader_pack.shader_diffuse.get())));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {3.f, 2.0f, 2.f}, 1.f, shader_pack.shader_diffuse.get())));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {2.f, 0.5f, -4.f}, 1.f, shader_pack.shader_reflect.get())));
-    scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {-2.f, 4.0f, 2.f}, glm::vec3 {0.6f, 0.7f, 1.0f}, 10.f, 0.5f)));
-    scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {2.f, 3.0f, -2.f}, glm::vec3 {1.0f, 0.3f, 0.4f}, 5.f, 0.1f)));
-    // scene.add_light(std::unique_ptr<Light>(new SunLight(glm::vec3 {-1.f, -1.f, -1.f}, glm::vec3 {1.f, 0.95f, 0.95f}, 1.0f, 2.f)));
+    std::shared_ptr<Material> mat_floor = std::make_shared<Material>(glm::vec3 {0.9f, 0.9f, 0.9f}, 0.5f, 0.f);
+    std::shared_ptr<Material> mat_a = std::make_shared<Material>(glm::vec3 {1.f, 1.f, 1.f}, 0.f, 1.f);
+    std::shared_ptr<Material> mat_b = std::make_shared<Material>(glm::vec3 {0.9f, 0.2f, 0.2f}, 0.03f, 0.f);
+    std::shared_ptr<Material> mat_c = std::make_shared<Material>(glm::vec3 {0.2f, 0.9f, 0.3f}, 1.f, 0.f);
+
+    scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_combined.get(), mat_floor)));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.f, 0.f, 1015.f}, 1000.f, shader_pack.shader_combined.get(), mat_floor)));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {1.2f, 1.0f, 1.2f}, 1.f, shader_pack.shader_combined.get(), mat_a)));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {-1.2f, 1.0f, 0.f}, 1.f, shader_pack.shader_combined.get(), mat_b)));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {1.1f, 0.5f, -0.5f}, 0.5f, shader_pack.shader_combined.get(), mat_c)));
+
+    scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {2.5f, 4.0f, 2.5f}, glm::vec3 {0.8f, 0.9f, 1.0f}, 40.f, 0.1f)));
+    scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {-2.f, 3.0f, -3.f}, glm::vec3 {0.9f, 0.6f, 1.0f}, 20.f, 1.f)));
+    // scene.add_light(std::unique_ptr<Light>(new SunLight(glm::vec3 {-0.5f, -1.f, -0.5f}, glm::vec3 {1.f, 0.95f, 0.95f}, 5.0f, 2.f)));
 
     accelerator = Accelerator {&scene};
     window_manager = WindowManager {cfg.window_size};

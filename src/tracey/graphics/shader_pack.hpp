@@ -12,10 +12,11 @@ struct ShaderPack {
 
     std::unique_ptr<Shader> shader_default;
     std::unique_ptr<Shader> shader_preview;
-    std::unique_ptr<Shader> shader_light_direct;
     std::unique_ptr<Shader> shader_diffuse_direct;
     std::unique_ptr<Shader> shader_diffuse_indirect;
-    std::unique_ptr<Shader> shader_diffuse;
+    std::unique_ptr<Shader> shader_specular_direct;
+    std::unique_ptr<Shader> shader_specular_indirect;
+    std::unique_ptr<Shader> shader_combined;
 
     std::unique_ptr<Shader> shader_red;
     std::unique_ptr<Shader> shader_normal;

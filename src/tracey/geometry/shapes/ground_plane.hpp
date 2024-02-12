@@ -14,7 +14,7 @@ namespace trc {
 
 class GroundPlane : public Shape {
 public:
-    GroundPlane(float p_height, Shader *p_shader);
+    GroundPlane(float p_height, Shader *p_shader, std::shared_ptr<Material> p_material);
 
     std::optional<Intersection> calc_ray_intersection(Ray ray) const;
 

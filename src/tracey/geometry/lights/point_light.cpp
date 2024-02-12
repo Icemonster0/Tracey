@@ -1,5 +1,7 @@
 #include "point_light.hpp"
 
+#include "../../util/math_util.hpp"
+
 namespace trc {
 
 PointLight::PointLight(glm::vec3 p_pos, glm::vec3 p_color, float p_intensity, float p_radius)
@@ -16,7 +18,7 @@ glm::vec3 PointLight::get_sample_point(RNG *rng) {
     //      normal_distrib(*rng)
     // };
     //
-    // offset = glm::normalize(offset);
+    // offset = math::normalize(offset);
     //
     // offset *= radius;
 

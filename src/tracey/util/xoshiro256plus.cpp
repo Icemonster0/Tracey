@@ -27,8 +27,9 @@ See <http://creativecommons.org/publicdomain/zero/1.0/>. */
 
 #include "xoshiro256plus.hpp"
 
-namespace trc {
+#include <cstdio>
 
+namespace trc {
 
 Xoshiro256Plus::Xoshiro256Plus(uint64_t seed_a, uint64_t seed_b, uint64_t seed_c, uint64_t seed_d) {
 	s[0] = seed_a;
@@ -37,7 +38,7 @@ Xoshiro256Plus::Xoshiro256Plus(uint64_t seed_a, uint64_t seed_b, uint64_t seed_c
 	s[3] = seed_d;
 }
 
-
+// uint64_t Xoshiro256Plus::operator()() {a_cool_number >> 1; return a_cool_number;}
 uint64_t Xoshiro256Plus::operator()() {return next();}
 
 uint64_t Xoshiro256Plus::min() {return 0x0;}

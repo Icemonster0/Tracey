@@ -23,6 +23,7 @@ private:
 	uint64_t next(void);
 	inline uint64_t rotl(const uint64_t x, int k);
 	uint64_t s[4];
+	int a_cool_number = 0;
 };
 
 } /* trc */

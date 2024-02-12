@@ -1,9 +1,11 @@
 #include "sphere.hpp"
 
+#include "../../util/math_util.hpp"
+
 namespace trc {
 
-Sphere::Sphere(glm::vec3 p_pos, float p_radius, Shader *p_shader)
-    : Shape(p_shader), pos(p_pos), radius(p_radius) {}
+Sphere::Sphere(glm::vec3 p_pos, float p_radius, Shader *p_shader, std::shared_ptr<Material> p_material)
+    : Shape(p_shader, p_material), pos(p_pos), radius(p_radius) {}
 
 std::optional<Intersection> Sphere::calc_ray_intersection(Ray ray) const {
     // translate ray to object space
@@ -40,7 +42,7 @@ std::optional<Intersection> Sphere::calc_ray_intersection(Ray ray) const {
 
     // calculate intersection parameters
     const glm::vec3 point = ray.get_point(t);
-    const glm::vec3 normal = glm::normalize(point);
+    const glm::vec3 normal = math::normalize(point);
     glm::vec2 tex_coord;
 
     if (normal.z == 0.f) {
@@ -59,10 +61,11 @@ std::optional<Intersection> Sphere::calc_ray_intersection(Ray ray) const {
 
     return std::make_optional<Intersection> (
         point + pos, // pos
-        normal, // normal
-        tex_coord, // tex_coord
+        normal,
+        tex_coord,
+        material,
         t, // distance
-        shader // shader
+        shader
     );
 }
 

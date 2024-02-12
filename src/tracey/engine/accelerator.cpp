@@ -2,6 +2,8 @@
 
 #include <limits>
 
+#include "../util/math_util.hpp"
+
 namespace trc {
 
 Accelerator::Accelerator(Scene *source_scene) {
@@ -33,7 +35,7 @@ std::optional<Intersection> Accelerator::calc_intersection(Ray ray) const {
     return min_isect;
 }
 
-glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 normal, RNG *rng) const {
+glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 normal, glm::vec3 view, float roughness, RNG *rng, float (*brdf)(glm::vec3, glm::vec3, glm::vec3, float)) const {
     glm::vec3 light_color {0.f};
 
     for (auto &light : light_ptr_list) {
@@ -42,7 +44,10 @@ glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 n
         if (isect && isect.value().distance < light_data.distance) {
             continue;
         } else {
-            light_color += light_data.light * glm::clamp(glm::dot(normal, light_data.shadow_ray.direction), 0.f, 1.f);
+            float cos_theta = glm::clamp(glm::dot(normal, light_data.shadow_ray.direction), 0.f, 1.f);
+            light_color += light_data.light
+                         * cos_theta
+                         * brdf(light_data.shadow_ray.direction, view, normal, roughness);
         }
     }
 
