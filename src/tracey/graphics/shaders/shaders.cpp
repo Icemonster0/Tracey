@@ -127,6 +127,8 @@ TRC_DEFINE_SHADER(ShaderCombined) {
         diffuse_indirect = EVALUATE_SHADER(shader_diffuse_indirect, shader_data).rgb();
         specular_indirect = EVALUATE_SHADER(shader_specular_indirect, shader_data).rgb();
     }
+    diffuse_indirect = glm::min(diffuse_indirect, {TRC_INDIRECT_LIGHT_CLAMP});
+    specular_indirect = glm::min(specular_indirect, {TRC_INDIRECT_LIGHT_CLAMP});
 
     glm::vec3 albedo = SAMPLE_ATTRIB(albedo);
     float metallic = SAMPLE_ATTRIB(metallic);

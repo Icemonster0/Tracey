@@ -5,6 +5,7 @@
 
 #define TRC_RAY_CLIP_EPSILON 0.001f
 #define TRC_RAY_MAX_BOUNCES 5
+#define TRC_INDIRECT_LIGHT_CLAMP 10.f
 
 namespace trc {
 
