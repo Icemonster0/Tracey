@@ -14,7 +14,7 @@ where `path/to/Tracey` should be the directory in which `CMakeLists.txt` can be 
 
 To be able to compile, you need
 - CMake
-- a C++ compiler
+- a C++ compiler with C++17 support
 - GL library
 - openmp library
 
