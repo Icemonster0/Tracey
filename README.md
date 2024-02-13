@@ -4,6 +4,8 @@ A minimal progressive CPU raytracer.  (Work in progress)
 ![render example](media/render_example.png)
 
 ## Building
+**Currently, you can only build for Linux. I am still working on getting Mac to work.**  
+
 To compile the source code, use CMake:
 ```
 cmake -S path/to/Tracey -B path/to/build/dir
@@ -14,7 +16,7 @@ where `path/to/Tracey` should be the directory in which `CMakeLists.txt` can be 
 
 To be able to compile, you need
 - CMake
-- a C++ compiler
+- a C++ compiler with C++17 support
 - GL library
 - openmp library
 
