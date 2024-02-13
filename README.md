@@ -4,7 +4,7 @@ A minimal progressive CPU raytracer.  (Work in progress)
 ![render example](media/render_example.png)
 
 ## Building
-**Currently, you can only build for Linux. I am still working on getting Mac to work.**  
+**Currently, you can only build for Linux.** There is a [testing branch](https://github.com/Icemonster0/Tracey/tree/mac-test) for Mac.  
 
 To compile the source code, use CMake:
 ```
