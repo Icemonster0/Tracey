@@ -4,7 +4,7 @@
 
 namespace trc {
 
-Sphere::Sphere(glm::vec3 p_pos, float p_radius, Shader *p_shader, std::shared_ptr<Material> p_material)
+Sphere::Sphere(glm::vec3 p_pos, float p_radius, Shader *p_shader, Material *p_material)
     : Shape(p_shader, p_material), pos(p_pos), radius(p_radius) {}
 
 std::optional<Intersection> Sphere::calc_ray_intersection(Ray ray) const {

@@ -2,7 +2,7 @@
 
 namespace trc {
 
-Shape::Shape(Shader *shader_ptr, std::shared_ptr<Material> p_material)
+Shape::Shape(Shader *shader_ptr, Material *p_material)
     : shader(shader_ptr), material(p_material) {}
 
 std::optional<Intersection> Shape::calc_ray_intersection(Ray ray) const {
@@ -17,11 +17,11 @@ void Shape::set_shader(Shader *shader_ptr) {
     shader = shader_ptr;
 }
 
-std::shared_ptr<Material> Shape::get_material() {
+Material *Shape::get_material() {
     return material;
 }
 
-void Shape::set_material(std::shared_ptr<Material> mat) {
+void Shape::set_material(Material *mat) {
     material = mat;
 }
 

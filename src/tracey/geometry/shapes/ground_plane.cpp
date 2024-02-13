@@ -2,7 +2,7 @@
 
 namespace trc {
 
-GroundPlane::GroundPlane(float p_height, Shader *p_shader, std::shared_ptr<Material> p_material)
+GroundPlane::GroundPlane(float p_height, Shader *p_shader, Material *p_material)
     : Shape(p_shader, p_material), height(p_height) {}
 
 std::optional<Intersection> GroundPlane::calc_ray_intersection(Ray ray) const {

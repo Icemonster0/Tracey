@@ -17,7 +17,7 @@ struct ShaderData {
     glm::vec3 pos;
     glm::vec3 normal;
     glm::vec2 tex_coord;
-    std::shared_ptr<Material> material;
+    Material *material;
     float distance;
     Ray ray;
     Accelerator *accelerator;
