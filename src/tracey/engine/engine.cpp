@@ -17,7 +17,7 @@ Engine::Engine(UserConfig cfg) : cfg(cfg), error(0), preview_mode(true) {}
 
 int Engine::run() {
     Material *mat_floor = scene.add_material(std::make_unique<Material>(glm::vec3 {0.9f, 0.9f, 0.9f}, 0.5f, 0.f));
-    Material *mat_a = scene.add_material(std::make_unique<Material>(glm::vec3 {1.f, 1.f, 1.f}, 0.f, 1.f));
+    Material *mat_a = scene.add_material(std::make_unique<Material>(glm::vec3 {1.0f, 0.5f, 0.0f}, 0.001f, 1.f));
     Material *mat_b = scene.add_material(std::make_unique<Material>(glm::vec3 {0.9f, 0.2f, 0.2f}, 0.03f, 0.f));
     Material *mat_c = scene.add_material(std::make_unique<Material>(glm::vec3 {0.2f, 0.9f, 0.3f}, 1.f, 0.f));
 

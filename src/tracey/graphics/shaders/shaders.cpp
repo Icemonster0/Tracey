@@ -130,8 +130,10 @@ TRC_DEFINE_SHADER(ShaderCombined) {
 
     glm::vec3 albedo = SAMPLE_ATTRIB(albedo);
     float metallic = SAMPLE_ATTRIB(metallic);
-    glm::vec3 diffuse_color {albedo * (1.f - metallic)};
-    glm::vec3 specular_color {math::fresnel(1.f, 2.0f, -shader_data.ray.direction, shader_data.normal) + albedo * metallic};
+    float fresnel = math::fresnel(1.f, 2.0f, -shader_data.ray.direction, shader_data.normal);
+
+    glm::vec3 diffuse_color {glm::saturate(albedo * (1.f - metallic))}; // saturate = clamp between 0 and 1
+    glm::vec3 specular_color {glm::saturate(fresnel + (albedo * metallic))};
 
     glm::vec3 diffuse = (diffuse_direct + diffuse_indirect) * diffuse_color;
     glm::vec3 specular = (specular_direct + specular_indirect) * specular_color;
