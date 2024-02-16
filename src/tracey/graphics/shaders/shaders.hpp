@@ -11,6 +11,7 @@ TRC_DECLARE_SHADER(ShaderDiffuseDirect)
 TRC_DECLARE_SHADER(ShaderDiffuseIndirect)
 TRC_DECLARE_SHADER(ShaderSpecularDirect)
 TRC_DECLARE_SHADER(ShaderSpecularIndirect)
+TRC_DECLARE_SHADER(ShaderTransmission)
 TRC_DECLARE_SHADER(ShaderCombined)
 
 TRC_DECLARE_SHADER(ShaderRed)

@@ -20,12 +20,14 @@ int Engine::run() {
     Material *mat_a = scene.add_material(std::make_unique<Material>(glm::vec3 {1.0f, 0.5f, 0.0f}, 0.001f, 1.f));
     Material *mat_b = scene.add_material(std::make_unique<Material>(glm::vec3 {0.9f, 0.2f, 0.2f}, 0.03f, 0.f));
     Material *mat_c = scene.add_material(std::make_unique<Material>(glm::vec3 {0.2f, 0.9f, 0.3f}, 1.f, 0.f));
+    Material *mat_d = scene.add_material(std::make_unique<Material>(glm::vec3 {0.8f, 0.8f, 0.8f}, 0.001f, 0.f, glm::vec3 {0.f}, glm::vec3 {0.f}, 1.f, 1.5f));
 
     scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_combined.get(), mat_floor)));
     scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.f, 0.f, 1015.f}, 1000.f, shader_pack.shader_combined.get(), mat_floor)));
     scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {1.2f, 1.0f, 1.2f}, 1.f, shader_pack.shader_combined.get(), mat_a)));
     scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {-1.2f, 1.0f, 0.f}, 1.f, shader_pack.shader_combined.get(), mat_b)));
     scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {1.1f, 0.5f, -0.5f}, 0.5f, shader_pack.shader_combined.get(), mat_c)));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.0f, 0.6f, -1.1f}, 0.6f, shader_pack.shader_combined.get(), mat_d)));
 
     scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {2.5f, 4.0f, 2.5f}, glm::vec3 {0.8f, 0.9f, 1.0f}, 40.f, 0.1f)));
     scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {-2.f, 3.0f, -3.f}, glm::vec3 {0.9f, 0.6f, 1.0f}, 20.f, 1.f)));

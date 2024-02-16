@@ -14,7 +14,7 @@
 namespace trc {
 
 #define SAMPLE_ATTRIB(attrib) shader_data.material->attrib->sample(shader_data.tex_coord)
-#define EVALUATE_SHADER(shader_name, shader_data) shader_data.shader_pack->shader_name->evaluate(shader_data)
+#define EVALUATE_SHADER(shader_name, new_shader_data) shader_data.shader_pack->shader_name->evaluate(new_shader_data)
 
 TRC_DEFINE_SHADER(ShaderPreview) {
     float ambient = 0.2f;
@@ -84,12 +84,11 @@ TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
 
     Ray specular_ray {
         shader_data.pos,
-        brdf::ggx_inverse(
-            -shader_data.ray.direction, // outgoing direction
+        glm::reflect(shader_data.ray.direction, brdf::ggx_normal(
             shader_data.normal, // normal
             SAMPLE_ATTRIB(roughness), // roughness
             shader_data.rng // rng
-        ),
+        )),
         TRC_SPECULAR_RAY,
         shader_data.ray.index + 1
     };
@@ -114,35 +113,119 @@ TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
     return glm::vec4 {color, 1.f};
 }
 
-TRC_DEFINE_SHADER(ShaderCombined) {
-    if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f)
-        return glm::vec4 {glm::vec3 {0.f}, 1.f};
+TRC_DEFINE_SHADER(ShaderTransmission) {
+    glm::vec3 indirect {0.f};
+    glm::vec3 direct {0.f};
 
-    glm::vec3 diffuse_direct = EVALUATE_SHADER(shader_diffuse_direct, shader_data).rgb();
-    glm::vec3 specular_direct = EVALUATE_SHADER(shader_specular_direct, shader_data).rgb();
+    float roughness = SAMPLE_ATTRIB(roughness);
+    float ior = SAMPLE_ATTRIB(ior);
+    float ior_ratio;
+    float normal_flipper;
 
-    glm::vec3 diffuse_indirect {0.f};
-    glm::vec3 specular_indirect {0.f};
-    if (shader_data.ray.index <= TRC_RAY_MAX_BOUNCES) {
-        diffuse_indirect = EVALUATE_SHADER(shader_diffuse_indirect, shader_data).rgb();
-        specular_indirect = EVALUATE_SHADER(shader_specular_indirect, shader_data).rgb();
+    if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f) {
+        ior_ratio = ior;
+        normal_flipper = -1.f;
+
+        direct = shader_data.accelerator->calc_light_influence(
+            shader_data.pos, // shading point
+            shader_data.normal, // normal
+            -shader_data.ray.direction, // outgoing direction
+            roughness, // roughness
+            shader_data.rng, // rng
+            brdf::ggx // brdf
+        );
+    } else {
+        ior_ratio = 1.f / ior;
+        normal_flipper = 1.f;
     }
-    diffuse_indirect = glm::min(diffuse_indirect, {TRC_INDIRECT_LIGHT_CLAMP});
-    specular_indirect = glm::min(specular_indirect, {TRC_INDIRECT_LIGHT_CLAMP});
+
+    glm::vec3 refract_dir = glm::refract(
+        shader_data.ray.direction,
+        brdf::ggx_normal(
+            shader_data.normal, // normal
+            roughness, // roughness
+            shader_data.rng // rng
+        ) * normal_flipper,
+        ior_ratio
+    );
+
+    Ray transmit_ray {
+        shader_data.pos,
+        refract_dir,
+        TRC_TRANSMISSION_RAY,
+        shader_data.ray.index + 1
+    };
+
+    std::optional<Intersection> isect = shader_data.accelerator->calc_intersection(transmit_ray);
+    if (isect) {
+        ShaderData transmit_shader_data {
+            isect.value().pos,
+            isect.value().normal,
+            isect.value().tex_coord,
+            isect.value().material,
+            shader_data.distance + isect.value().distance,
+            transmit_ray,
+            shader_data.accelerator,
+            shader_data.shader_pack,
+            shader_data.rng
+        };
+        indirect = isect.value().shader->evaluate(transmit_shader_data).rgb();
+    }
+
+    return glm::vec4 {indirect + direct, 1.f};
+}
+
+TRC_DEFINE_SHADER(ShaderCombined) {
+    glm::vec3 transmission {0.f};
+    glm::vec3 diffuse {0.f};
+    glm::vec3 specular {0.f};
 
     glm::vec3 albedo = SAMPLE_ATTRIB(albedo);
     float metallic = SAMPLE_ATTRIB(metallic);
-    float fresnel = math::fresnel(1.f, 2.0f, -shader_data.ray.direction, shader_data.normal);
+    float fresnel = math::fresnel(1.f, SAMPLE_ATTRIB(ior), -shader_data.ray.direction, shader_data.normal);
 
-    glm::vec3 diffuse_color {glm::saturate(albedo * (1.f - metallic))}; // saturate = clamp between 0 and 1
+    if (SAMPLE_ATTRIB(transmissive) > 0.f) {
+        // transmission
+        glm::vec3 transmission_indirect {0.f};
+        if (shader_data.ray.index <= TRC_RAY_MAX_BOUNCES) {
+            transmission_indirect = EVALUATE_SHADER(shader_transmission, shader_data).rgb();
+            transmission_indirect = glm::min(transmission_indirect, {TRC_INDIRECT_LIGHT_CLAMP});
+        }
+        glm::vec3 transmission_color {glm::saturate(albedo)}; // saturate = clamp between 0 and 1
+        transmission = transmission_indirect * transmission_color;
+    }
+    else {
+        // make backfacing geometry black
+        if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f)
+            return glm::vec4 {glm::vec3 {0.f}, 1.f};
+
+        // diffuse
+        glm::vec3 diffuse_direct = EVALUATE_SHADER(shader_diffuse_direct, shader_data).rgb();
+        glm::vec3 diffuse_indirect {0.f};
+        if (shader_data.ray.index <= TRC_RAY_MAX_BOUNCES) {
+            diffuse_indirect = EVALUATE_SHADER(shader_diffuse_indirect, shader_data).rgb();
+            diffuse_indirect = glm::min(diffuse_indirect, {TRC_INDIRECT_LIGHT_CLAMP});
+        }
+        glm::vec3 diffuse_color {glm::saturate(albedo * (1.f - metallic))};
+        diffuse = (diffuse_direct + diffuse_indirect) * diffuse_color;
+    }
+
+    // specular
+    glm::vec3 specular_direct = EVALUATE_SHADER(shader_specular_direct, shader_data).rgb();
+    glm::vec3 specular_indirect {0.f};
+    if (shader_data.ray.index <= TRC_RAY_MAX_BOUNCES) {
+        specular_indirect = EVALUATE_SHADER(shader_specular_indirect, shader_data).rgb();
+        specular_indirect = glm::min(specular_indirect, {TRC_INDIRECT_LIGHT_CLAMP});
+    }
     glm::vec3 specular_color {glm::saturate(fresnel + (albedo * metallic))};
+    specular = (specular_direct + specular_indirect) * specular_color;
 
-    glm::vec3 diffuse = (diffuse_direct + diffuse_indirect) * diffuse_color;
-    glm::vec3 specular = (specular_direct + specular_indirect) * specular_color;
-
+    // emission
     glm::vec3 emission {SAMPLE_ATTRIB(emission)};
 
-    glm::vec3 combined = diffuse + specular + emission;
+    // combine
+    glm::vec3 combined = diffuse + specular + transmission + emission;
+
     return glm::vec4 {combined, 1.f};
 }
 
