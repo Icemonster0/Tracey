@@ -41,12 +41,16 @@ add_library(main_module STATIC
     src/tracey/geometry/shapes/shapes.hpp
     src/tracey/geometry/shapes/sphere.cpp
     src/tracey/geometry/shapes/sphere.hpp
+    src/tracey/geometry/shapes/triangle.cpp
+    src/tracey/geometry/shapes/triangle.hpp
     src/tracey/geometry/camera.cpp
     src/tracey/geometry/camera.hpp
     src/tracey/geometry/intersection.cpp
     src/tracey/geometry/intersection.hpp
     src/tracey/geometry/light.cpp
     src/tracey/geometry/light.hpp
+    src/tracey/geometry/mesh.cpp
+    src/tracey/geometry/mesh.hpp
     src/tracey/geometry/ray.cpp
     src/tracey/geometry/ray.hpp
     src/tracey/geometry/shape.cpp

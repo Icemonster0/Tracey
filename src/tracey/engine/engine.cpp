@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "../../lib/glfw.hpp"
+#include "../util/math_util.hpp"
 #include "input_package.hpp"
 #include "../geometry/shape.hpp"
 #include "../geometry/shapes/shapes.hpp"
@@ -105,6 +106,31 @@ void Engine::scene_setup() {
     //     Material *mat = scene.add_material(std::make_unique<Material>(glm::vec3 {1.f, 0.f, 0.f}, (float)i / (float)max_i, 1.f));
     //     scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {i * 2.2f, 1.f, 0.f}, 1.f, shader_pack.shader_combined.get(), mat)));
     // }
+
+
+    /* MESH TEST SETUP */
+    // std::vector<glm::vec3> pos_vec {
+    //     {-0.5f, -0.5f, 0.0f},
+    //     {0.5f, -0.5f, 0.0f},
+    //     {0.0f, 0.5f, 0.0f}
+    // };
+    // std::vector<glm::vec3> normal_vec {
+    //     {0.f, 0.f, 1.f},
+    // };
+    // std::vector<glm::vec2> tex_vec {
+    //     {0.0f, 0.0f},
+    //     {1.0f, 0.0f},
+    //     {0.5f, 1.0f}
+    // };
+    // Mesh *mesh = scene.add_mesh(std::make_unique<Mesh>(pos_vec, normal_vec, tex_vec));
+    //
+    // scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {3.f, 3.f, 3.f}, glm::vec3 {1.f}, 30.f, 2.5f)));
+    //
+    // Material *floor_mat = scene.add_material(std::make_unique<Material>(glm::vec3 {1.f}, 1.f, 0.f));
+    // Material *tri_mat = scene.add_material(std::make_unique<Material>(glm::vec3 {1.f, 0.4f, 0.05f}, 0.f, 0.7f));
+    //
+    // scene.add_object(std::unique_ptr<Shape>(new GroundPlane(-0.5f, shader_pack.shader_combined.get(), floor_mat)));
+    // scene.add_object(std::unique_ptr<Shape>(new Triangle({0, 1, 2}, {0, 0, 0}, {0, 1, 2}, mesh, shader_pack.shader_combined.get(), tri_mat)));
 }
 
 int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen) {
