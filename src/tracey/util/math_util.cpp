@@ -88,4 +88,40 @@ float fresnel(float n1, float n2, glm::vec3 incident, glm::vec3 normal) {
     return (Rparl * Rparl + Rperp * Rperp) / 2;
 }
 
+std::optional<float> intersect_sphere(Ray ray, glm::vec3 center, float radius) {
+    // translate ray to object space
+    ray.origin -= center;
+
+    // coefficients for the quadratic equation at² + bt + c = 0
+    const float a = ray.direction.x*ray.direction.x + ray.direction.y*ray.direction.y + ray.direction.z*ray.direction.z;
+    const float b = 2 * (ray.direction.x*ray.origin.x + ray.direction.y*ray.origin.y + ray.direction.z*ray.origin.z);
+    const float c = ray.origin.x*ray.origin.x + ray.origin.y*ray.origin.y + ray.origin.z*ray.origin.z - radius*radius;
+
+    // solve equation
+    const float discriminant = b*b - 4*a*c;
+
+    if (discriminant < 0.f) return std::optional<float>(); // no solution
+
+    const float inv_denominator = 1.f / (2*a);
+
+    float t;
+
+    if (discriminant == 0) { // one solution
+        t = -b * inv_denominator;
+        if (t < TRC_RAY_CLIP_EPSILON) return std::optional<float>();
+    }
+    else { // two solutions
+        float sqrt_discriminant = sqrtf(discriminant);
+        float t1 = (-b + sqrt_discriminant) * inv_denominator;
+        float t2 = (-b - sqrt_discriminant) * inv_denominator;
+        if (t1 < TRC_RAY_CLIP_EPSILON) {
+            if (t2 < TRC_RAY_CLIP_EPSILON) return std::optional<float>();
+            else t = t2;
+        } else if (t2 < TRC_RAY_CLIP_EPSILON) t = t1;
+        else t = std::min(t1, t2);
+    }
+
+    return std::optional<float>(t);
+}
+
 } /* trc::math */

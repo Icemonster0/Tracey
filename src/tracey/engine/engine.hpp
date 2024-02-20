@@ -34,6 +34,8 @@ private:
     bool preview_mode;
     int error;
 
+    void scene_setup();
+
     int render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen);
 };
 

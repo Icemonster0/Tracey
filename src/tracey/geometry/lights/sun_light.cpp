@@ -32,4 +32,17 @@ LightSampleData SunLight::sample(glm::vec3 shading_point, RNG *rng) {
     return data;
 }
 
+LightSampleData SunLight::calc_ray_intersection(Ray ray) {
+    glm::vec3 light {0.f};
+
+    if (acos(glm::dot(ray.direction, -direction)) <= glm::radians(half_angle))
+        light = color * intensity;
+
+    return LightSampleData {
+        light,
+        ray,
+        std::numeric_limits<float>::infinity()
+    };
+}
+
 } /* trc */

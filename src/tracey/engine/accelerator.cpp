@@ -35,6 +35,25 @@ std::optional<Intersection> Accelerator::calc_intersection(Ray ray) const {
     return min_isect;
 }
 
+LightSampleData Accelerator::calc_light_intersection(Ray ray) const {
+    float min_dist = std::numeric_limits<float>::infinity();
+    LightSampleData min_isect {
+        glm::vec3 {0.f},
+        ray,
+        std::numeric_limits<float>::infinity()
+    };
+
+    for (auto &light : light_ptr_list) {
+        LightSampleData isect = light->calc_ray_intersection(ray);
+        if (isect.distance <= min_dist) {
+            min_dist = isect.distance;
+            min_isect = isect;
+        }
+    }
+
+    return min_isect;
+}
+
 glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 normal, glm::vec3 view, float roughness, RNG *rng, float (*brdf)(glm::vec3, glm::vec3, glm::vec3, float)) const {
     glm::vec3 light_color {0.f};
 

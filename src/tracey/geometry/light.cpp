@@ -20,6 +20,14 @@ LightSampleData Light::sample(glm::vec3 shading_point, RNG *rng) {
     return data;
 }
 
+LightSampleData Light::calc_ray_intersection(Ray ray) {
+    return LightSampleData {
+        glm::vec3 {0.f},
+        ray,
+        std::numeric_limits<float>::infinity()
+    };
+}
+
 glm::vec3 Light::get_sample_point(RNG *rng) {
     return pos;
 }

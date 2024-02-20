@@ -9,6 +9,7 @@ namespace trc {
 template <typename T>
 struct Attrib {
     virtual T sample(glm::vec2 tex_coord) = 0;
+    virtual void clamp(T min, T max) = 0;
 };
 
 template <typename T>
@@ -18,6 +19,10 @@ struct AttribValue : public Attrib<T> {
 
     T sample(glm::vec2 tex_coord) {
         return value;
+    }
+
+    void clamp(T min, T max) {
+        value = glm::clamp(value, min, max);
     }
 
 private:
@@ -42,6 +47,14 @@ struct AttribTexture : public Attrib<T> {
         T ab = glm::mix(*texture.at(a_pos), *texture.at(b_pos), fract_coord.x);
         T cd = glm::mix(*texture.at(c_pos), *texture.at(c_pos), fract_coord.x);
         return glm::mix(ab, cd, fract_coord.y);
+    }
+
+    void clamp(T min, T max) {
+        for (int x = 0; x < get_size().x; ++x) {
+            for (int y = 0; y < get_size().y; ++y) {
+                *texture.at({x, y}) = glm::clamp(*texture.at({x, y}), min, max);
+            }
+        }
     }
 
     glm::ivec2 get_size() { return texture.get_size(); }

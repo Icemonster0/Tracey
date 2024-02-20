@@ -9,6 +9,8 @@ class PointLight : public Light {
 public:
     PointLight(glm::vec3 p_pos, glm::vec3 p_color = glm::vec3 {1.f}, float p_intensity = 1.f, float p_radius = 0.1f);
 
+    LightSampleData calc_ray_intersection(Ray ray);
+
 protected:
     glm::vec3 get_sample_point(RNG *rng);
 

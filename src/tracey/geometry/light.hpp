@@ -1,6 +1,9 @@
 #ifndef LIGHT_HPP
 #define LIGHT_HPP
 
+#include <optional>
+#include <limits>
+
 #include "../../lib/glm.hpp"
 #include "ray.hpp"
 #include "../util/random.hpp"
@@ -18,6 +21,7 @@ public:
     Light(glm::vec3 p_pos, glm::vec3 p_color = glm::vec3 {1.f}, float p_intensity = 1.f);
 
     virtual LightSampleData sample(glm::vec3 shading_point, RNG *rng);
+    virtual LightSampleData calc_ray_intersection(Ray ray);
 
 protected:
     virtual glm::vec3 get_sample_point(RNG *rng);

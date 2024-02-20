@@ -8,6 +8,24 @@ PointLight::PointLight(glm::vec3 p_pos, glm::vec3 p_color, float p_intensity, fl
     : Light(p_pos, p_color, p_intensity), radius(p_radius),
       random_distrib(std::uniform_real_distribution<float> {0.f, 6.283185307f}) {}
 
+LightSampleData PointLight::calc_ray_intersection(Ray ray) {
+    // calculate intersection
+    std::optional<float> t = math::intersect_sphere(ray, pos, radius);
+    if (!t) return LightSampleData {
+        glm::vec3 {0.f},
+        ray,
+        std::numeric_limits<float>::infinity()
+    };
+
+    // calculate intersection parameters
+    LightSampleData data {
+        color * intensity,
+        ray,
+        t.value()
+    };
+    return data;
+}
+
 glm::vec3 PointLight::get_sample_point(RNG *rng) {
     /* surface; using gaussian distribution */
     // std::normal_distribution<float> normal_distrib;

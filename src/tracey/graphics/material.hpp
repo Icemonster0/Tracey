@@ -26,6 +26,8 @@ struct Material {
     std::shared_ptr<Attrib<glm::vec3>> normal;
     std::shared_ptr<Attrib<float>> transmissive;
     std::shared_ptr<Attrib<float>> ior;
+
+    void clamp_attribs();
 };
 
 } /* trc */

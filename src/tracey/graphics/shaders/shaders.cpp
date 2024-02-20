@@ -42,7 +42,7 @@ TRC_DEFINE_SHADER(ShaderDiffuseIndirect) {
 
     Ray diffuse_ray {
         shader_data.pos,
-        math::random_dir_in_hemisphere(shader_data.normal, shader_data.rng),
+        math::random_dir_in_hemisphere(shader_data.normal, shader_data.rng), // brdf normal reflection direction (for flat distribution)
         TRC_DIFFUSE_RAY,
         shader_data.ray.index + 1
     };
@@ -64,15 +64,22 @@ TRC_DEFINE_SHADER(ShaderDiffuseIndirect) {
     }
     else color = glm::vec3 {0.f, 0.f, 0.f};
 
+    // color *= brdf::flat(shader_data.normal, shader_data.normal, shader_data.normal, SAMPLE_ATTRIB(roughness));
+
     return glm::vec4 {color, 1.f};
 }
 
 TRC_DEFINE_SHADER(ShaderSpecularDirect) {
+    float roughness = SAMPLE_ATTRIB(roughness);
+
+    // if (roughness < TRC_SPECULAR_OPTIMIZE_TRESHOLD)
+    //     return glm::vec4 {glm::vec3 {0.f}, 1.f};
+
     glm::vec3 light = shader_data.accelerator->calc_light_influence(
         shader_data.pos, // shading point
         shader_data.normal, // normal
         -shader_data.ray.direction, // outgoing direction
-        SAMPLE_ATTRIB(roughness), // roughness
+        roughness, // roughness
         shader_data.rng, // rng
         brdf::ggx // brdf
     );
@@ -82,33 +89,47 @@ TRC_DEFINE_SHADER(ShaderSpecularDirect) {
 TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
     glm::vec3 color;
 
+    float roughness = SAMPLE_ATTRIB(roughness);
+    bool include_lights = (roughness < TRC_SPECULAR_OPTIMIZE_TRESHOLD);
+
     Ray specular_ray {
         shader_data.pos,
         glm::reflect(shader_data.ray.direction, brdf::ggx_normal(
             shader_data.normal, // normal
-            SAMPLE_ATTRIB(roughness), // roughness
+            roughness, // roughness
             shader_data.rng // rng
         )),
         TRC_SPECULAR_RAY,
         shader_data.ray.index + 1
     };
 
-    std::optional<Intersection> isect = shader_data.accelerator->calc_intersection(specular_ray);
-    if (isect) {
+    float obj_isect_distance = std::numeric_limits<float>::infinity();
+    std::optional<Intersection> obj_isect = shader_data.accelerator->calc_intersection(specular_ray);
+    if (obj_isect) {
+        obj_isect_distance = obj_isect.value().distance;
         ShaderData specular_shader_data {
-            isect.value().pos,
-            isect.value().normal,
-            isect.value().tex_coord,
-            isect.value().material,
-            shader_data.distance + isect.value().distance,
+            obj_isect.value().pos,
+            obj_isect.value().normal,
+            obj_isect.value().tex_coord,
+            obj_isect.value().material,
+            shader_data.distance + obj_isect_distance,
             specular_ray,
             shader_data.accelerator,
             shader_data.shader_pack,
             shader_data.rng
         };
-        color = isect.value().shader->evaluate(specular_shader_data);
+        color = obj_isect.value().shader->evaluate(specular_shader_data);
     }
-    else color = glm::vec3 {0.f, 0.f, 0.f};
+    else color = glm::vec3 {0.f};
+
+    // if (include_lights) {
+    //     LightSampleData light_isect = shader_data.accelerator->calc_light_intersection(specular_ray);
+    //     if (light_isect.distance <= obj_isect_distance) {
+    //         color += light_isect.light;
+    //     }
+    // }
+
+    // color *= brdf::ggx(shader_data.normal, shader_data.normal, shader_data.normal, roughness);
 
     return glm::vec4 {color, 1.f};
 }
@@ -122,7 +143,7 @@ TRC_DEFINE_SHADER(ShaderTransmission) {
     float ior_ratio;
     float normal_flipper;
 
-    if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f) {
+    if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f) { // if backfacing
         ior_ratio = ior;
         normal_flipper = -1.f;
 
@@ -156,21 +177,28 @@ TRC_DEFINE_SHADER(ShaderTransmission) {
         shader_data.ray.index + 1
     };
 
-    std::optional<Intersection> isect = shader_data.accelerator->calc_intersection(transmit_ray);
-    if (isect) {
+    float obj_isect_distance = std::numeric_limits<float>::infinity();
+    std::optional<Intersection> obj_isect = shader_data.accelerator->calc_intersection(transmit_ray);
+    if (obj_isect) {
+        obj_isect_distance = obj_isect.value().distance;
         ShaderData transmit_shader_data {
-            isect.value().pos,
-            isect.value().normal,
-            isect.value().tex_coord,
-            isect.value().material,
-            shader_data.distance + isect.value().distance,
+            obj_isect.value().pos,
+            obj_isect.value().normal,
+            obj_isect.value().tex_coord,
+            obj_isect.value().material,
+            shader_data.distance + obj_isect_distance,
             transmit_ray,
             shader_data.accelerator,
             shader_data.shader_pack,
             shader_data.rng
         };
-        indirect = isect.value().shader->evaluate(transmit_shader_data).rgb();
+        indirect = obj_isect.value().shader->evaluate(transmit_shader_data).rgb();
     }
+
+    // LightSampleData light_isect = shader_data.accelerator->calc_light_intersection(transmit_ray);
+    // if (light_isect.distance <= obj_isect_distance) {
+    //     indirect += light_isect.light;
+    // }
 
     return glm::vec4 {indirect + direct, 1.f};
 }

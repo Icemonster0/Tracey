@@ -16,22 +16,7 @@ namespace trc {
 Engine::Engine(UserConfig cfg) : cfg(cfg), error(0), preview_mode(true) {}
 
 int Engine::run() {
-    Material *mat_floor = scene.add_material(std::make_unique<Material>(glm::vec3 {0.9f, 0.9f, 0.9f}, 0.5f, 0.f));
-    Material *mat_a = scene.add_material(std::make_unique<Material>(glm::vec3 {1.0f, 0.5f, 0.0f}, 0.001f, 1.f));
-    Material *mat_b = scene.add_material(std::make_unique<Material>(glm::vec3 {0.9f, 0.2f, 0.2f}, 0.03f, 0.f));
-    Material *mat_c = scene.add_material(std::make_unique<Material>(glm::vec3 {0.2f, 0.9f, 0.3f}, 1.f, 0.f));
-    Material *mat_d = scene.add_material(std::make_unique<Material>(glm::vec3 {0.8f, 0.8f, 0.8f}, 0.001f, 0.f, glm::vec3 {0.f}, glm::vec3 {0.f}, 1.f, 1.5f));
-
-    scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_combined.get(), mat_floor)));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.f, 0.f, 1015.f}, 1000.f, shader_pack.shader_combined.get(), mat_floor)));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {1.2f, 1.0f, 1.2f}, 1.f, shader_pack.shader_combined.get(), mat_a)));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {-1.2f, 1.0f, 0.f}, 1.f, shader_pack.shader_combined.get(), mat_b)));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {1.1f, 0.5f, -0.5f}, 0.5f, shader_pack.shader_combined.get(), mat_c)));
-    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.0f, 0.6f, -1.1f}, 0.6f, shader_pack.shader_combined.get(), mat_d)));
-
-    scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {2.5f, 4.0f, 2.5f}, glm::vec3 {0.8f, 0.9f, 1.0f}, 40.f, 0.1f)));
-    scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {-2.f, 3.0f, -3.f}, glm::vec3 {0.9f, 0.6f, 1.0f}, 20.f, 1.f)));
-    // scene.add_light(std::unique_ptr<Light>(new SunLight(glm::vec3 {-0.5f, -1.f, -0.5f}, glm::vec3 {1.f, 0.95f, 0.95f}, 5.0f, 2.f)));
+    scene_setup();
 
     accelerator = Accelerator {&scene};
     window_manager = WindowManager {cfg.window_size};
@@ -87,6 +72,39 @@ int Engine::run() {
     window_manager.close();
     console.clear();
     return error;
+}
+
+void Engine::scene_setup() {
+    /* SPHERE GROUP SETUP */
+    Material *mat_floor = scene.add_material(std::make_unique<Material>(glm::vec3 {0.9f, 0.9f, 0.9f}, 0.5f, 0.f));
+    Material *mat_a = scene.add_material(std::make_unique<Material>(glm::vec3 {1.0f, 0.5f, 0.0f}, 0.001f, 1.f));
+    Material *mat_b = scene.add_material(std::make_unique<Material>(glm::vec3 {0.9f, 0.2f, 0.2f}, 0.03f, 0.f));
+    Material *mat_c = scene.add_material(std::make_unique<Material>(glm::vec3 {0.2f, 0.9f, 0.3f}, 1.f, 0.f));
+    Material *mat_d = scene.add_material(std::make_unique<Material>(glm::vec3 {0.8f, 0.8f, 0.8f}, 0.f, 0.f, glm::vec3 {0.f}, glm::vec3 {0.f}, 1.f, 1.5f));
+
+    scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_combined.get(), mat_floor)));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.f, 0.f, 1015.f}, 1000.f, shader_pack.shader_combined.get(), mat_floor)));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {1.2f, 1.0f, 1.2f}, 1.f, shader_pack.shader_combined.get(), mat_a)));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {-1.2f, 1.0f, 0.f}, 1.f, shader_pack.shader_combined.get(), mat_b)));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {1.1f, 0.5f, -0.5f}, 0.5f, shader_pack.shader_combined.get(), mat_c)));
+    scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {0.0f, 0.6f, -1.1f}, 0.6f, shader_pack.shader_combined.get(), mat_d)));
+
+    scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {2.5f, 4.0f, 2.5f}, glm::vec3 {0.8f, 0.9f, 1.0f}, 40.f, 0.1f)));
+    scene.add_light(std::unique_ptr<Light>(new PointLight(glm::vec3 {-2.f, 3.0f, -3.f}, glm::vec3 {0.9f, 0.6f, 1.0f}, 20.f, 1.f)));
+    // scene.add_light(std::unique_ptr<Light>(new SunLight(glm::vec3 {0.5f, -1.f, 0.5f}, glm::vec3 {1.f, 0.95f, 0.95f}, 3.0f, 0.526f)));
+
+
+    /* SPHERE ROW SETUP */
+    // scene.add_light(std::unique_ptr<Light>(new SunLight(glm::vec3 {0.f, -0.5f, -0.5f}, glm::vec3 {1.f}, 3.f, 5.f)));
+    //
+    // Material *mat_floor = scene.add_material(std::make_unique<Material>(glm::vec3 {1.f}, 0.0f, 0.0f));
+    // scene.add_object(std::unique_ptr<Shape>(new GroundPlane(0.f, shader_pack.shader_combined.get(), mat_floor)));
+    //
+    // const int max_i = 10;
+    // for (int i = 0; i <= max_i; ++i) {
+    //     Material *mat = scene.add_material(std::make_unique<Material>(glm::vec3 {1.f, 0.f, 0.f}, (float)i / (float)max_i, 1.f));
+    //     scene.add_object(std::unique_ptr<Shape>(new Sphere(glm::vec3 {i * 2.2f, 1.f, 0.f}, 1.f, shader_pack.shader_combined.get(), mat)));
+    // }
 }
 
 int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen) {
