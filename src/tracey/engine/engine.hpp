@@ -1,6 +1,8 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
+#include <string>
+
 #include "../../lib/glm.hpp"
 #include "../util/random.hpp"
 
@@ -19,6 +21,7 @@ class Engine {
 public:
     Engine(UserConfig cfg);
 
+    int load_file(std::string file_path);
     int run();
 
 private:
@@ -34,7 +37,7 @@ private:
     bool preview_mode;
     int error;
 
-    void scene_setup();
+    void test_scene_setup();
 
     int render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen);
 };

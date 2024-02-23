@@ -8,6 +8,7 @@
 #include "../../lib/glfw.hpp"
 #include "../util/math_util.hpp"
 #include "input_package.hpp"
+#include "importer.hpp"
 #include "../geometry/shape.hpp"
 #include "../geometry/shapes/shapes.hpp"
 #include "../graphics/image_read_write.hpp"
@@ -16,8 +17,22 @@ namespace trc {
 
 Engine::Engine(UserConfig cfg) : cfg(cfg), error(0), preview_mode(true) {}
 
+int Engine::load_file(std::string file_path) {
+    if(system("clear")) {};
+    printf("Loading file '%s' ...\n", file_path.c_str());
+
+    Importer importer;
+    if (!importer.load_file(file_path, &shader_pack)) {
+        printf("Assimp import error:\n%s\n\n", importer.get_error_string().c_str());
+        return 1;
+    }
+    scene = importer.get_loaded_scene();
+
+    return 0;
+}
+
 int Engine::run() {
-    scene_setup();
+    // test_scene_setup();
 
     accelerator = Accelerator {&scene};
     window_manager = WindowManager {cfg.window_size};
@@ -75,7 +90,7 @@ int Engine::run() {
     return error;
 }
 
-void Engine::scene_setup() {
+void Engine::test_scene_setup() {
     /* SPHERE GROUP SETUP */
     Material *mat_floor = scene.add_material(std::make_unique<Material>(glm::vec3 {0.9f, 0.9f, 0.9f}, 0.5f, 0.f));
     Material *mat_a = scene.add_material(std::make_unique<Material>(glm::vec3 {1.0f, 0.5f, 0.0f}, 0.001f, 1.f));

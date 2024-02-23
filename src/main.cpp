@@ -14,9 +14,16 @@ int main(int argc, char const *argv[]) {
 
     // Create the engine
     trc::Engine engine {cfg};
+    int result;
 
-    // Start the graphical runtime
-    int result = engine.run();
+    // Load file
+    result = engine.load_file("../scenes/example.glb");
+    if (result == 0) {
+
+        // Start the graphical runtime
+        result = engine.run();
+
+    }
 
     // Exit once the user quits or a crash occurs
     printf("Engine exited with code %d\n", result);
