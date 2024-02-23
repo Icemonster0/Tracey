@@ -3,6 +3,7 @@
 #include <omp.h>
 
 #include "../graphics/shader_data.hpp"
+#include "../graphics/color_spaces.hpp"
 #include "../util/random.hpp"
 
 namespace trc {
@@ -37,7 +38,7 @@ void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *a
             glm::vec3 *new_pixel = new_sample.at({x, y});
 
             *old_pixel *= old_pixel_fac;
-            *old_pixel += *new_pixel * inv_samples;
+            *old_pixel += color::to_sRGB(*new_pixel) * inv_samples;
         }
     }
 }
