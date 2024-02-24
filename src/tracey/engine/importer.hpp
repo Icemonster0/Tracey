@@ -24,9 +24,10 @@ private:
     std::string error_string = "Success";
 
     Scene assimp_to_trc(const aiScene *scene, ShaderPack *shader_pack);
-    void import_assimp_hierarchy(const aiScene *scene, const aiNode *root_node, const glm::mat4 transform, Scene *trc_scene, ShaderPack *shader_pack, Material *material);
-    void import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::mat4 transform, Scene *trc_scene, ShaderPack *shader_pack, Material *material);
+    void import_assimp_hierarchy(const aiScene *scene, const aiNode *root_node, const glm::mat4 transform, Scene *trc_scene, ShaderPack *shader_pack);
+    void import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::mat4 transform, Scene *trc_scene, ShaderPack *shader_pack);
     void import_light(const aiLight *light, const aiScene *scene, const aiNode *root_node, Scene *trc_scene);
+    void import_material(const aiMaterial *mat, Scene *trc_scene);
 };
 
 } /* trc */

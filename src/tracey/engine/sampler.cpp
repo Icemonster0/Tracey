@@ -57,7 +57,7 @@ void Sampler::render_image_sample(Camera *camera, Accelerator *accelerator, Shad
             glm::vec3 *new_pixel = new_sample.at({x, y});
 
             *old_pixel *= old_pixel_fac;
-            *old_pixel += *new_pixel * inv_sample;
+            *old_pixel += color::to_sRGB(*new_pixel) * inv_sample;
         }
     }
 }

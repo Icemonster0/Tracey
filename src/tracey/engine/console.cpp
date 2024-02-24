@@ -13,6 +13,7 @@ namespace trc {
 Console::Console() : print_cooldown(0.f) {}
 
 void Console::print(float frequency, float delta_t, bool preview_mode, int samples, int max_samples, glm::ivec2 window_size, glm::vec3 view_pos, float yaw, float pitch, float fov, float speed) {
+    print_cooldown -= delta_t;
     if (print_cooldown <= 0.f) {
         std::stringstream s;
 
@@ -44,12 +45,10 @@ void Console::print(float frequency, float delta_t, bool preview_mode, int sampl
 
         print_cooldown = 1.f / frequency;
     }
-    else {
-        print_cooldown -= delta_t;
-    }
 }
 
 void Console::print_render_info(float frequency, float delta_t, int sample, int max_samples, glm::ivec2 image_size, float time, float sample_rate) {
+    print_cooldown -= delta_t;
     if (print_cooldown <= 0.f) {
         std::stringstream s;
 
@@ -85,16 +84,13 @@ void Console::print_render_info(float frequency, float delta_t, int sample, int 
         s << "Controls" << '\n';
         s << " ESC:          Quit" << '\n';
         s << " ENTER:        Toggle mouse focus" << '\n';
-        s << " R:            Save rendered image" << '\n';
-        s << " I:            Interrupt render without saving" << '\n';
+        s << " R:            Save rendered image (does not interrupt)" << '\n';
+        s << " I:            Interrupt render (does not save)" << '\n';
 
         clear();
         printf("%s\n", s.str().c_str());
 
         print_cooldown = 1.f / frequency;
-    }
-    else {
-        print_cooldown -= delta_t;
     }
 }
 

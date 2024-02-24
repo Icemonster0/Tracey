@@ -24,7 +24,15 @@ Material::Material(std::shared_ptr<Attrib<glm::vec3>> a,
     clamp_attribs();
 }
 
-Material::Material() {}
+Material::Material() {
+    albedo = std::shared_ptr<Attrib<glm::vec3>> {new AttribValue<glm::vec3> {glm::vec3 {1.f}}};
+    roughness = std::shared_ptr<Attrib<float>> {new AttribValue<float> {0.5f}};
+    metallic = std::shared_ptr<Attrib<float>> {new AttribValue<float> {0.f}};
+    emission = std::shared_ptr<Attrib<glm::vec3>> {new AttribValue<glm::vec3> {glm::vec3 {0.f}}};
+    normal = std::shared_ptr<Attrib<glm::vec3>> {new AttribValue<glm::vec3> {glm::vec3 {0.5f, 0.5f, 1.f}}};
+    transmissive = std::shared_ptr<Attrib<float>> {new AttribValue<float> {0.f}};
+    ior = std::shared_ptr<Attrib<float>> {new AttribValue<float> {1.6f}};
+}
 
 void Material::clamp_attribs() {
     albedo->clamp(glm::vec3 {0.001f}, glm::vec3 {0.999f});

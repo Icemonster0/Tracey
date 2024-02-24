@@ -37,9 +37,9 @@ private:
     bool preview_mode;
     int error;
 
-    void test_scene_setup();
-
     int render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen);
+
+    void test_scene_setup(); // For testing purposes
 };
 
 } /* trc */
