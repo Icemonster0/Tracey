@@ -19,7 +19,7 @@ int main(int argc, char const *argv[]) {
     // If no scene file is specified, abort
     if (cfg.scene_path.length() == 0) {
         printf("Usage: Tracey -S path/to/scene/file\n");
-        return 5;
+        return 1;
     }
     else {
         // Load scene file

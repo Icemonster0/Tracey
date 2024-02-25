@@ -33,7 +33,7 @@ template <typename T>
 struct AttribTexture : public Attrib<T> {
     AttribTexture(glm::vec2 size, T init) : texture(Buffer<T> {size, init}) {}
     AttribTexture(glm::vec2 size) : texture(Buffer<T> {size}) {}
-    AttribTexture() : texture(Buffer<T> {}) {}
+    AttribTexture() : texture(Buffer<T> {glm::vec2 {0, 0}}) {}
 
     T sample(glm::vec2 tex_coord) {
         glm::vec2 image_coord = tex_coord * glm::vec2 {get_size()};
@@ -60,6 +60,7 @@ struct AttribTexture : public Attrib<T> {
     glm::ivec2 get_size() { return texture.get_size(); }
     void set_size(glm::ivec2 size) { texture.fill(size, T {}); }
     void fill(T value) { texture.fill(value); }
+    T get_pixel(glm::ivec2 coord) { return *texture.at(coord); }
     void set_pixel(glm::ivec2 coord, T value) { *texture.at(coord) = value; }
 
 private:

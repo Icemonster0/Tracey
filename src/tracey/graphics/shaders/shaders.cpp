@@ -224,8 +224,8 @@ TRC_DEFINE_SHADER(ShaderCombined) {
     }
     else {
         // make backfacing geometry black
-        if (glm::dot(shader_data.normal, -shader_data.ray.direction) < -0.1f)
-            return glm::vec4 {glm::vec3 {0.f}, 1.f};
+        // if (glm::dot(shader_data.normal, -shader_data.ray.direction) < -0.1f)
+        //     return glm::vec4 {glm::vec3 {0.f}, 1.f};
 
         // diffuse
         glm::vec3 diffuse_direct = EVALUATE_SHADER(shader_diffuse_direct, shader_data).rgb();

@@ -24,7 +24,8 @@ bool Importer::load_file(std::string file_path, ShaderPack *shader_pack) {
     }
 
     // construct a trc::Scene
-    loaded_scene = assimp_to_trc(scene, shader_pack);
+    std::string path = file_path.substr(0, file_path.find_last_of("\\/")+1);
+    loaded_scene = assimp_to_trc(scene, shader_pack, path);
 
     return true;
 }
@@ -37,13 +38,13 @@ std::string Importer::get_error_string() {
     return error_string;
 }
 
-Scene Importer::assimp_to_trc(const aiScene *scene, ShaderPack *shader_pack) {
+Scene Importer::assimp_to_trc(const aiScene *scene, ShaderPack *shader_pack, std::string path) {
     Scene trc_scene;
 
     // materials
     for (int i = 0; i < scene->mNumMaterials; ++i) {
         aiMaterial *mat = scene->mMaterials[i];
-        import_material(mat, &trc_scene);
+        import_material(mat, scene, &trc_scene, path);
     }
 
     // meshes
@@ -87,19 +88,15 @@ void Importer::import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::
         pos_vec.push_back(p.xyz());
     }
 
-    glm::vec3 trash3;
-    glm::vec4 trash4;
-    glm::quat rotation;
-    glm::decompose(transform, trash3, rotation, trash3, trash3, trash4);
-
     if (mesh->HasNormals()) {
+        glm::mat4 normal_transform = glm::transpose(glm::inverse(transform));
         normal_vec.reserve(mesh->mNumVertices);
         for (int i = 0; i < mesh->mNumVertices; ++i) {
             aiVector3D normal = mesh->mNormals[i];
 
             glm::vec4 n {normal[0], normal[1], normal[2], 1.f};
-            n = n * rotation;
-            normal_vec.push_back(n.xyz());
+            n = n * normal_transform;
+            normal_vec.push_back(math::normalize(n.xyz()));
         }
     }
 
@@ -171,42 +168,66 @@ void Importer::import_light(const aiLight *light, const aiScene *scene, const ai
     }
 }
 
-void Importer::import_material(const aiMaterial *mat, Scene *trc_scene) {
+void Importer::import_material(const aiMaterial *mat, const aiScene *scene, Scene *trc_scene, std::string path) {
     // initialize deafult values
     aiColor3D albedo {1.f};
     float roughness = 0.5f;
     float metallic = 0.f;
     aiColor3D emission {0.f};
+    float emission_intensity = 1.f;
     aiColor3D normal {0.5f, 0.5f, 1.f};
     float transmissive = 0.f;
     float ior = 1.6f;
 
-    // get values from assimp
-    mat->Get(AI_MATKEY_BASE_COLOR, albedo);
-    mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness);
-    mat->Get(AI_MATKEY_METALLIC_FACTOR, metallic);
+    // albedo
+    std::shared_ptr<Attrib<glm::vec3>> attrib_albedo;
+    import_material_attrib(attrib_albedo, albedo, AI_MATKEY_BASE_COLOR, aiTextureType_BASE_COLOR, mat, scene, path);
 
-    float emission_intensity = 1.f;
+    // roughness
+    std::shared_ptr<Attrib<float>> attrib_roughness;
+    import_material_attrib(attrib_roughness, roughness, AI_MATKEY_ROUGHNESS_FACTOR, aiTextureType_DIFFUSE_ROUGHNESS, mat, scene, path);
+
+    // metallic
+    std::shared_ptr<Attrib<float>> attrib_metallic;
+    import_material_attrib(attrib_metallic, metallic, AI_MATKEY_METALLIC_FACTOR, aiTextureType_METALNESS, mat, scene, path);
+
+    // emission
     mat->Get(AI_MATKEY_COLOR_EMISSIVE, emission);
     mat->Get(AI_MATKEY_EMISSIVE_INTENSITY, emission_intensity);
-
-    mat->Get(AI_MATKEY_TRANSMISSION_FACTOR, transmissive);
-    mat->Get(AI_MATKEY_REFRACTI, ior);
-
-    // translate to tracey (glm)
-    glm::vec3 trc_albedo {albedo[0], albedo[1], albedo[2]};
     glm::vec3 trc_emission {emission[0], emission[1], emission[2]};
     trc_emission *= emission_intensity;
-    glm::vec3 trc_normal {normal[0], normal[1], normal[2]};
+    std::shared_ptr<Attrib<glm::vec3>> attrib_emission;
+    AttribTexture<glm::vec3> emission_tex = import_texture<glm::vec3>(mat, aiTextureType_EMISSION_COLOR, scene, path);
+    if (emission_tex.get_size() != glm::ivec2 {0}) {
+        for (int x = 0; x < emission_tex.get_size().x; ++x) {
+            for (int y = 0; y < emission_tex.get_size().y; ++y) {
+                emission_tex.set_pixel({x, y}, emission_tex.get_pixel({x, y}) * emission_intensity);
+            }
+        }
+        attrib_emission = std::shared_ptr<Attrib<glm::vec3>>(new AttribTexture(emission_tex));
+    } else {
+        attrib_emission = std::shared_ptr<Attrib<glm::vec3>>(new AttribValue(trc_emission));
+    }
 
-    std::shared_ptr<Attrib<glm::vec3>> attrib_albedo = std::shared_ptr<Attrib<glm::vec3>>(new AttribValue(trc_albedo));
-    std::shared_ptr<Attrib<float>> attrib_roughness = std::shared_ptr<Attrib<float>>(new AttribValue(roughness));
-    std::shared_ptr<Attrib<float>> attrib_metallic = std::shared_ptr<Attrib<float>>(new AttribValue(metallic));
-    std::shared_ptr<Attrib<glm::vec3>> attrib_emission = std::shared_ptr<Attrib<glm::vec3>>(new AttribValue(trc_emission));
-    std::shared_ptr<Attrib<glm::vec3>> attrib_normal = std::shared_ptr<Attrib<glm::vec3>>(new AttribValue(trc_normal));
-    std::shared_ptr<Attrib<float>> attrib_transmissive = std::shared_ptr<Attrib<float>>(new AttribValue(transmissive));
+    // normal
+    glm::vec3 trc_normal {normal[0], normal[1], normal[2]};
+    std::shared_ptr<Attrib<glm::vec3>> attrib_normal;
+    AttribTexture<glm::vec3> normal_tex = import_texture<glm::vec3>(mat, aiTextureType_NORMALS, scene, path);
+    if (normal_tex.get_size() != glm::ivec2 {0}) {
+        attrib_normal = std::shared_ptr<Attrib<glm::vec3>>(new AttribTexture(normal_tex));
+    } else {
+        attrib_normal = std::shared_ptr<Attrib<glm::vec3>>(new AttribValue(trc_normal));
+    }
+
+    // transmissive
+    std::shared_ptr<Attrib<float>> attrib_transmissive;
+    import_material_attrib(attrib_transmissive, transmissive, AI_MATKEY_TRANSMISSION_FACTOR, aiTextureType_TRANSMISSION, mat, scene, path);
+
+    // ior
+    mat->Get(AI_MATKEY_REFRACTI, ior);
     std::shared_ptr<Attrib<float>> attrib_ior = std::shared_ptr<Attrib<float>>(new AttribValue(ior));
 
+    // create the new material
     trc_scene->add_material(std::make_unique<Material>(
         attrib_albedo,
         attrib_roughness,
@@ -216,6 +237,89 @@ void Importer::import_material(const aiMaterial *mat, Scene *trc_scene) {
         attrib_transmissive,
         attrib_ior
     ));
+}
+
+// instead of supplying (pKey, type, idx), use the macros AI_MATKEY_XXX which will provide the three values
+void Importer::import_material_attrib(
+        std::shared_ptr<Attrib<glm::vec3>> &attrib,
+        aiColor3D default_value,
+        const char *pKey, unsigned int type, unsigned int idx,
+        aiTextureType tex_type,
+        const aiMaterial *mat,
+        const aiScene *scene,
+        std::string path) {
+
+    mat->Get(pKey, type, idx, default_value);
+    glm::vec3 value {default_value[0], default_value[1], default_value[2]};
+
+    // check for a texture and import it if found
+    AttribTexture<glm::vec3> texture = import_texture<glm::vec3>(mat, tex_type, scene, path);
+    if (texture.get_size() != glm::ivec2 {0}) {
+        attrib = std::shared_ptr<Attrib<glm::vec3>>(new AttribTexture(texture));
+    } else {
+        attrib = std::shared_ptr<Attrib<glm::vec3>>(new AttribValue(value));
+    }
+}
+
+// instead of supplying (pKey, type, idx), use the macros AI_MATKEY_XXX which will provide the three values
+void Importer::import_material_attrib(
+        std::shared_ptr<Attrib<float>> &attrib,
+        float default_value,
+        const char *pKey, unsigned int type, unsigned int idx,
+        aiTextureType tex_type,
+        const aiMaterial *mat,
+        const aiScene *scene,
+        std::string path) {
+
+    mat->Get(pKey, type, idx, default_value);
+
+    // check for a texture and import it if found
+    AttribTexture<float> texture = import_texture<float>(mat, tex_type, scene, path);
+    if (texture.get_size() != glm::ivec2 {0}) {
+        attrib = std::shared_ptr<Attrib<float>>(new AttribTexture(texture));
+    } else {
+        attrib = std::shared_ptr<Attrib<float>>(new AttribValue(default_value));
+    }
+}
+
+void Importer::aiTexture_to_AttribTexture(const aiTexture *texture, AttribTexture<glm::vec3> &trc_texture) {
+    glm::ivec2 size {texture->mWidth, texture->mHeight};
+    trc_texture.set_size(size);
+    for (int x = 0; x < size.x; ++x) {
+        for (int y = 0; y < size.y; ++y) {
+            int offset = y * size.x + x;
+            float r = float(texture->pcData[offset].r) / 255.f;
+            float g = float(texture->pcData[offset].g) / 255.f;
+            float b = float(texture->pcData[offset].b) / 255.f;
+
+            trc_texture.set_pixel({x, y}, glm::saturate(glm::vec3 {r, g, b}));
+        }
+    }
+}
+
+void Importer::aiTexture_to_AttribTexture(const aiTexture *texture, AttribTexture<float> &trc_texture) {
+    glm::ivec2 size {texture->mWidth, texture->mHeight};
+    trc_texture.set_size(size);
+    for (int x = 0; x < size.x; ++x) {
+        for (int y = 0; y < size.y; ++y) {
+            int offset = y * size.x + x;
+            float r = float(texture->pcData[offset].r) / 255.f;
+            float g = float(texture->pcData[offset].g) / 255.f;
+            float b = float(texture->pcData[offset].b) / 255.f;
+
+            trc_texture.set_pixel({x, y}, std::clamp((r+g+b) / 3.f, 0.f, 1.f));
+        }
+    }
+}
+
+void Importer::make_texture_invalid(AttribTexture<glm::vec3> &trc_texture) {
+    trc_texture.set_size(glm::ivec2 {1, 1});
+    trc_texture.fill(glm::vec3 {1.f, 0.f, 1.f});
+}
+
+void Importer::make_texture_invalid(AttribTexture<float> &trc_texture) {
+    trc_texture.set_size(glm::ivec2 {1, 1});
+    trc_texture.fill(0.f);
 }
 
 } /* trc */
