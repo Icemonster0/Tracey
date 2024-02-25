@@ -23,11 +23,12 @@ int Engine::load_file(std::string file_path) {
 
     Importer importer;
     if (!importer.load_file(file_path, &shader_pack)) {
-        printf("Import error:\n%s\n\n", importer.get_error_string().c_str());
+        printf("\nImport error:\n%s\n\n", importer.get_error_string().c_str());
         return 1;
     }
     scene = importer.get_loaded_scene();
 
+    printf("\n");
     return 0;
 }
 

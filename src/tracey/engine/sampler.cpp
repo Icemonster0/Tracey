@@ -124,6 +124,8 @@ Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera, 
                     ShaderData shader_data {
                         isect.value().pos,
                         isect.value().normal,
+                        isect.value().tan,
+                        isect.value().bitan,
                         isect.value().tex_coord,
                         isect.value().material,
                         isect.value().distance,
@@ -169,6 +171,8 @@ Buffer<glm::vec3> Sampler::render_preview_sample(glm::ivec2 frame_size, Camera *
                 ShaderData shader_data {
                     isect.value().pos,
                     isect.value().normal,
+                    isect.value().tan,
+                    isect.value().bitan,
                     isect.value().tex_coord,
                     isect.value().material,
                     isect.value().distance,

@@ -36,13 +36,13 @@ struct AttribTexture : public Attrib<T> {
     AttribTexture() : texture(Buffer<T> {glm::vec2 {0, 0}}) {}
 
     T sample(glm::vec2 tex_coord) {
-        glm::vec2 image_coord = tex_coord * glm::vec2 {get_size()};
-        glm::vec2 fract_coord = glm::fract(image_coord);
+        glm::vec2 fract_coord = glm::fract(tex_coord);
+        glm::vec2 image_coord = fract_coord * glm::vec2 {get_size()};
 
-        glm::ivec2 a_pos = glm::clamp(glm::ivec2 {glm::floor(image_coord.x), glm::floor(image_coord.y)}, glm::ivec2 {0}, get_size());
-        glm::ivec2 b_pos = glm::clamp(glm::ivec2 {glm::ceil(image_coord.x), glm::floor(image_coord.y)}, glm::ivec2 {0}, get_size());
-        glm::ivec2 c_pos = glm::clamp(glm::ivec2 {glm::floor(image_coord.x), glm::ceil(image_coord.y)}, glm::ivec2 {0}, get_size());
-        glm::ivec2 d_pos = glm::clamp(glm::ivec2 {glm::ceil(image_coord.x), glm::ceil(image_coord.y)}, glm::ivec2 {0}, get_size());
+        glm::ivec2 a_pos = glm::clamp(glm::ivec2 {glm::floor(image_coord.x), glm::floor(image_coord.y)}, glm::ivec2 {0}, get_size()-1);
+        glm::ivec2 b_pos = glm::clamp(glm::ivec2 {glm::ceil(image_coord.x), glm::floor(image_coord.y)}, glm::ivec2 {0}, get_size()-1);
+        glm::ivec2 c_pos = glm::clamp(glm::ivec2 {glm::floor(image_coord.x), glm::ceil(image_coord.y)}, glm::ivec2 {0}, get_size()-1);
+        glm::ivec2 d_pos = glm::clamp(glm::ivec2 {glm::ceil(image_coord.x), glm::ceil(image_coord.y)}, glm::ivec2 {0}, get_size()-1);
 
         T ab = glm::mix(*texture.at(a_pos), *texture.at(b_pos), fract_coord.x);
         T cd = glm::mix(*texture.at(c_pos), *texture.at(c_pos), fract_coord.x);

@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "../util/math_util.hpp"
+#include "../graphics/color_spaces.hpp"
 
 namespace trc {
 
@@ -12,10 +13,13 @@ bool Importer::load_file(std::string file_path, ShaderPack *shader_pack) {
     Assimp::Importer importer;
 
     const aiScene* scene = importer.ReadFile(file_path,
-        aiProcess_CalcTangentSpace       |
-        aiProcess_Triangulate            |
-        aiProcess_JoinIdenticalVertices  |
-        aiProcess_SortByPType);
+        aiProcess_CalcTangentSpace         |
+        aiProcess_Triangulate              |
+        aiProcess_JoinIdenticalVertices    |
+        aiProcess_SortByPType              |
+        aiProcess_RemoveRedundantMaterials |
+        aiProcess_ValidateDataStructure    |
+        aiProcess_FixInfacingNormals);
 
     // check assimp errors
     if (scene == nullptr) {
@@ -77,6 +81,8 @@ void Importer::import_assimp_hierarchy(const aiScene *scene, const aiNode *root_
 void Importer::import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::mat4 transform, Scene *trc_scene, ShaderPack *shader_pack) {
     std::vector<glm::vec3> pos_vec;
     std::vector<glm::vec3> normal_vec;
+    std::vector<glm::vec3> tan_vec;
+    std::vector<glm::vec3> bitan_vec;
     std::vector<glm::vec2> tex_vec;
 
     pos_vec.reserve(mesh->mNumVertices);
@@ -100,6 +106,22 @@ void Importer::import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::
         }
     }
 
+    if (mesh->HasTangentsAndBitangents()) {
+        tan_vec.reserve(mesh->mNumVertices);
+        bitan_vec.reserve(mesh->mNumVertices);
+        for (int i = 0; i < mesh->mNumVertices; ++i) {
+            aiVector3D tangent = mesh->mTangents[i];
+            aiVector3D bitangent = mesh->mBitangents[i];
+
+            glm::vec4 t {tangent[0], tangent[1], tangent[2], 1.f};
+            glm::vec4 bt {bitangent[0], bitangent[1], bitangent[2], 1.f};
+            t = t * transform;
+            bt = bt * transform;
+            tan_vec.push_back(math::normalize(t.xyz()));
+            bitan_vec.push_back(math::normalize(bt.xyz()));
+        }
+    }
+
     if (mesh->GetNumUVChannels() > 0 && mesh->HasTextureCoords(0)) {
         tex_vec.reserve(mesh->mNumVertices);
         for (int i = 0; i < mesh->mNumVertices; ++i) {
@@ -108,7 +130,7 @@ void Importer::import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::
         }
     }
 
-    Mesh *trc_mesh = trc_scene->add_mesh(std::make_unique<Mesh>(pos_vec, normal_vec, tex_vec));
+    Mesh *trc_mesh = trc_scene->add_mesh(std::make_unique<Mesh>(pos_vec, normal_vec, tan_vec, bitan_vec, tex_vec));
 
     auto mat_it = trc_scene->get_material_list()->begin();
     std::advance(mat_it, mesh->mMaterialIndex);
@@ -121,7 +143,7 @@ void Importer::import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::
             face.mIndices[1],
             face.mIndices[2]
         };
-        trc_scene->add_object(std::unique_ptr<Shape>(new Triangle(indices, indices, indices, trc_mesh, shader_pack->shader_combined.get(), trc_mat)));
+        trc_scene->add_object(std::unique_ptr<Shape>(new Triangle(indices, indices, indices, indices, indices, trc_mesh, shader_pack->shader_combined.get(), trc_mat)));
     }
 }
 
@@ -155,10 +177,10 @@ void Importer::import_light(const aiLight *light, const aiScene *scene, const ai
 
     switch (light->mType) {
         case aiLightSource_DIRECTIONAL:
-            trc_scene->add_light(std::unique_ptr<Light>(new SunLight(trc_dir, trc_color / 500)));
+            trc_scene->add_light(std::unique_ptr<Light>(new SunLight(trc_dir, trc_color / 700)));
             break;
         case aiLightSource_POINT:
-            trc_scene->add_light(std::unique_ptr<Light>(new PointLight(trc_pos, trc_color / 500)));
+            trc_scene->add_light(std::unique_ptr<Light>(new PointLight(trc_pos, trc_color / 700)));
             break;
         case aiLightSource_SPOT:
         case aiLightSource_UNDEFINED:
@@ -180,8 +202,20 @@ void Importer::import_material(const aiMaterial *mat, const aiScene *scene, Scen
     float ior = 1.6f;
 
     // albedo
+    mat->Get(AI_MATKEY_BASE_COLOR, albedo);
+    glm::vec3 trc_albedo {albedo[0], albedo[1], albedo[2]};
     std::shared_ptr<Attrib<glm::vec3>> attrib_albedo;
-    import_material_attrib(attrib_albedo, albedo, AI_MATKEY_BASE_COLOR, aiTextureType_BASE_COLOR, mat, scene, path);
+    AttribTexture<glm::vec3> albedo_tex = import_texture<glm::vec3>(mat, aiTextureType_BASE_COLOR, scene, path);
+    if (albedo_tex.get_size() != glm::ivec2 {0}) {
+        for (int x = 0; x < albedo_tex.get_size().x; ++x) {
+            for (int y = 0; y < albedo_tex.get_size().y; ++y) {
+                albedo_tex.set_pixel({x, y}, color::sRGB_to_flat(albedo_tex.get_pixel({x, y})));
+            }
+        }
+        attrib_albedo = std::shared_ptr<Attrib<glm::vec3>>(new AttribTexture(albedo_tex));
+    } else {
+        attrib_albedo = std::shared_ptr<Attrib<glm::vec3>>(new AttribValue(trc_albedo));
+    }
 
     // roughness
     std::shared_ptr<Attrib<float>> attrib_roughness;

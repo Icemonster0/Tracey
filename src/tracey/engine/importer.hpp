@@ -56,38 +56,39 @@ private:
 
         // get full relative path
         path.append(texture_file.C_Str());
-        printf("File: %s\n", path.c_str());
 
         if (strlen(texture_file.C_Str()) == 0) {
             // texture doesn't exist
-            printf("This texture doesn't exist!\n");
             return AttribTexture<T>();
         }
 
         else if (const aiTexture *texture = scene->GetEmbeddedTexture(texture_file.C_Str())) {
             // texture is embedded
-            printf("This is an embedded texture!\n");
             AttribTexture<T> trc_texture;
+            printf("Loading embedded texture: %s", texture_file.C_Str());
             if (texture->mHeight == 0) {
                 // texture is compressed
                 if (image_rw::read_texture_from_memory((uint8_t*)texture->pcData, (int)texture->mWidth, trc_texture) != 0) {
+                    printf("    Failed\n");
                     make_texture_invalid(trc_texture);
-                }
+                } else printf("    Success\n");
             }
             else {
                 // texture data is uncompressed
                 aiTexture_to_AttribTexture(texture, trc_texture);
+                printf("    Success\n");
             }
             return std::move(trc_texture);
         }
 
         else {
             // texture is a regular file
-            printf("This is an external texture file!\n");
+            printf("Loading texture file: %s", path.c_str());
             AttribTexture<T> trc_texture;
             if (image_rw::read_texture(path.c_str(), trc_texture) != 0) {
+                printf("    Failed\n");
                 make_texture_invalid(trc_texture);
-            }
+            } else printf("    Success\n");
             return std::move(trc_texture);
         }
     }

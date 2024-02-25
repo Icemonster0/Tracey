@@ -4,8 +4,8 @@
 
 namespace trc {
 
-Triangle::Triangle(glm::ivec3 p_pos_i, glm::ivec3 p_normal_i, glm::ivec3 p_tex_i, Mesh *p_mesh, Shader *p_shader, Material *p_material)
-    : Shape(p_shader, p_material), pos_i(p_pos_i), normal_i(p_normal_i), tex_i(p_tex_i), mesh(p_mesh) {}
+Triangle::Triangle(glm::ivec3 p_pos_i, glm::ivec3 p_normal_i, glm::ivec3 p_tan_i, glm::ivec3 p_bitan_i, glm::ivec3 p_tex_i, Mesh *p_mesh, Shader *p_shader, Material *p_material)
+    : Shape(p_shader, p_material), pos_i(p_pos_i), normal_i(p_normal_i), tan_i(p_tan_i), bitan_i(p_bitan_i), tex_i(p_tex_i), mesh(p_mesh) {}
 
 std::optional<Intersection> Triangle::calc_ray_intersection(Ray ray) const {
     // fetch the three corners' coordinates
@@ -87,6 +87,12 @@ std::optional<Intersection> Triangle::calc_ray_intersection(Ray ray) const {
     glm::vec3 normal = b_a * mesh->get_normal(normal_i.x)
                      + b_b * mesh->get_normal(normal_i.y)
                      + b_c * mesh->get_normal(normal_i.z);
+    glm::vec3 tan = b_a * mesh->get_tan(tan_i.x)
+                  + b_b * mesh->get_tan(tan_i.y)
+                  + b_c * mesh->get_tan(tan_i.z);
+    glm::vec3 bitan = b_a * mesh->get_bitan(bitan_i.x)
+                    + b_b * mesh->get_bitan(bitan_i.y)
+                    + b_c * mesh->get_bitan(bitan_i.z);
     glm::vec2 tex = b_a * mesh->get_tex(tex_i.x)
                   + b_b * mesh->get_tex(tex_i.y)
                   + b_c * mesh->get_tex(tex_i.z);
@@ -94,6 +100,8 @@ std::optional<Intersection> Triangle::calc_ray_intersection(Ray ray) const {
     return std::make_optional<Intersection> (
         pos,
         normal,
+        tan,
+        bitan,
         tex,
         material,
         distance,
@@ -107,6 +115,14 @@ glm::ivec3 Triangle::get_pos_i() {
 
 glm::ivec3 Triangle::get_normal_i() {
     return normal_i;
+}
+
+glm::ivec3 Triangle::get_tan_i() {
+    return tan_i;
+}
+
+glm::ivec3 Triangle::get_bitan_i() {
+    return bitan_i;
 }
 
 glm::ivec3 Triangle::get_tex_i() {
