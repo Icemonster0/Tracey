@@ -17,6 +17,8 @@ std::optional<Intersection> GroundPlane::calc_ray_intersection(Ray ray) const {
     return std::make_optional<Intersection> (
         point, // pos
         glm::vec3 {0.f, 1.f, 0.f}, // normal
+        glm::vec3 {1.f, 0.f, 0.f}, // tangent
+        glm::vec3 {0.f, 0.f, 1.f}, // bitangent
         glm::fract(point.xz()), // tex_coord
         material, // material
         t, // distance

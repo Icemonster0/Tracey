@@ -32,9 +32,15 @@ std::optional<Intersection> Sphere::calc_ray_intersection(Ray ray) const {
         tex_coord.t = atanf(normal.y / radius_at_height) / 3.1415927f + 0.5f;
     }
 
+    // tangent and bitangent
+    glm::vec3 tan = glm::cross(glm::vec3 {0.f, 1.f, 0.f}, normal);
+    glm::vec3 bitan = glm::cross(normal, tan);
+
     return std::make_optional<Intersection> (
         point, // pos
         normal,
+        tan,
+        bitan,
         tex_coord,
         material,
         t.value(), // distance

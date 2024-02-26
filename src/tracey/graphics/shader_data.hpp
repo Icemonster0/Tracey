@@ -16,6 +16,8 @@ struct ShaderPack;
 struct ShaderData {
     glm::vec3 pos;
     glm::vec3 normal;
+    glm::vec3 tangent;
+    glm::vec3 bitangent;
     glm::vec2 tex_coord;
     Material *material;
     float distance;

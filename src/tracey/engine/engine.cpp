@@ -8,6 +8,7 @@
 #include "../../lib/glfw.hpp"
 #include "../util/math_util.hpp"
 #include "input_package.hpp"
+#include "../util/parser.hpp"
 #include "../geometry/shape.hpp"
 #include "../geometry/shapes/shapes.hpp"
 #include "../graphics/image_read_write.hpp"
@@ -16,8 +17,35 @@ namespace trc {
 
 Engine::Engine(UserConfig cfg) : cfg(cfg), error(0), preview_mode(true) {}
 
+int Engine::load_file(std::string file_path) {
+    if(system("clear")) {};
+    printf("Loading file '%s'\n", file_path.c_str());
+
+    if (file_path.size() >= 7 && file_path.substr(file_path.size() - 7) == ".tracey") {
+        // native file: use own parser
+        TraceyParser parser;
+        if (!parser.load_file(file_path, &shader_pack)) {
+            printf("\nImport error:\n%s\n\n", parser.get_error_string().c_str());
+            return 1;
+        }
+        scene = parser.get_loaded_scene();
+    }
+    else {
+        // non-native file: use assimp
+        Importer importer;
+        if (!importer.load_file(file_path, &shader_pack)) {
+            printf("\nImport error:\n%s\n\n", importer.get_error_string().c_str());
+            return 1;
+        }
+        scene = importer.get_loaded_scene();
+    }
+
+    printf("\n");
+    return 0;
+}
+
 int Engine::run() {
-    scene_setup();
+    // test_scene_setup();
 
     accelerator = Accelerator {&scene};
     window_manager = WindowManager {cfg.window_size};
@@ -75,7 +103,67 @@ int Engine::run() {
     return error;
 }
 
-void Engine::scene_setup() {
+int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen) {
+    InputPackage input = window_manager.handle_events();
+
+    int return_code = 0;
+
+    sampler.initialize_image(image_size);
+
+    Camera render_camera = *viewer.get_camera();
+    render_camera.set_aspect((float)image_size.x / (float)image_size.y);
+
+    float start_t = glfwGetTime();
+    float last_t = glfwGetTime();
+    float this_t = glfwGetTime();
+    float delta_t = 0.f;
+    float render_time = 0.f;
+    float sample_rate = 1.f;
+
+    int sample = 0;
+    while (!input.i && !window_manager.window_should_close() && sample < samples) {
+
+        console.print_render_info(
+            cfg.console_frequency,
+            delta_t,
+            sample,
+            cfg.samples,
+            image_size,
+            render_time,
+            sample_rate
+        );
+
+        ++sample;
+        sampler.render_image_sample(
+            &render_camera,
+            &accelerator,
+            &shader_pack,
+            seed_gen->operator()(),
+            sample
+        );
+
+        input = window_manager.handle_events();
+
+        if (sample >= samples || input.r) {
+            if (image_rw::write_png(sampler.get_image(), cfg.output_path) == 0)
+                return_code = 1;
+            if (sample >= samples) break;
+        }
+
+        this_t = glfwGetTime();
+        delta_t = this_t - last_t;
+        last_t = this_t;
+        render_time = this_t - start_t;
+        sample_rate = (float)sample / render_time;
+    }
+
+    sampler.destroy_image();
+
+    return return_code;
+}
+
+// For testing purposes
+void Engine::test_scene_setup() {
     /* SPHERE GROUP SETUP */
     Material *mat_floor = scene.add_material(std::make_unique<Material>(glm::vec3 {0.9f, 0.9f, 0.9f}, 0.5f, 0.f));
     Material *mat_a = scene.add_material(std::make_unique<Material>(glm::vec3 {1.0f, 0.5f, 0.0f}, 0.001f, 1.f));
@@ -131,65 +219,6 @@ void Engine::scene_setup() {
     //
     // scene.add_object(std::unique_ptr<Shape>(new GroundPlane(-0.5f, shader_pack.shader_combined.get(), floor_mat)));
     // scene.add_object(std::unique_ptr<Shape>(new Triangle({0, 1, 2}, {0, 0, 0}, {0, 1, 2}, mesh, shader_pack.shader_combined.get(), tri_mat)));
-}
-
-int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen) {
-    InputPackage input = window_manager.handle_events();
-
-    int return_code = 0;
-
-    sampler.initialize_image(image_size);
-
-    Camera render_camera = *viewer.get_camera();
-    render_camera.set_aspect((float)image_size.x / (float)image_size.y);
-
-    float start_t = glfwGetTime();
-    float last_t = glfwGetTime();
-    float this_t = glfwGetTime();
-    float delta_t = 0.f;
-    float render_time = 0.f;
-    float sample_rate = 1.f;
-
-    int sample = 0;
-    while (!input.i && !window_manager.window_should_close() && sample < samples) {
-
-        ++sample;
-        sampler.render_image_sample(
-            &render_camera,
-            &accelerator,
-            &shader_pack,
-            seed_gen->operator()(),
-            sample
-        );
-
-        input = window_manager.handle_events();
-
-        console.print_render_info(
-            cfg.console_frequency,
-            delta_t,
-            sample,
-            cfg.samples,
-            image_size,
-            render_time,
-            sample_rate
-        );
-
-        if (sample >= samples || input.r) {
-            if (image_rw::write_png(sampler.get_image(), "render_result.png") == 0)
-                return_code = 1;
-            break;
-        }
-
-        this_t = glfwGetTime();
-        delta_t = this_t - last_t;
-        last_t = this_t;
-        render_time = this_t - start_t;
-        sample_rate = (float)sample / render_time;
-    }
-
-    sampler.destroy_image();
-
-    return return_code;
 }
 
 } /* trc */

@@ -11,4 +11,13 @@ glm::vec3 to_sRGB(glm::vec3 color) {
     };
 }
 
+glm::vec3 sRGB_to_flat(glm::vec3 color) {
+    const float c = 2.2f;
+    return glm::vec3 {
+        powf(color.x, c),
+        powf(color.y, c),
+        powf(color.z, c)
+    };
+}
+
 } /* trc::color */

@@ -44,4 +44,11 @@ std::list<std::unique_ptr<Mesh>> *Scene::get_mesh_list() {
     return &mesh_list;
 }
 
+void Scene::append(Scene &other_scene) {
+    object_list.splice(object_list.end(), other_scene.object_list);
+    light_list.splice(light_list.end(), other_scene.light_list);
+    material_list.splice(material_list.end(), other_scene.material_list);
+    mesh_list.splice(mesh_list.end(), other_scene.mesh_list);
+}
+
 } /* trc */

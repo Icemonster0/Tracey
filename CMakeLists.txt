@@ -3,9 +3,19 @@ project(Tracey VERSION 1.0.0)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
+# Assimp config
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
+set(ASSIMP_NO_EXPORT ON CACHE INTERNAL "" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE INTERNAL "" FORCE)
+configure_file("${PROJECT_SOURCE_DIR}/lib/assimp-5.3.1/include/assimp/config.h.in" "${PROJECT_SOURCE_DIR}/lib/assimp-5.3.1/include/assimp/config.h")
+configure_file("${PROJECT_SOURCE_DIR}/lib/assimp-5.3.1/contrib/zlib/zconf.h.cmakein" "${PROJECT_SOURCE_DIR}/lib/assimp-5.3.1/contrib/zlib/zconf.h")
+
 add_subdirectory(lib/glfw-3.3.8)
+add_subdirectory(lib/assimp-5.3.1)
 
 add_library(main_module STATIC
+    src/lib/assimp.hpp
     src/lib/clom.cpp
     src/lib/clom.hpp
     src/lib/glfw_callbacks.cpp
@@ -21,6 +31,8 @@ add_library(main_module STATIC
     src/tracey/engine/console.hpp
     src/tracey/engine/engine.cpp
     src/tracey/engine/engine.hpp
+    src/tracey/engine/importer.cpp
+    src/tracey/engine/importer.hpp
     src/tracey/engine/sampler.cpp
     src/tracey/engine/sampler.hpp
     src/tracey/engine/scene.cpp
@@ -77,6 +89,8 @@ add_library(main_module STATIC
     src/tracey/util/math_util.hpp
     src/tracey/util/normal_dist.cpp
     src/tracey/util/normal_dist.hpp
+    src/tracey/util/parser.cpp
+    src/tracey/util/parser.hpp
     src/tracey/util/random.hpp
     src/tracey/util/xoshiro256plus.cpp
     src/tracey/util/xoshiro256plus.hpp
@@ -93,7 +107,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(main_module pthread)
 endif()
 
-target_link_libraries(main_module glfw GL -fopenmp)
+target_link_libraries(main_module glfw assimp GL -fopenmp)
 
 add_executable(${PROJECT_NAME} src/main.cpp)
 

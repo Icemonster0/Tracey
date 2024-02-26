@@ -9,7 +9,7 @@
 namespace trc {
 
 struct Material {
-    Material(glm::vec3 a, float r = 0.5f, float m = 0.f, glm::vec3 e = glm::vec3 {0.f}, glm::vec3 n = glm::vec3(0.5f, 0.5f, 1.f), float t = false, float i = 1.6f);
+    Material(glm::vec3 a, float r = 0.5f, float m = 0.f, glm::vec3 e = glm::vec3 {0.f}, glm::vec3 n = glm::vec3 {0.5f, 0.5f, 1.f}, float t = 0.f, float i = 1.6f);
     Material(std::shared_ptr<Attrib<glm::vec3>> a,
              std::shared_ptr<Attrib<float>> r,
              std::shared_ptr<Attrib<float>> m,

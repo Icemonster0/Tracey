@@ -24,6 +24,9 @@ inline float triangle_signed_area(glm::vec2 a, glm::vec2 b, glm::vec2 c) {
     return glm::cross(glm::vec3 {b - a, 0.f}, glm::vec3 {c - a, 0.f}).z;
 }
 
+float quad_interp(float t);
+float cube_interp(float t);
+
 } /* trc::math */
 
 #endif /* end of include guard: MATH_UTIL_HPP */

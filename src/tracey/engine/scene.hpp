@@ -25,6 +25,8 @@ public:
     std::list<std::unique_ptr<Material>> *get_material_list();
     std::list<std::unique_ptr<Mesh>> *get_mesh_list();
 
+    void append(Scene &other_scene);
+
 private:
     std::list<std::unique_ptr<Shape>> object_list;
     std::list<std::unique_ptr<Light>> light_list;

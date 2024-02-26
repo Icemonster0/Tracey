@@ -15,18 +15,22 @@ namespace trc {
 
 class Triangle : public Shape {
 public:
-    Triangle(glm::ivec3 p_pos_i, glm::ivec3 p_normal_i, glm::ivec3 p_tex_i, Mesh *p_mesh, Shader *p_shader, Material *p_material);
+    Triangle(glm::ivec3 p_pos_i, glm::ivec3 p_normal_i, glm::ivec3 p_tan_i, glm::ivec3 p_bitan_i, glm::ivec3 p_tex_i, Mesh *p_mesh, Shader *p_shader, Material *p_material);
 
     std::optional<Intersection> calc_ray_intersection(Ray ray) const;
 
     glm::ivec3 get_pos_i();
     glm::ivec3 get_normal_i();
+    glm::ivec3 get_tan_i();
+    glm::ivec3 get_bitan_i();
     glm::ivec3 get_tex_i();
     Mesh *get_mesh();
 
 private:
     glm::ivec3 pos_i;
     glm::ivec3 normal_i;
+    glm::ivec3 tan_i;
+    glm::ivec3 bitan_i;
     glm::ivec3 tex_i;
 
     Mesh *mesh;

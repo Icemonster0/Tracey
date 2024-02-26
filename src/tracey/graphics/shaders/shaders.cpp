@@ -52,6 +52,8 @@ TRC_DEFINE_SHADER(ShaderDiffuseIndirect) {
         ShaderData diffuse_shader_data {
             isect.value().pos,
             isect.value().normal,
+            isect.value().tan,
+            isect.value().bitan,
             isect.value().tex_coord,
             isect.value().material,
             shader_data.distance + isect.value().distance,
@@ -110,6 +112,8 @@ TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
         ShaderData specular_shader_data {
             obj_isect.value().pos,
             obj_isect.value().normal,
+            obj_isect.value().tan,
+            obj_isect.value().bitan,
             obj_isect.value().tex_coord,
             obj_isect.value().material,
             shader_data.distance + obj_isect_distance,
@@ -184,6 +188,8 @@ TRC_DEFINE_SHADER(ShaderTransmission) {
         ShaderData transmit_shader_data {
             obj_isect.value().pos,
             obj_isect.value().normal,
+            obj_isect.value().tan,
+            obj_isect.value().bitan,
             obj_isect.value().tex_coord,
             obj_isect.value().material,
             shader_data.distance + obj_isect_distance,
@@ -208,6 +214,12 @@ TRC_DEFINE_SHADER(ShaderCombined) {
     glm::vec3 diffuse {0.f};
     glm::vec3 specular {0.f};
 
+    glm::vec3 tan_space_normal = SAMPLE_ATTRIB(normal)*2.f-1.f;
+    shader_data.normal = glm::vec3 {
+        shader_data.tangent * tan_space_normal.x +
+        shader_data.bitangent * tan_space_normal.y +
+        shader_data.normal * tan_space_normal.z
+    };
     glm::vec3 albedo = SAMPLE_ATTRIB(albedo);
     float metallic = SAMPLE_ATTRIB(metallic);
     float fresnel = math::fresnel(1.f, SAMPLE_ATTRIB(ior), -shader_data.ray.direction, shader_data.normal);
@@ -224,8 +236,13 @@ TRC_DEFINE_SHADER(ShaderCombined) {
     }
     else {
         // make backfacing geometry black
-        if (glm::dot(shader_data.normal, -shader_data.ray.direction) < -0.1f)
-            return glm::vec4 {glm::vec3 {0.f}, 1.f};
+        // if (glm::dot(shader_data.normal, -shader_data.ray.direction) < -0.1f)
+        //     return glm::vec4 {glm::vec3 {0.f}, 1.f};
+
+        // invert backfacing normals
+        if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f) {
+            shader_data.normal *= -1.f;
+        }
 
         // diffuse
         glm::vec3 diffuse_direct = EVALUATE_SHADER(shader_diffuse_direct, shader_data).rgb();
@@ -305,6 +322,8 @@ TRC_DEFINE_SHADER(ShaderReflect) {
             ShaderData reflect_shader_data {
                 isect.value().pos,
                 isect.value().normal,
+                isect.value().tan,
+                isect.value().bitan,
                 isect.value().tex_coord,
                 isect.value().material,
                 shader_data.distance + isect.value().distance,

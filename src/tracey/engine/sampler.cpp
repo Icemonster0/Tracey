@@ -57,7 +57,7 @@ void Sampler::render_image_sample(Camera *camera, Accelerator *accelerator, Shad
             glm::vec3 *new_pixel = new_sample.at({x, y});
 
             *old_pixel *= old_pixel_fac;
-            *old_pixel += *new_pixel * inv_sample;
+            *old_pixel += color::to_sRGB(*new_pixel) * inv_sample;
         }
     }
 }
@@ -124,6 +124,8 @@ Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera, 
                     ShaderData shader_data {
                         isect.value().pos,
                         isect.value().normal,
+                        isect.value().tan,
+                        isect.value().bitan,
                         isect.value().tex_coord,
                         isect.value().material,
                         isect.value().distance,
@@ -169,6 +171,8 @@ Buffer<glm::vec3> Sampler::render_preview_sample(glm::ivec2 frame_size, Camera *
                 ShaderData shader_data {
                     isect.value().pos,
                     isect.value().normal,
+                    isect.value().tan,
+                    isect.value().bitan,
                     isect.value().tex_coord,
                     isect.value().material,
                     isect.value().distance,

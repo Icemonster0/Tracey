@@ -22,4 +22,14 @@ To be able to compile, you need
 
 (The latter two of which are usually installed (on Linux) if you have g++ (I think))  
 
-To run, execute the generated binary from the terminal (it can also be run without a terminal, but it has a nice console interface so it is recommended).
+## Usage
+Run Tracey with the option `-S` to specify the scene file to be loaded. You can use the examples in [`scenes`](scenes). You can also write your own scene description files using the syntax described in [`tracey_syntax.md`](tracey_syntax.md).  
+
+For example:  
+```
+Tracey -S scenes/example.tracey
+Tracey -S scenes/example1.glb
+```
+
+All other command line options can be found by running `Tracey help`.  
+Camera navigation and rendering controls are displayed in the console during runtime.

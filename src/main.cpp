@@ -14,9 +14,22 @@ int main(int argc, char const *argv[]) {
 
     // Create the engine
     trc::Engine engine {cfg};
+    int result;
 
-    // Start the graphical runtime
-    int result = engine.run();
+    // If no scene file is specified, abort
+    if (cfg.scene_path.length() == 0) {
+        printf("Usage: Tracey -S path/to/scene/file\n");
+        return 1;
+    }
+    else {
+        // Load scene file
+        result = engine.load_file(cfg.scene_path);
+
+        // If successful, start the graphical runtime
+        if (result == 0) {
+            result = engine.run();
+        }
+    }
 
     // Exit once the user quits or a crash occurs
     printf("Engine exited with code %d\n", result);
