@@ -23,10 +23,11 @@ To be able to compile, you need
 (The latter two of which are usually installed (on Linux) if you have g++ (I think))  
 
 ## Usage
-Run Tracey with the option `-S` to specify the scene file to be loaded. You can use the examples in [`scenes`](scenes).  
+Run Tracey with the option `-S` to specify the scene file to be loaded. You can use the examples in [`scenes`](scenes). You can also write your own scene description files using the syntax described in [`tracey_syntax.md`](tracey_syntax.md).  
 
 For example:  
 ```
+Tracey -S scenes/example.tracey
 Tracey -S scenes/example1.glb
 ```
 

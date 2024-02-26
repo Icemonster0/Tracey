@@ -8,7 +8,9 @@
 
 namespace trc {
 
-bool Importer::load_file(std::string file_path, ShaderPack *shader_pack) {
+// public
+
+bool Importer::load_file(std::string file_path, ShaderPack *shader_pack, glm::mat4 transform) {
     // setup assimp and load file
     Assimp::Importer importer;
 
@@ -29,7 +31,7 @@ bool Importer::load_file(std::string file_path, ShaderPack *shader_pack) {
 
     // construct a trc::Scene
     std::string path = file_path.substr(0, file_path.find_last_of("\\/")+1);
-    loaded_scene = assimp_to_trc(scene, shader_pack, path);
+    loaded_scene = assimp_to_trc(scene, shader_pack, transform, path);
 
     return true;
 }
@@ -42,7 +44,9 @@ std::string Importer::get_error_string() {
     return error_string;
 }
 
-Scene Importer::assimp_to_trc(const aiScene *scene, ShaderPack *shader_pack, std::string path) {
+// private
+
+Scene Importer::assimp_to_trc(const aiScene *scene, ShaderPack *shader_pack, glm::mat4 transform, std::string path) {
     Scene trc_scene;
 
     // materials
@@ -53,7 +57,7 @@ Scene Importer::assimp_to_trc(const aiScene *scene, ShaderPack *shader_pack, std
 
     // meshes
     aiNode *root_node = scene->mRootNode;
-    import_assimp_hierarchy(scene, root_node, glm::mat4 {1.f}, &trc_scene, shader_pack);
+    import_assimp_hierarchy(scene, root_node, glm::transpose(transform), &trc_scene, shader_pack);
 
     // lights
     for (int i = 0; i < scene->mNumLights; ++i) {

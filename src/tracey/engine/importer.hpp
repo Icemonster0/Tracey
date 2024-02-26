@@ -17,7 +17,7 @@ namespace trc {
 
 class Importer {
 public:
-    bool load_file(std::string file_path, ShaderPack *shader_pack);
+    bool load_file(std::string file_path, ShaderPack *shader_pack, glm::mat4 transform = glm::mat4 {1.f});
 
     Scene get_loaded_scene();
     std::string get_error_string();
@@ -26,7 +26,7 @@ private:
     Scene loaded_scene;
     std::string error_string = "Success";
 
-    Scene assimp_to_trc(const aiScene *scene, ShaderPack *shader_pack, std::string path);
+    Scene assimp_to_trc(const aiScene *scene, ShaderPack *shader_pack, glm::mat4 transform, std::string path);
     void import_assimp_hierarchy(const aiScene *scene, const aiNode *root_node, const glm::mat4 transform, Scene *trc_scene, ShaderPack *shader_pack);
     void import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::mat4 transform, Scene *trc_scene, ShaderPack *shader_pack);
     void import_light(const aiLight *light, const aiScene *scene, const aiNode *root_node, Scene *trc_scene);

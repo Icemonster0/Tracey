@@ -239,6 +239,11 @@ TRC_DEFINE_SHADER(ShaderCombined) {
         // if (glm::dot(shader_data.normal, -shader_data.ray.direction) < -0.1f)
         //     return glm::vec4 {glm::vec3 {0.f}, 1.f};
 
+        // invert backfacing normals
+        if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f) {
+            shader_data.normal *= -1.f;
+        }
+
         // diffuse
         glm::vec3 diffuse_direct = EVALUATE_SHADER(shader_diffuse_direct, shader_data).rgb();
         glm::vec3 diffuse_indirect {0.f};

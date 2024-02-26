@@ -89,6 +89,8 @@ add_library(main_module STATIC
     src/tracey/util/math_util.hpp
     src/tracey/util/normal_dist.cpp
     src/tracey/util/normal_dist.hpp
+    src/tracey/util/parser.cpp
+    src/tracey/util/parser.hpp
     src/tracey/util/random.hpp
     src/tracey/util/xoshiro256plus.cpp
     src/tracey/util/xoshiro256plus.hpp

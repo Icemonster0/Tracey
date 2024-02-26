@@ -8,7 +8,7 @@
 #include "../../lib/glfw.hpp"
 #include "../util/math_util.hpp"
 #include "input_package.hpp"
-#include "importer.hpp"
+#include "../util/parser.hpp"
 #include "../geometry/shape.hpp"
 #include "../geometry/shapes/shapes.hpp"
 #include "../graphics/image_read_write.hpp"
@@ -19,14 +19,26 @@ Engine::Engine(UserConfig cfg) : cfg(cfg), error(0), preview_mode(true) {}
 
 int Engine::load_file(std::string file_path) {
     if(system("clear")) {};
-    printf("Loading file '%s' ...\n", file_path.c_str());
+    printf("Loading file '%s'\n", file_path.c_str());
 
-    Importer importer;
-    if (!importer.load_file(file_path, &shader_pack)) {
-        printf("\nImport error:\n%s\n\n", importer.get_error_string().c_str());
-        return 1;
+    if (file_path.size() >= 7 && file_path.substr(file_path.size() - 7) == ".tracey") {
+        // native file: use own parser
+        TraceyParser parser;
+        if (!parser.load_file(file_path, &shader_pack)) {
+            printf("\nImport error:\n%s\n\n", parser.get_error_string().c_str());
+            return 1;
+        }
+        scene = parser.get_loaded_scene();
     }
-    scene = importer.get_loaded_scene();
+    else {
+        // non-native file: use assimp
+        Importer importer;
+        if (!importer.load_file(file_path, &shader_pack)) {
+            printf("\nImport error:\n%s\n\n", importer.get_error_string().c_str());
+            return 1;
+        }
+        scene = importer.get_loaded_scene();
+    }
 
     printf("\n");
     return 0;
