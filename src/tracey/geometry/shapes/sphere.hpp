@@ -17,6 +17,8 @@ public:
     Sphere(glm::vec3 p_pos, float p_radius, Shader *p_shader, Material *p_material);
 
     std::optional<Intersection> calc_ray_intersection(Ray ray) const;
+    Box calc_bounding_box() const;
+    glm::vec3 center() const;
 
 private:
     glm::vec3 pos;

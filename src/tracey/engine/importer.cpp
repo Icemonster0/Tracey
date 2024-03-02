@@ -147,7 +147,7 @@ void Importer::import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::
             face.mIndices[1],
             face.mIndices[2]
         };
-        trc_scene->add_object(std::unique_ptr<Shape>(new Triangle(indices, indices, indices, indices, indices, trc_mesh, shader_pack->shader_combined.get(), trc_mat)));
+        trc_scene->add_object(std::unique_ptr<Shape>(new Triangle(indices, trc_mesh, shader_pack->shader_combined.get(), trc_mat)));
     }
 }
 

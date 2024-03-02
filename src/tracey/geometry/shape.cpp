@@ -9,6 +9,14 @@ std::optional<Intersection> Shape::calc_ray_intersection(Ray ray) const {
     return std::optional<Intersection>();
 }
 
+Box Shape::calc_bounding_box() const {
+    return Box {};
+}
+
+glm::vec3 Shape::center() const {
+    return glm::vec3 {};
+}
+
 Shader *Shape::get_shader() {
     return shader;
 }

@@ -4,7 +4,11 @@
 
 #include "../util/math_util.hpp"
 
+#include <unistd.h>
+
 namespace trc {
+
+// public
 
 Accelerator::Accelerator(Scene *source_scene) {
     std::list<std::unique_ptr<Shape>> *source_object_list = source_scene->get_object_list();
@@ -21,18 +25,7 @@ Accelerator::Accelerator(Scene *source_scene) {
 Accelerator::Accelerator() {}
 
 std::optional<Intersection> Accelerator::calc_intersection(Ray ray) const {
-    float min_dist = std::numeric_limits<float>::infinity();
-    std::optional<Intersection> min_isect;
-
-    for (auto &obj : object_ptr_list) {
-        std::optional<Intersection> isect = obj->calc_ray_intersection(ray);
-        if (isect && isect.value().distance < min_dist) {
-            min_dist = isect.value().distance;
-            min_isect = isect;
-        }
-    }
-
-    return min_isect;
+    return calc_intersection_in_list(ray, &object_ptr_list);
 }
 
 LightSampleData Accelerator::calc_light_intersection(Ray ray) const {
@@ -47,7 +40,7 @@ LightSampleData Accelerator::calc_light_intersection(Ray ray) const {
         LightSampleData isect = light->calc_ray_intersection(ray);
         if (isect.distance <= min_dist) {
             min_dist = isect.distance;
-            min_isect = isect;
+            min_isect = std::move(isect);
         }
     }
 
@@ -71,6 +64,23 @@ glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 n
     }
 
     return light_color;
+}
+
+// private
+
+std::optional<Intersection> Accelerator::calc_intersection_in_list(Ray ray, const std::list<Shape*> *list) const {
+    float min_dist = std::numeric_limits<float>::infinity();
+    std::optional<Intersection> min_isect;
+
+    for (auto &obj : *list) {
+        std::optional<Intersection> isect = obj->calc_ray_intersection(ray);
+        if (isect && isect.value().distance < min_dist) {
+            min_dist = isect.value().distance;
+            min_isect = std::move(isect);
+        }
+    }
+
+    return min_isect;
 }
 
 } /* trc */

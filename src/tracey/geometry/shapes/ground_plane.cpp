@@ -1,5 +1,7 @@
 #include "ground_plane.hpp"
 
+#include <limits>
+
 namespace trc {
 
 GroundPlane::GroundPlane(float p_height, Shader *p_shader, Material *p_material)
@@ -24,6 +26,17 @@ std::optional<Intersection> GroundPlane::calc_ray_intersection(Ray ray) const {
         t, // distance
         shader // shader
     );
+}
+
+Box GroundPlane::calc_bounding_box() const {
+    return Box {
+        glm::vec3 {-std::numeric_limits<float>::infinity(), height, -std::numeric_limits<float>::infinity()},
+        glm::vec3 {std::numeric_limits<float>::infinity(), height, std::numeric_limits<float>::infinity()}
+    };
+}
+
+glm::vec3 GroundPlane::center() const {
+    return glm::vec3 {0.f, height, 0.f};
 }
 
 } /* trc */

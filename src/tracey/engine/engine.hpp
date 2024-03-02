@@ -2,6 +2,7 @@
 #define ENGINE_HPP
 
 #include <string>
+#include <memory>
 
 #include "../../lib/glm.hpp"
 #include "../util/random.hpp"
@@ -10,6 +11,7 @@
 #include "../graphics/shader_pack.hpp"
 #include "scene.hpp"
 #include "accelerator.hpp"
+#include "bvh.hpp"
 #include "window_manager.hpp"
 #include "viewer.hpp"
 #include "sampler.hpp"
@@ -28,7 +30,7 @@ private:
     UserConfig cfg;
     ShaderPack shader_pack;
     Scene scene;
-    Accelerator accelerator;
+    std::unique_ptr<Accelerator> accelerator;
     WindowManager window_manager;
     Viewer viewer;
     Sampler sampler;

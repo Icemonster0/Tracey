@@ -48,4 +48,15 @@ std::optional<Intersection> Sphere::calc_ray_intersection(Ray ray) const {
     );
 }
 
+Box Sphere::calc_bounding_box() const {
+    return Box {
+        pos - glm::vec3 {radius},
+        pos + glm::vec3 {radius}
+    };
+}
+
+glm::vec3 Sphere::center() const {
+    return pos;
+}
+
 } /* trc */

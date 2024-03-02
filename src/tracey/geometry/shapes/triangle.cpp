@@ -4,14 +4,14 @@
 
 namespace trc {
 
-Triangle::Triangle(glm::ivec3 p_pos_i, glm::ivec3 p_normal_i, glm::ivec3 p_tan_i, glm::ivec3 p_bitan_i, glm::ivec3 p_tex_i, Mesh *p_mesh, Shader *p_shader, Material *p_material)
-    : Shape(p_shader, p_material), pos_i(p_pos_i), normal_i(p_normal_i), tan_i(p_tan_i), bitan_i(p_bitan_i), tex_i(p_tex_i), mesh(p_mesh) {}
+Triangle::Triangle(glm::ivec3 p_data_index, Mesh *p_mesh, Shader *p_shader, Material *p_material)
+    : Shape(p_shader, p_material), data_index(p_data_index), mesh(p_mesh) {}
 
 std::optional<Intersection> Triangle::calc_ray_intersection(Ray ray) const {
     // fetch the three corners' coordinates
-    glm::vec3 pos_a = mesh->get_pos(pos_i.x);
-    glm::vec3 pos_b = mesh->get_pos(pos_i.y);
-    glm::vec3 pos_c = mesh->get_pos(pos_i.z);
+    glm::vec3 pos_a = mesh->get_pos(data_index.x);
+    glm::vec3 pos_b = mesh->get_pos(data_index.y);
+    glm::vec3 pos_c = mesh->get_pos(data_index.z);
 
     // transform to ray-space --------------------------------------------------
 
@@ -75,27 +75,27 @@ std::optional<Intersection> Triangle::calc_ray_intersection(Ray ray) const {
         return std::optional<Intersection>();
 
     // claculate intersection parameters ---------------------------------------
-    glm::vec3 pos = b_a * mesh->get_pos(pos_i.x)
-                  + b_b * mesh->get_pos(pos_i.y)
-                  + b_c * mesh->get_pos(pos_i.z);
+    glm::vec3 pos = b_a * mesh->get_pos(data_index.x)
+                  + b_b * mesh->get_pos(data_index.y)
+                  + b_c * mesh->get_pos(data_index.z);
 
     float distance = glm::length(pos - ray.origin);
 
     if (distance < TRC_RAY_CLIP_EPSILON || (b_a*pos_a.z + b_b*pos_b.z + b_c*pos_c.z) > 0) // too close or behind the ray origin
         return std::optional<Intersection>();
 
-    glm::vec3 normal = b_a * mesh->get_normal(normal_i.x)
-                     + b_b * mesh->get_normal(normal_i.y)
-                     + b_c * mesh->get_normal(normal_i.z);
-    glm::vec3 tan = b_a * mesh->get_tan(tan_i.x)
-                  + b_b * mesh->get_tan(tan_i.y)
-                  + b_c * mesh->get_tan(tan_i.z);
-    glm::vec3 bitan = b_a * mesh->get_bitan(bitan_i.x)
-                    + b_b * mesh->get_bitan(bitan_i.y)
-                    + b_c * mesh->get_bitan(bitan_i.z);
-    glm::vec2 tex = b_a * mesh->get_tex(tex_i.x)
-                  + b_b * mesh->get_tex(tex_i.y)
-                  + b_c * mesh->get_tex(tex_i.z);
+    glm::vec3 normal = b_a * mesh->get_normal(data_index.x)
+                     + b_b * mesh->get_normal(data_index.y)
+                     + b_c * mesh->get_normal(data_index.z);
+    glm::vec3 tan = b_a * mesh->get_tan(data_index.x)
+                  + b_b * mesh->get_tan(data_index.y)
+                  + b_c * mesh->get_tan(data_index.z);
+    glm::vec3 bitan = b_a * mesh->get_bitan(data_index.x)
+                    + b_b * mesh->get_bitan(data_index.y)
+                    + b_c * mesh->get_bitan(data_index.z);
+    glm::vec2 tex = b_a * mesh->get_tex(data_index.x)
+                  + b_b * mesh->get_tex(data_index.y)
+                  + b_c * mesh->get_tex(data_index.z);
 
     return std::make_optional<Intersection> (
         pos,
@@ -109,24 +109,31 @@ std::optional<Intersection> Triangle::calc_ray_intersection(Ray ray) const {
     );
 }
 
-glm::ivec3 Triangle::get_pos_i() {
-    return pos_i;
+Box Triangle::calc_bounding_box() const {
+    float min_x = std::min(std::min(mesh->get_pos(data_index.x).x, mesh->get_pos(data_index.y).x), mesh->get_pos(data_index.z).x);
+    float max_x = std::max(std::max(mesh->get_pos(data_index.x).x, mesh->get_pos(data_index.y).x), mesh->get_pos(data_index.z).x);
+    float min_y = std::min(std::min(mesh->get_pos(data_index.x).y, mesh->get_pos(data_index.y).y), mesh->get_pos(data_index.z).y);
+    float max_y = std::max(std::max(mesh->get_pos(data_index.x).y, mesh->get_pos(data_index.y).y), mesh->get_pos(data_index.z).y);
+    float min_z = std::min(std::min(mesh->get_pos(data_index.x).z, mesh->get_pos(data_index.y).z), mesh->get_pos(data_index.z).z);
+    float max_z = std::max(std::max(mesh->get_pos(data_index.x).z, mesh->get_pos(data_index.y).z), mesh->get_pos(data_index.z).z);
+
+    return Box {
+        glm::vec3 {min_x, min_y, min_z},
+        glm::vec3 {max_x, max_y, max_z}
+    };
 }
 
-glm::ivec3 Triangle::get_normal_i() {
-    return normal_i;
+glm::vec3 Triangle::center() const {
+    // return mesh->get_pos(data_index.z);
+    return (
+        mesh->get_pos(data_index.x) +
+        mesh->get_pos(data_index.y) +
+        mesh->get_pos(data_index.z)
+    ) / 3.f;
 }
 
-glm::ivec3 Triangle::get_tan_i() {
-    return tan_i;
-}
-
-glm::ivec3 Triangle::get_bitan_i() {
-    return bitan_i;
-}
-
-glm::ivec3 Triangle::get_tex_i() {
-    return tex_i;
+glm::ivec3 Triangle::get_indices() {
+    return data_index;
 }
 
 Mesh *Triangle::get_mesh() {

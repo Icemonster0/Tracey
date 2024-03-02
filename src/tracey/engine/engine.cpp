@@ -40,14 +40,15 @@ int Engine::load_file(std::string file_path) {
         scene = importer.get_loaded_scene();
     }
 
+    accelerator = std::unique_ptr<Accelerator> {new BVH {&scene}};
+
     printf("\n");
     return 0;
 }
 
 int Engine::run() {
-    // test_scene_setup();
+    // test_scene_setup(); // for testing
 
-    accelerator = Accelerator {&scene};
     window_manager = WindowManager {cfg.window_size};
     viewer = Viewer {window_manager.get_size(), cfg.fov};
     sampler = Sampler {window_manager.get_size()};
@@ -63,7 +64,7 @@ int Engine::run() {
         sampler.render_frame(
             window_manager.get_size(),
             viewer.get_camera(),
-            &accelerator,
+            accelerator.get(),
             &shader_pack,
             seed_gen(),
             window_manager.is_update_required(),
@@ -136,7 +137,7 @@ int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_
         ++sample;
         sampler.render_image_sample(
             &render_camera,
-            &accelerator,
+            accelerator.get(),
             &shader_pack,
             seed_gen->operator()(),
             sample

@@ -9,6 +9,7 @@
 #include "../geometry/shape.hpp"
 #include "../geometry/intersection.hpp"
 #include "../geometry/ray.hpp"
+#include "../geometry/box.hpp"
 #include "scene.hpp"
 #include "../util/random.hpp"
 
@@ -19,13 +20,16 @@ public:
     Accelerator(Scene *source_scene);
     Accelerator();
 
-    std::optional<Intersection> calc_intersection(Ray ray) const;
-    LightSampleData calc_light_intersection(Ray ray) const;
-    glm::vec3 calc_light_influence(glm::vec3 shading_point, glm::vec3 normal, glm::vec3 view, float roughness, RNG *rng, float (*brdf)(glm::vec3, glm::vec3, glm::vec3, float)) const;
+    virtual std::optional<Intersection> calc_intersection(Ray ray) const;
+    virtual LightSampleData calc_light_intersection(Ray ray) const;
 
-private:
+    virtual glm::vec3 calc_light_influence(glm::vec3 shading_point, glm::vec3 normal, glm::vec3 view, float roughness, RNG *rng, float (*brdf)(glm::vec3, glm::vec3, glm::vec3, float)) const;
+
+protected:
     std::list<Shape*> object_ptr_list;
     std::list<Light*> light_ptr_list;
+
+    std::optional<Intersection> calc_intersection_in_list(Ray ray, const std::list<Shape*> *list) const;
 };
 
 } /* trc */

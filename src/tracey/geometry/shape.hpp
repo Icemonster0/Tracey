@@ -8,6 +8,7 @@
 #include "../graphics/material.hpp"
 #include "ray.hpp"
 #include "intersection.hpp"
+#include "box.hpp"
 
 namespace trc {
 
@@ -16,6 +17,8 @@ public:
     Shape(Shader *shader_ptr, Material *p_material);
 
     virtual std::optional<Intersection> calc_ray_intersection(Ray ray) const;
+    virtual Box calc_bounding_box() const;
+    virtual glm::vec3 center() const;
 
     Shader *get_shader();
     void set_shader(Shader *shader_ptr);

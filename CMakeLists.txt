@@ -27,6 +27,8 @@ add_library(main_module STATIC
     src/lib/stb.hpp
     src/tracey/engine/accelerator.cpp
     src/tracey/engine/accelerator.hpp
+    src/tracey/engine/bvh.cpp
+    src/tracey/engine/bvh.hpp
     src/tracey/engine/console.cpp
     src/tracey/engine/console.hpp
     src/tracey/engine/engine.cpp
@@ -55,6 +57,8 @@ add_library(main_module STATIC
     src/tracey/geometry/shapes/sphere.hpp
     src/tracey/geometry/shapes/triangle.cpp
     src/tracey/geometry/shapes/triangle.hpp
+    src/tracey/geometry/box.cpp
+    src/tracey/geometry/box.hpp
     src/tracey/geometry/camera.cpp
     src/tracey/geometry/camera.hpp
     src/tracey/geometry/intersection.cpp
