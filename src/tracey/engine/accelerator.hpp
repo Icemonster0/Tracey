@@ -25,9 +25,12 @@ public:
 
     virtual glm::vec3 calc_light_influence(glm::vec3 shading_point, glm::vec3 normal, glm::vec3 view, float roughness, RNG *rng, float (*brdf)(glm::vec3, glm::vec3, glm::vec3, float)) const;
 
+    glm::vec3 get_environment_light(Ray ray) const;
+
 protected:
     std::list<Shape*> object_ptr_list;
     std::list<Light*> light_ptr_list;
+    EnvironmentTexture *env_texture_ptr;
 
     std::optional<Intersection> calc_intersection_in_list(Ray ray, const std::list<Shape*> *list) const;
 };

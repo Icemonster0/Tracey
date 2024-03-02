@@ -80,6 +80,8 @@ add_library(main_module STATIC
     src/tracey/graphics/buffer.hpp
     src/tracey/graphics/color_spaces.cpp
     src/tracey/graphics/color_spaces.hpp
+    src/tracey/graphics/environment_texture.cpp
+    src/tracey/graphics/environment_texture.hpp
     src/tracey/graphics/image_read_write.cpp
     src/tracey/graphics/image_read_write.hpp
     src/tracey/graphics/material.cpp

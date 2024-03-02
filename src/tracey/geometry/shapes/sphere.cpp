@@ -17,20 +17,7 @@ std::optional<Intersection> Sphere::calc_ray_intersection(Ray ray) const {
     const glm::vec3 normal = math::normalize(point - pos);
 
     // texture coordinates
-    glm::vec2 tex_coord;
-    if (normal.z == 0.f) {
-        tex_coord.s = 0.f;
-    } else {
-        tex_coord.s = atanf(normal.x / normal.z) / 6.2831853f;
-        if (normal.z >= 0.f) tex_coord.s += 0.75f;
-        else tex_coord.s += 0.25f;
-    }
-    float radius_at_height = glm::length(normal.xz());
-    if (radius_at_height == 0.f) {
-        tex_coord.t = 0.f;
-    } else {
-        tex_coord.t = atanf(normal.y / radius_at_height) / 3.1415927f + 0.5f;
-    }
+    glm::vec2 tex_coord = math::sphere_coords(normal);
 
     // tangent and bitangent
     glm::vec3 tan = glm::cross(glm::vec3 {0.f, 1.f, 0.f}, normal);

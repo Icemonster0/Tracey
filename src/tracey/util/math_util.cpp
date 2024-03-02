@@ -124,6 +124,25 @@ std::optional<float> intersect_sphere(Ray ray, glm::vec3 center, float radius) {
     return std::optional<float>(t);
 }
 
+glm::vec2 sphere_coords(glm::vec3 dir) {
+    // Map a unique texture coordinate to every normal vector on a sphere
+    glm::vec2 tex_coord;
+    if (dir.z == 0.f || dir.x == 0.f) {
+        tex_coord.s = 0.f;
+    } else {
+        tex_coord.s = atanf(dir.x / dir.z) / 6.2831853f;
+        if (dir.z >= 0.f) tex_coord.s += 0.75f;
+        else tex_coord.s += 0.25f;
+    }
+    float radius_at_height = glm::length(dir.xz());
+    if (radius_at_height == 0.f || dir.y == 0.f) {
+        tex_coord.t = 0.f;
+    } else {
+        tex_coord.t = atanf(dir.y / radius_at_height) / 3.1415927f + 0.5f;
+    }
+    return tex_coord;
+}
+
 float quad_interp(float t) {
     return (t < 0.5f) ?
            (2.f * t*t) :

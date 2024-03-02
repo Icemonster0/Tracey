@@ -59,6 +59,7 @@ private:
     bool parse_point_light(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack);
     bool parse_sun_light(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack);
     bool parse_external(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack, std::string path);
+    bool parse_environment(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack, std::string path);
     bool parse_material(std::list<parser::Token>::iterator &i, Material *&mat, Scene &scene, std::string path);
 
     bool parse_string(std::list<parser::Token>::iterator &i, std::string &str);

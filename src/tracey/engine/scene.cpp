@@ -2,7 +2,9 @@
 
 namespace trc {
 
-Scene::Scene() {}
+Scene::Scene() {
+    env_texture.set_color(glm::vec3 {0.05f});
+}
 
 Shape *Scene::add_object(std::unique_ptr<Shape> obj) {
     Shape *ptr = obj.get();
@@ -42,6 +44,15 @@ std::list<std::unique_ptr<Material>> *Scene::get_material_list() {
 
 std::list<std::unique_ptr<Mesh>> *Scene::get_mesh_list() {
     return &mesh_list;
+}
+
+EnvironmentTexture *Scene::set_environment(EnvironmentTexture tex) {
+    env_texture = std::move(tex);
+    return &env_texture;
+}
+
+EnvironmentTexture *Scene::get_environment() {
+    return &env_texture;
 }
 
 void Scene::append(Scene &other_scene) {

@@ -18,6 +18,8 @@ int read_texture(const char *path, AttribTexture<float> &texture);
 int read_texture_from_memory(const uint8_t *buffer, int length, AttribTexture<glm::vec3> &texture);
 int read_texture_from_memory(const uint8_t *buffer, int length, AttribTexture<float> &texture);
 
+int read_hdr_texture(const char *path, AttribTexture<glm::vec3> &texture);
+
 } /* trc::image_rw */
 
 #endif /* end of include guard: IMAGE_READ_WRITE_HPP */

@@ -8,6 +8,7 @@
 #include "../geometry/shapes/shapes.hpp"
 #include "../geometry/mesh.hpp"
 #include "../geometry/lights/lights.hpp"
+#include "../graphics/environment_texture.hpp"
 
 namespace trc {
 
@@ -25,6 +26,9 @@ public:
     std::list<std::unique_ptr<Material>> *get_material_list();
     std::list<std::unique_ptr<Mesh>> *get_mesh_list();
 
+    EnvironmentTexture *set_environment(EnvironmentTexture tex);
+    EnvironmentTexture *get_environment();
+
     void append(Scene &other_scene);
 
 private:
@@ -32,6 +36,7 @@ private:
     std::list<std::unique_ptr<Light>> light_list;
     std::list<std::unique_ptr<Material>> material_list;
     std::list<std::unique_ptr<Mesh>> mesh_list;
+    EnvironmentTexture env_texture;
 };
 
 } /* trc */

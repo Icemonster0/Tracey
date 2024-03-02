@@ -19,6 +19,7 @@ glm::vec3 random_dir_in_hemisphere(glm::vec3 normal, RNG *rng);
 float fresnel(float n1, float n2, glm::vec3 incident, glm::vec3 normal);
 
 std::optional<float> intersect_sphere(Ray ray, glm::vec3 center, float radius);
+glm::vec2 sphere_coords(glm::vec3 dir);
 
 inline float triangle_signed_area(glm::vec2 a, glm::vec2 b, glm::vec2 c) {
     return glm::cross(glm::vec3 {b - a, 0.f}, glm::vec3 {c - a, 0.f}).z;

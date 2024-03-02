@@ -125,4 +125,29 @@ int read_texture_from_memory(const uint8_t *buffer, int length, AttribTexture<fl
     return 0;
 }
 
+int read_hdr_texture(const char *path, AttribTexture<glm::vec3> &texture) {
+    glm::ivec2 size;
+    int channels;
+    const int force_channels = 3;
+    float *data = stbi_loadf(path, &size.x, &size.y, &channels, force_channels);
+
+    if (data == nullptr) return 1;
+
+    texture.set_size(size);
+    for (int x = 0; x < size.x; ++x) {
+        for (int y = 0; y < size.y; ++y) {
+            int offset = y * size.x + x;
+
+            float r = *(data + offset * 3 + 0);
+            float g = *(data + offset * 3 + 1);
+            float b = *(data + offset * 3 + 2);
+
+            texture.set_pixel({x, size.y-y-1}, glm::vec3 {r, g, b});
+        }
+    }
+
+    free(data);
+    return 0;
+}
+
 } /* trc::image_rw */

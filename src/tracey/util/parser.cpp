@@ -200,6 +200,8 @@ bool TraceyParser::parse_object(std::list<parser::Token>::iterator &i, Scene &sc
             if (!parse_sun_light(i, scene, shader_pack)) return false;
         } else if (token.content == "EXTERNAL") {
             if (!parse_external(i, scene, shader_pack, path)) return false;
+        } else if (token.content == "ENVIRONMENT") {
+            if (!parse_environment(i, scene, shader_pack, path)) return false;
         } else {
             error_string = unknown_keyword_str(token, "global scope");
             return false;
@@ -420,6 +422,52 @@ bool TraceyParser::parse_external(std::list<parser::Token>::iterator &i, Scene &
     if (!load_non_native_file(path, new_scene, shader_pack, transform)) return false;
 
     scene.append(new_scene);
+
+    return true;
+}
+
+bool TraceyParser::parse_environment(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack, std::string path) {
+    using namespace parser;
+
+    ADVANCE_IF(i, i->type == BRACE_OPEN); CHECK_I(i);
+
+    std::string source = "";
+    glm::vec3 color {0.05f};
+    float rotation = 0.f;
+
+    Token token = *i;
+    while (i != tokens.end()) {
+        token = *i;
+        ADVANCE_IF(i, (i->type == WORD || i->type == BRACE_CLOSE));
+
+        if (token.type == BRACE_CLOSE) break;
+
+        CHECK_I(i);
+
+        if (token.content == "SOURCE") {
+            if(!parse_string(i, source)) return false;
+            path.append(source);
+        }
+        else if (token.content == "COLOR") {
+            if(!parse_vec3(i, color)) return false;
+        }
+        else if (token.content == "ROTATION") {
+            if(!parse_float(i, rotation)) return false;
+        }
+        else {
+            error_string = unknown_keyword_str(token, "ENVIRONMENT");
+            return false;
+        }
+    }
+
+    EnvironmentTexture *env_tex = scene.set_environment(EnvironmentTexture {});
+
+    if (source.length() == 0) {
+        env_tex->set_color(color);
+    } else {
+        env_tex->load(path.c_str());
+    }
+    env_tex->set_rotation(rotation);
 
     return true;
 }

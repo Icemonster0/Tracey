@@ -136,6 +136,7 @@ Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera, 
                     };
                     color = isect.value().shader->evaluate(shader_data).rgb();
                 }
+                else color = accelerator->get_environment_light(ray);
 
                 *buf.at({x, y}) = color;
             }
@@ -183,6 +184,7 @@ Buffer<glm::vec3> Sampler::render_preview_sample(glm::ivec2 frame_size, Camera *
                 };
                 color = shader_pack->shader_preview->evaluate(shader_data).rgb();
             }
+            else color = glm::vec3 {0.05f};
 
             *buf.at({x, y}) = color;
         }

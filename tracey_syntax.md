@@ -52,6 +52,12 @@ A scene file. The `SOURCE` field is mandatory and should be a quotation-mark-enc
 + `ROTATION` (3)
 + `SCALE` (1)
 
+##### `ENVIRONMENT`
+An HDRI texture (only .hdr is supported) or a color. There can only be one in a scene. If `SOURCE` is not specified, the `COLOR` field is used.
++ `SOURCE`
++ `COLOR` (3)
++ `ROTATION` (1)
+
 ### Parameters
 Parameters are declared in an object scope. All parameter names are followed by a scope enclosed in curly-braces `{}`. In this scope, you must provide a number of values separated by commas indicated by the number in parentheses (unless stated otherwise).  
 

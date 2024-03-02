@@ -20,6 +20,8 @@ Accelerator::Accelerator(Scene *source_scene) {
     for (auto &light : *source_light_list) {
         light_ptr_list.push_back(light.get());
     }
+
+    env_texture_ptr = source_scene->get_environment();
 }
 
 Accelerator::Accelerator() {}
@@ -64,6 +66,13 @@ glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 n
     }
 
     return light_color;
+}
+
+glm::vec3 Accelerator::get_environment_light(Ray ray) const {
+    glm::vec3 color = env_texture_ptr->sample(ray.direction);
+    if (std::isnan(color.x) || std::isnan(color.y) || std::isnan(color.z)) printf("env NaN\n");
+    return color;
+    // return env_texture_ptr->sample(ray.direction);
 }
 
 // private

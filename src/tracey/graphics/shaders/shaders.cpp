@@ -64,7 +64,7 @@ TRC_DEFINE_SHADER(ShaderDiffuseIndirect) {
         };
         color = isect.value().shader->evaluate(diffuse_shader_data);
     }
-    else color = glm::vec3 {0.f, 0.f, 0.f};
+    else color = shader_data.accelerator->get_environment_light(diffuse_ray);
 
     // color *= brdf::flat(shader_data.normal, shader_data.normal, shader_data.normal, SAMPLE_ATTRIB(roughness));
 
@@ -92,14 +92,15 @@ TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
     glm::vec3 color;
 
     float roughness = SAMPLE_ATTRIB(roughness);
-    bool include_lights = (roughness < TRC_SPECULAR_OPTIMIZE_TRESHOLD);
+    // bool include_lights = (roughness < TRC_SPECULAR_OPTIMIZE_TRESHOLD);
 
     Ray specular_ray {
         shader_data.pos,
         glm::reflect(shader_data.ray.direction, brdf::ggx_normal(
-            shader_data.normal, // normal
-            roughness, // roughness
-            shader_data.rng // rng
+            shader_data.normal,
+            shader_data.tangent,
+            roughness,
+            shader_data.rng
         )),
         TRC_SPECULAR_RAY,
         shader_data.ray.index + 1
@@ -124,7 +125,7 @@ TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
         };
         color = obj_isect.value().shader->evaluate(specular_shader_data);
     }
-    else color = glm::vec3 {0.f};
+    else color = shader_data.accelerator->get_environment_light(specular_ray);
 
     // if (include_lights) {
     //     LightSampleData light_isect = shader_data.accelerator->calc_light_intersection(specular_ray);
@@ -167,9 +168,10 @@ TRC_DEFINE_SHADER(ShaderTransmission) {
     glm::vec3 refract_dir = glm::refract(
         shader_data.ray.direction,
         brdf::ggx_normal(
-            shader_data.normal, // normal
-            roughness, // roughness
-            shader_data.rng // rng
+            shader_data.normal,
+            shader_data.tangent,
+            roughness,
+            shader_data.rng
         ) * normal_flipper,
         ior_ratio
     );
@@ -200,6 +202,7 @@ TRC_DEFINE_SHADER(ShaderTransmission) {
         };
         indirect = obj_isect.value().shader->evaluate(transmit_shader_data).rgb();
     }
+    else indirect = shader_data.accelerator->get_environment_light(transmit_ray);
 
     // LightSampleData light_isect = shader_data.accelerator->calc_light_intersection(transmit_ray);
     // if (light_isect.distance <= obj_isect_distance) {
