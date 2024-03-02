@@ -69,10 +69,7 @@ glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 n
 }
 
 glm::vec3 Accelerator::get_environment_light(Ray ray) const {
-    glm::vec3 color = env_texture_ptr->sample(ray.direction);
-    if (std::isnan(color.x) || std::isnan(color.y) || std::isnan(color.z)) printf("env NaN\n");
-    return color;
-    // return env_texture_ptr->sample(ray.direction);
+    return env_texture_ptr->sample(ray.direction);
 }
 
 // private

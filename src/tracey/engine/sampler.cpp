@@ -138,6 +138,9 @@ Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera, 
                 }
                 else color = accelerator->get_environment_light(ray);
 
+                if (std::isnan(color.r) || std::isnan(color.g) || std::isnan(color.b))
+                    color = glm::vec3 {0.f};
+
                 *buf.at({x, y}) = color;
             }
         }
