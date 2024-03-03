@@ -65,6 +65,12 @@ Scene Importer::assimp_to_trc(const aiScene *scene, ShaderPack *shader_pack, glm
         import_light(light, scene, root_node, &trc_scene);
     }
 
+    // camera
+    if (scene->HasCameras()) {
+        aiCamera *camera = scene->mCameras[0];
+        import_camera(camera, scene, root_node, &trc_scene);
+    }
+
     return std::move(trc_scene);
 }
 
@@ -192,6 +198,69 @@ void Importer::import_light(const aiLight *light, const aiScene *scene, const ai
             trc_scene->add_light(std::unique_ptr<Light>(new Light(trc_pos, trc_color)));
             break;
     }
+}
+
+void Importer::import_camera(const aiCamera *camera, const aiScene *scene, const aiNode *root_node, Scene *trc_scene) {
+    float h_fov = camera->mHorizontalFOV;
+    float aspect = camera->mAspect;
+    aiVector3D look_at = camera->mLookAt;
+    aiVector3D pos = camera->mPosition;
+
+    glm::vec3 trc_look_at {look_at[0], look_at[1], look_at[2]};
+    glm::vec3 trc_pos {pos[0], pos[1], pos[2]};
+
+    const aiNode *cam_node = root_node->FindNode(camera->mName);
+    glm::mat4 transform {1.f};
+    const aiNode *i_node = cam_node;
+    while (true) {
+        transform = transform * glm::make_mat4(i_node->mTransformation[0]);
+        if (i_node == root_node) break;
+        i_node = i_node->mParent;
+    }
+
+    trc_look_at = (glm::vec4 {trc_look_at, 1.f} * transform).xyz();
+    trc_pos = (glm::vec4 {trc_pos, 1.f} * transform).xyz();
+    // trc_look_at.y *= -1.f;
+
+    // orientation
+    float pitch, yaw;
+    if (trc_look_at.x == 0.f) {
+        yaw = 0.f;
+    } else {
+        const float half_pi = 1.570796327f;
+        yaw = atanf(trc_look_at.z / trc_look_at.x) - glm::sign(trc_look_at.x) * half_pi;
+    }
+    float radius_at_height = glm::length(trc_look_at.xz());
+    if (radius_at_height == 0.f) {
+        pitch = 0.f;
+    } else {
+        pitch = atanf(trc_look_at.y / radius_at_height);
+    }
+    pitch = glm::degrees(pitch);
+    yaw = glm::degrees(yaw);
+    // pitch = glm::degrees(pitch)*-1.f;
+    // yaw = glm::degrees(yaw)-180.f;
+
+    // fov
+    float v_fov = atanf(4.f*tanf(h_fov) / aspect);
+    v_fov = glm::degrees(fabsf(v_fov));
+
+    Camera trc_camera {trc_pos, yaw, pitch, v_fov, aspect};
+    trc_scene->set_camera(trc_camera);
+
+    // glm::vec3 trc_forward = trc_camera.calc_forward_dir();
+    // trc_look_at = math::normalize(trc_look_at);
+    // trc_forward = math::normalize(trc_forward);
+    // printf("assimp:  %f %f %f\n", look_at[0], look_at[1], look_at[2]);
+    // printf("look at: %f %f %f\n", trc_look_at.x, trc_look_at.y, trc_look_at.z);
+    // printf("forward: %f %f %f\n", trc_forward.x, trc_forward.y, trc_forward.z);
+    // printf("H fov:   %f\n", glm::degrees(h_fov));
+    // printf("V fov:   %f\n", v_fov);
+    // printf("ai pos:  %f %f %f\n", pos[0], pos[1], pos[2]);
+    // printf("trc pos: %f %f %f\n", trc_pos.x, trc_pos.y, trc_pos.z);
+    // exit(1);
+
+    // TODO: debug incorrect camera position
 }
 
 void Importer::import_material(const aiMaterial *mat, const aiScene *scene, Scene *trc_scene, std::string path) {

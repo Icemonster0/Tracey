@@ -30,6 +30,7 @@ private:
     void import_assimp_hierarchy(const aiScene *scene, const aiNode *root_node, const glm::mat4 transform, Scene *trc_scene, ShaderPack *shader_pack);
     void import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::mat4 transform, Scene *trc_scene, ShaderPack *shader_pack);
     void import_light(const aiLight *light, const aiScene *scene, const aiNode *root_node, Scene *trc_scene);
+    void import_camera(const aiCamera *camera, const aiScene *scene, const aiNode *root_node, Scene *trc_scene);
     void import_material(const aiMaterial *mat, const aiScene *scene, Scene *trc_scene, std::string path);
 
     void import_material_attrib(

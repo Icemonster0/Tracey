@@ -55,6 +55,19 @@ EnvironmentTexture *Scene::get_environment() {
     return &env_texture;
 }
 
+std::optional<Camera> *Scene::set_camera(Camera cam) {
+    camera = std::make_optional<Camera>(cam);
+    return &camera;
+}
+
+void Scene::remove_camera() {
+    camera = std::optional<Camera>();
+}
+
+std::optional<Camera> *Scene::get_camera() {
+    return &camera;
+}
+
 void Scene::append(Scene &other_scene) {
     object_list.splice(object_list.end(), other_scene.object_list);
     light_list.splice(light_list.end(), other_scene.light_list);

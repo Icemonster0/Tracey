@@ -63,7 +63,8 @@ int Engine::run() {
     while (!window_manager.window_should_close()) {
         sampler.render_frame(
             window_manager.get_size(),
-            viewer.get_camera(),
+            &scene.get_camera()->value(),
+            // viewer.get_camera(),
             accelerator.get(),
             &shader_pack,
             seed_gen(),
@@ -111,7 +112,8 @@ int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_
 
     sampler.initialize_image(image_size);
 
-    Camera render_camera = *viewer.get_camera();
+    Camera render_camera = scene.get_camera()->value_or(*viewer.get_camera());
+    // Camera render_camera = *viewer.get_camera();
     render_camera.set_aspect((float)image_size.x / (float)image_size.y);
 
     float start_t = glfwGetTime();
