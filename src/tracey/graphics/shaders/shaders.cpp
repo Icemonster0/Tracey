@@ -106,6 +106,10 @@ TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
         shader_data.ray.index + 1
     };
 
+    if (glm::dot(specular_ray.direction, shader_data.normal) < 0.f) {
+        specular_ray.direction *= -1.f;
+    }
+
     float obj_isect_distance = std::numeric_limits<float>::infinity();
     std::optional<Intersection> obj_isect = shader_data.accelerator->calc_intersection(specular_ray);
     if (obj_isect) {

@@ -1,0 +1,27 @@
+// add two spheres to example4.glb
+
+EXTERNAL {
+    SOURCE {"example4.glb"}
+}
+
+ENVIRONMENT {
+    COLOR {0, 0, 0}
+}
+
+SPHERE {
+    POSITION {-1.05093, -0.2791, 0.601388}
+    RADIUS {1}
+    MATERIAL {
+        COLOR {0.172862, 0.254619, 0.8}
+        ROUGHNESS {0.77}
+    }
+}
+
+SPHERE {
+    POSITION {0.72407, -0.17463, -1.25789}
+    RADIUS {1}
+    MATERIAL {
+        ROUGHNESS {0}
+        METALLIC {1}
+    }
+}
