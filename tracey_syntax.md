@@ -69,4 +69,5 @@ Materials are declared in an object's scope that accepts a material. They also h
 + `EMISSION` (3)
 + `NORMAL` (3)
 + `TRANSMISSION` (1)
-+ `IOR` (1) stands for *index of refraction*
++ `IOR` (1) *index of refraction*
++ `ALPHA` (1) *opacity*

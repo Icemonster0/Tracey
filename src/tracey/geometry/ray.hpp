@@ -4,7 +4,7 @@
 #include "../../lib/glm.hpp"
 
 #define TRC_RAY_CLIP_EPSILON 0.0001f
-#define TRC_RAY_MAX_BOUNCES 5
+#define TRC_RAY_MAX_BOUNCES 3
 #define TRC_INDIRECT_LIGHT_CLAMP 10.f
 #define TRC_SPECULAR_OPTIMIZE_TRESHOLD 0.3f
 
@@ -16,6 +16,7 @@ enum RayType {
     TRC_DIFFUSE_RAY,
     TRC_SPECULAR_RAY,
     TRC_TRANSMISSION_RAY,
+    TRC_TRANSPARENT_RAY,
     TRC_COMMON_RAY
 };
 

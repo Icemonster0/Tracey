@@ -54,15 +54,13 @@ glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 n
 
     for (auto &light : light_ptr_list) {
         LightSampleData light_data = light->sample(shading_point, rng);
-        std::optional<Intersection> isect = calc_intersection(light_data.shadow_ray);
-        if (isect && isect.value().distance < light_data.distance) {
-            continue;
-        } else {
-            float cos_theta = glm::clamp(glm::dot(normal, light_data.shadow_ray.direction), 0.f, 1.f);
-            light_color += light_data.light
-                         * cos_theta
-                         * brdf(light_data.shadow_ray.direction, view, normal, roughness);
-        }
+
+        float occlusion = calc_light_occlusion(shading_point, shading_point + light_data.shadow_ray.direction * light_data.distance, 0.f);
+        float cos_theta = glm::clamp(glm::dot(normal, light_data.shadow_ray.direction), 0.f, 1.f);
+        light_color += light_data.light
+                     * (1.f - occlusion)
+                     * cos_theta
+                     * brdf(light_data.shadow_ray.direction, view, normal, roughness);
     }
 
     return light_color;
@@ -73,6 +71,25 @@ glm::vec3 Accelerator::get_environment_light(Ray ray) const {
 }
 
 // private
+
+float Accelerator::calc_light_occlusion(glm::vec3 shading_point, glm::vec3 source_point, float occlusion) const {
+    glm::vec3 ray = source_point - shading_point;
+    float distance = glm::length(ray);
+    std::optional<Intersection> isect = calc_intersection(Ray {shading_point, ray / distance, TRC_SHADOW_RAY});
+
+    if (isect && isect.value().distance < distance) {
+        occlusion += isect.value().material->alpha->sample(isect.value().tex_coord);
+        if (occlusion < 1.f) {
+            return calc_light_occlusion(isect.value().pos, source_point, occlusion);
+        }
+        else {
+            return 1.f;
+        }
+    }
+    else {
+        return occlusion;
+    }
+}
 
 std::optional<Intersection> Accelerator::calc_intersection_in_list(Ray ray, const std::list<Shape*> *list) const {
     float min_dist = std::numeric_limits<float>::infinity();

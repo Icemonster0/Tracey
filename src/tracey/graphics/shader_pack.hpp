@@ -17,6 +17,7 @@ struct ShaderPack {
     std::unique_ptr<Shader> shader_specular_direct;
     std::unique_ptr<Shader> shader_specular_indirect;
     std::unique_ptr<Shader> shader_transmission;
+    std::unique_ptr<Shader> shader_transparent;
     std::unique_ptr<Shader> shader_combined;
 
     std::unique_ptr<Shader> shader_red;

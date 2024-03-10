@@ -204,6 +204,7 @@ void Importer::import_material(const aiMaterial *mat, const aiScene *scene, Scen
     aiColor3D normal {0.5f, 0.5f, 1.f};
     float transmissive = 0.f;
     float ior = 1.6f;
+    float alpha = 1.f;
 
     // albedo
     mat->Get(AI_MATKEY_BASE_COLOR, albedo);
@@ -265,6 +266,10 @@ void Importer::import_material(const aiMaterial *mat, const aiScene *scene, Scen
     mat->Get(AI_MATKEY_REFRACTI, ior);
     std::shared_ptr<Attrib<float>> attrib_ior = std::shared_ptr<Attrib<float>>(new AttribValue(ior));
 
+    // alpha
+    std::shared_ptr<Attrib<float>> attrib_transparent;
+    import_material_attrib(attrib_transparent, alpha, AI_MATKEY_OPACITY, aiTextureType_OPACITY, mat, scene, path);
+
     // create the new material
     trc_scene->add_material(std::make_unique<Material>(
         attrib_albedo,
@@ -273,7 +278,8 @@ void Importer::import_material(const aiMaterial *mat, const aiScene *scene, Scen
         attrib_emission,
         attrib_normal,
         attrib_transmissive,
-        attrib_ior
+        attrib_ior,
+        attrib_transparent
     ));
 }
 

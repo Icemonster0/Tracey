@@ -484,6 +484,7 @@ bool TraceyParser::parse_material(std::list<parser::Token>::iterator &i, Materia
     glm::vec3 normal {0.5f, 0.5f, 1.f};
     float transmissive = 0.f;
     float ior = 1.6f;
+    float alpha = 1.f;
 
     std::shared_ptr<Attrib<glm::vec3>> albedo_attrib = std::shared_ptr<Attrib<glm::vec3>>(new AttribValue(albedo));
     std::shared_ptr<Attrib<float>> roughness_attrib = std::shared_ptr<Attrib<float>>(new AttribValue(roughness));
@@ -492,6 +493,7 @@ bool TraceyParser::parse_material(std::list<parser::Token>::iterator &i, Materia
     std::shared_ptr<Attrib<glm::vec3>> normal_attrib = std::shared_ptr<Attrib<glm::vec3>>(new AttribValue(normal));
     std::shared_ptr<Attrib<float>> transmissive_attrib = std::shared_ptr<Attrib<float>>(new AttribValue(transmissive));
     std::shared_ptr<Attrib<float>> ior_attrib = std::shared_ptr<Attrib<float>>(new AttribValue(ior));
+    std::shared_ptr<Attrib<float>> alpha_attrib = std::shared_ptr<Attrib<float>>(new AttribValue(alpha));
 
     AttribTexture<glm::vec3> *albedo_tex = new AttribTexture<glm::vec3>();
     AttribTexture<float> *roughness_tex = new AttribTexture<float>();
@@ -500,6 +502,7 @@ bool TraceyParser::parse_material(std::list<parser::Token>::iterator &i, Materia
     AttribTexture<glm::vec3> *normal_tex = new AttribTexture<glm::vec3>();
     AttribTexture<float> *transmissive_tex = new AttribTexture<float>();
     AttribTexture<float> *ior_tex = new AttribTexture<float>();
+    AttribTexture<float> *alpha_tex = new AttribTexture<float>();
 
     while (i != tokens.end()) {
         Token token = *i;
@@ -509,7 +512,6 @@ bool TraceyParser::parse_material(std::list<parser::Token>::iterator &i, Materia
 
         CHECK_I(i);
 
-        // printf(#param" "#type" "#full_type"\n");
 #       define PARSE_PARAMETER(param, type, full_type) \
             if (!parse_##type##_tex(i, param, *param##_tex, path)) return false; \
             if (param##_tex->get_size() != glm::ivec2 {0, 0}) \
@@ -543,6 +545,9 @@ bool TraceyParser::parse_material(std::list<parser::Token>::iterator &i, Materia
         else if (token.content == "IOR") {
             PARSE_PARAMETER(ior, float, float);
         }
+        else if (token.content == "ALPHA") {
+            PARSE_PARAMETER(alpha, float, float);
+        }
         else {
             error_string = unknown_keyword_str(token, "MATERIAL");
             return false;
@@ -559,7 +564,8 @@ bool TraceyParser::parse_material(std::list<parser::Token>::iterator &i, Materia
         emission_attrib,
         normal_attrib,
         transmissive_attrib,
-        ior_attrib
+        ior_attrib,
+        alpha_attrib
     ));
 
     return true;

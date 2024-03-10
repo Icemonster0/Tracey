@@ -32,6 +32,8 @@ protected:
     std::list<Light*> light_ptr_list;
     EnvironmentTexture *env_texture_ptr;
 
+    float calc_light_occlusion(glm::vec3 shading_point, glm::vec3 source_point, float occlusion) const;
+
     std::optional<Intersection> calc_intersection_in_list(Ray ray, const std::list<Shape*> *list) const;
 };
 

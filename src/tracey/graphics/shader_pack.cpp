@@ -10,6 +10,7 @@ ShaderPack::ShaderPack()
       shader_specular_direct(std::unique_ptr<Shader>(new ShaderSpecularDirect())),
       shader_specular_indirect(std::unique_ptr<Shader>(new ShaderSpecularIndirect())),
       shader_transmission(std::unique_ptr<Shader>(new ShaderTransmission())),
+      shader_transparent(std::unique_ptr<Shader>(new ShaderTransparent())),
       shader_combined(std::unique_ptr<Shader>(new ShaderCombined())),
 
       shader_red(std::unique_ptr<Shader>(new ShaderRed())),

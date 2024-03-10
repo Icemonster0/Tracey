@@ -216,10 +216,43 @@ TRC_DEFINE_SHADER(ShaderTransmission) {
     return glm::vec4 {indirect + direct, 1.f};
 }
 
+TRC_DEFINE_SHADER(ShaderTransparent) {
+    glm::vec3 color;
+
+    Ray through_ray {
+        shader_data.pos,
+        shader_data.ray.direction,
+        TRC_TRANSPARENT_RAY,
+        shader_data.ray.index // not incrementing to allow infinite transparent bounces
+    };
+
+    std::optional<Intersection> isect = shader_data.accelerator->calc_intersection(through_ray);
+    if (isect) {
+        ShaderData isect_shader_data {
+            isect.value().pos,
+            isect.value().normal,
+            isect.value().tan,
+            isect.value().bitan,
+            isect.value().tex_coord,
+            isect.value().material,
+            shader_data.distance + isect.value().distance,
+            through_ray,
+            shader_data.accelerator,
+            shader_data.shader_pack,
+            shader_data.rng
+        };
+        color = isect.value().shader->evaluate(isect_shader_data);
+    }
+    else color = shader_data.accelerator->get_environment_light(through_ray);
+
+    return glm::vec4 {color, 1.f};
+}
+
 TRC_DEFINE_SHADER(ShaderCombined) {
-    glm::vec3 transmission {0.f};
     glm::vec3 diffuse {0.f};
     glm::vec3 specular {0.f};
+    glm::vec3 transmission {0.f};
+    glm::vec3 transparent {0.f};
 
     glm::vec3 tan_space_normal = SAMPLE_ATTRIB(normal)*2.f-1.f;
     shader_data.normal = glm::vec3 {
@@ -230,6 +263,7 @@ TRC_DEFINE_SHADER(ShaderCombined) {
     glm::vec3 albedo = SAMPLE_ATTRIB(albedo);
     float metallic = SAMPLE_ATTRIB(metallic);
     float fresnel = math::fresnel(1.f, SAMPLE_ATTRIB(ior), -shader_data.ray.direction, shader_data.normal);
+    float alpha = SAMPLE_ATTRIB(alpha);
 
     if (SAMPLE_ATTRIB(transmissive) > 0.f) {
         // transmission
@@ -242,10 +276,6 @@ TRC_DEFINE_SHADER(ShaderCombined) {
         transmission = transmission_indirect * transmission_color;
     }
     else {
-        // make backfacing geometry black
-        // if (glm::dot(shader_data.normal, -shader_data.ray.direction) < -0.1f)
-        //     return glm::vec4 {glm::vec3 {0.f}, 1.f};
-
         // invert backfacing normals
         if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f) {
             shader_data.normal *= -1.f;
@@ -275,8 +305,14 @@ TRC_DEFINE_SHADER(ShaderCombined) {
     // emission
     glm::vec3 emission {SAMPLE_ATTRIB(emission)};
 
+    // transparency
+    if (alpha < 1.f) {
+        transparent = EVALUATE_SHADER(shader_transparent, shader_data).rgb();
+    }
+
     // combine
     glm::vec3 combined = diffuse + specular + transmission + emission;
+    combined = glm::mix(transparent, combined, alpha);
 
     return glm::vec4 {combined, 1.f};
 }
