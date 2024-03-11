@@ -24,6 +24,7 @@ public:
     virtual LightSampleData calc_light_intersection(Ray ray) const;
 
     virtual glm::vec3 calc_light_influence(glm::vec3 shading_point, glm::vec3 normal, glm::vec3 view, float roughness, RNG *rng, float (*brdf)(glm::vec3, glm::vec3, glm::vec3, float)) const;
+    float calc_light_occlusion(glm::vec3 shading_point, glm::vec3 direction, float distance, float occlusion) const;
 
     glm::vec3 get_environment_light(Ray ray) const;
 
@@ -31,8 +32,6 @@ protected:
     std::list<Shape*> object_ptr_list;
     std::list<Light*> light_ptr_list;
     EnvironmentTexture *env_texture_ptr;
-
-    float calc_light_occlusion(glm::vec3 shading_point, glm::vec3 source_point, float occlusion) const;
 
     std::optional<Intersection> calc_intersection_in_list(Ray ray, const std::list<Shape*> *list) const;
 };

@@ -262,7 +262,6 @@ TRC_DEFINE_SHADER(ShaderCombined) {
     };
     glm::vec3 albedo = SAMPLE_ATTRIB(albedo);
     float metallic = SAMPLE_ATTRIB(metallic);
-    float fresnel = math::fresnel(1.f, SAMPLE_ATTRIB(ior), -shader_data.ray.direction, shader_data.normal);
     float alpha = SAMPLE_ATTRIB(alpha);
 
     if (SAMPLE_ATTRIB(transmissive) > 0.f) {
@@ -293,6 +292,7 @@ TRC_DEFINE_SHADER(ShaderCombined) {
     }
 
     // specular
+    float fresnel = math::fresnel(1.f, SAMPLE_ATTRIB(ior), -shader_data.ray.direction, shader_data.normal);
     glm::vec3 specular_direct = EVALUATE_SHADER(shader_specular_direct, shader_data).rgb();
     glm::vec3 specular_indirect {0.f};
     if (shader_data.ray.index <= TRC_RAY_MAX_BOUNCES) {

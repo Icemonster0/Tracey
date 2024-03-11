@@ -14,7 +14,7 @@ int main(int argc, char const *argv[]) {
 
     // Create the engine
     trc::Engine engine {cfg};
-    int result;
+    int result = 0;
 
     // If no scene file is specified, abort
     if (cfg.scene_path.length() == 0) {
