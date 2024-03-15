@@ -14,7 +14,9 @@ namespace cfg_parser {
 } /* cfg_parser */
 
 struct UserConfig {
+    CLOM2_SETTING_FLOAT(aperture, --aperture, -ap, 0.0, Camera aperture radius);
     CLOM2_SETTING_FLOAT(console_frequency, --console-frequency, -cf, 5.0, Refresh rate for the console interface in hertz);
+    CLOM2_SETTING_FLOAT(focal_length, --focal-length, -fl, 10.0, Focus distance);
     CLOM2_SETTING_FLOAT(fov, --fov, -fov, 70.0, Vertical field of view of the viewer camera in degrees);
     CLOM2_SETTING_STRING(output_path, --output-path, -o, ./render-result.png, Path where the rendered image is saved including file name (must be a png));
     CLOM2_GENERAL_SETTING(render_size, --render-size, -rs, glm::ivec2, 1280 720, Resolution of the rendered image, trc::cfg_parser::str_to_ivec2);

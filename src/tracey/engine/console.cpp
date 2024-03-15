@@ -12,7 +12,10 @@ namespace trc {
 
 Console::Console() : print_cooldown(0.f) {}
 
-void Console::print(float frequency, float delta_t, bool preview_mode, int samples, int max_samples, glm::ivec2 window_size, glm::vec3 view_pos, float yaw, float pitch, float fov, float speed) {
+void Console::print(float frequency, float delta_t, bool preview_mode, int samples,
+        int max_samples, glm::ivec2 window_size, glm::vec3 view_pos, float yaw,
+        float pitch, float fov, float speed, float focal_length, float aperture) {
+
     print_cooldown -= delta_t;
     if (print_cooldown <= 0.f) {
         std::stringstream s;
@@ -29,6 +32,8 @@ void Console::print(float frequency, float delta_t, bool preview_mode, int sampl
         s << " camera rot:   " << PADDED << DECIMAL << yaw << " " << PADDED << DECIMAL << pitch << '\n';
         s << " camera fov:   " << PADDED << int(fov) << '\n';
         s << " camera speed: " << PADDED << DECIMAL << speed << '\n';
+        s << " focal length: " << PADDED << DECIMAL << focal_length << '\n';
+        s << " aperture:     " << PADDED << DECIMAL << aperture << '\n';
         s << '\n';
 
         s << "Controls" << '\n';

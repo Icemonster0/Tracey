@@ -53,7 +53,7 @@ int Engine::run() {
     // test_integrals();
 
     window_manager = WindowManager {cfg.window_size};
-    viewer = Viewer {window_manager.get_size(), cfg.fov};
+    viewer = Viewer {window_manager.get_size(), cfg.fov, cfg.focal_length, cfg.aperture};
     sampler = Sampler {window_manager.get_size()};
 
     std::random_device rand_dev;
@@ -94,7 +94,9 @@ int Engine::run() {
             viewer.get_camera()->get_yaw(),
             viewer.get_camera()->get_pitch(),
             viewer.get_camera()->get_fov(),
-            viewer.get_speed()
+            viewer.get_speed(),
+            viewer.get_camera()->get_focal_length(),
+            viewer.get_camera()->get_aperture()
         );
 
         this_frame_t = glfwGetTime();
@@ -236,7 +238,7 @@ void Engine::test_integrals() {
     const glm::vec3 tangent {1, 0, 0};
 
     std::random_device rand_dev;
-    int seed = rand_dev();
+    unsigned long seed = rand_dev();
     RNG rng {seed, seed << 2, (seed >> 12) + 0xabc, seed * 3 >> 31};
 
     printf("Calculating Integrals ...\n\n");

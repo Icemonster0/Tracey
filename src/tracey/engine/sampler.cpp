@@ -110,12 +110,7 @@ Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera, 
                     ((float)y + sample_offset.y) * 2.f / (float)frame_size.y - 1.f
                 };
 
-                Ray ray {
-                    camera->get_pos(),
-                    camera->calc_ray_dir_at(screen_coords),
-                    TRC_CAMERA_RAY,
-                    0
-                };
+                Ray ray = camera->calc_ray_at(screen_coords, &rng);
 
                 glm::vec3 color {0.f};
 
@@ -163,7 +158,7 @@ Buffer<glm::vec3> Sampler::render_preview_sample(glm::ivec2 frame_size, Camera *
 
             Ray ray {
                 camera->get_pos(),
-                camera->calc_ray_dir_at(screen_coords),
+                camera->calc_view_dir_at(screen_coords),
                 TRC_CAMERA_RAY,
                 0
             };

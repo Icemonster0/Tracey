@@ -9,7 +9,7 @@ namespace trc {
 
 class Viewer {
 public:
-    Viewer(glm::ivec2 window_size, float fov);
+    Viewer(glm::ivec2 window_size, float fov, float focal_length = 10.f, float aperture = 0.f);
     Viewer();
 
     void update(InputPackage input, float delta_t, glm::ivec2 window_size);

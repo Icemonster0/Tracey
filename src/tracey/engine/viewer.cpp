@@ -6,14 +6,15 @@
 
 namespace trc {
 
-Viewer::Viewer(glm::ivec2 window_size, float fov)
+Viewer::Viewer(glm::ivec2 window_size, float fov, float focal_length, float aperture)
     : look_sens(0.1f), scroll_fac(1.1f), move_speed(5.0f) {
     camera = Camera {
         glm::vec3 {0.f}, // position
-        0.f, // pitch
-        0.f, // yaw
-        fov, // fov
-        (float)window_size.x / (float)window_size.y // aspect ratio
+        0.f, 0.f, // rotation
+        fov,
+        (float)window_size.x / (float)window_size.y, // aspect ratio
+        focal_length,
+        aperture
     };
     window_size_cache = window_size;
 }
