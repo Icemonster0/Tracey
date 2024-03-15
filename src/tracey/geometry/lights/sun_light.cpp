@@ -35,8 +35,10 @@ LightSampleData SunLight::sample(glm::vec3 shading_point, RNG *rng) {
 LightSampleData SunLight::calc_ray_intersection(Ray ray) {
     glm::vec3 light {0.f};
 
+    float solid_angle = 6.283185307f * (1.f - cos(glm::radians(half_angle)));
+
     if (acos(glm::dot(ray.direction, -direction)) <= glm::radians(half_angle))
-        light = color * intensity;
+        light = color * intensity / solid_angle;
 
     return LightSampleData {
         light,

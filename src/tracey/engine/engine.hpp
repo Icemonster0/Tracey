@@ -41,7 +41,9 @@ private:
 
     int render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen);
 
-    void test_scene_setup(); // For testing purposes
+    // Tests
+    void test_scene_setup();
+    void test_integrals();
 };
 
 } /* trc */

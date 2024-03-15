@@ -17,9 +17,11 @@ LightSampleData PointLight::calc_ray_intersection(Ray ray) {
         std::numeric_limits<float>::infinity()
     };
 
+    float projected_area = 3.141592654f * radius*radius;
+
     // calculate intersection parameters
     LightSampleData data {
-        color * intensity,
+        color * intensity / projected_area,
         ray,
         t.value()
     };

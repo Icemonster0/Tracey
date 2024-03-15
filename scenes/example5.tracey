@@ -1,0 +1,9 @@
+// Hello World of ray tracing
+
+EXTERNAL {
+    SOURCE {"example5.glb"}
+}
+
+ENVIRONMENT {
+    SOURCE {"textures/golden_bay_4k.hdr"}
+}

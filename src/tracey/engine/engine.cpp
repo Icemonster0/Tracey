@@ -12,6 +12,7 @@
 #include "../geometry/shape.hpp"
 #include "../geometry/shapes/shapes.hpp"
 #include "../graphics/image_read_write.hpp"
+#include "../graphics/brdfs.hpp"
 
 namespace trc {
 
@@ -47,7 +48,9 @@ int Engine::load_file(std::string file_path) {
 }
 
 int Engine::run() {
-    // test_scene_setup(); // for testing
+    // Tests
+    // test_scene_setup();
+    // test_integrals();
 
     window_manager = WindowManager {cfg.window_size};
     viewer = Viewer {window_manager.get_size(), cfg.fov};
@@ -163,7 +166,8 @@ int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_
     return return_code;
 }
 
-// For testing purposes
+// Tests
+
 void Engine::test_scene_setup() {
     /* SPHERE GROUP SETUP */
     Material *mat_floor = scene.add_material(std::make_unique<Material>(glm::vec3 {0.9f, 0.9f, 0.9f}, 0.5f, 0.f));
@@ -220,6 +224,89 @@ void Engine::test_scene_setup() {
     //
     // scene.add_object(std::unique_ptr<Shape>(new GroundPlane(-0.5f, shader_pack.shader_combined.get(), floor_mat)));
     // scene.add_object(std::unique_ptr<Shape>(new Triangle({0, 1, 2}, {0, 0, 0}, {0, 1, 2}, mesh, shader_pack.shader_combined.get(), tri_mat)));
+}
+
+void Engine::test_integrals() {
+    const float step = 0.001f;
+    const float phi_max = 2.f*3.141592654f;
+    const float theta_max = 3.141592654f;
+
+    const float roughness = 0.3f;
+    const glm::vec3 normal {0, 1, 0};
+    const glm::vec3 tangent {1, 0, 0};
+
+    std::random_device rand_dev;
+    int seed = rand_dev();
+    RNG rng {seed, seed << 2, (seed >> 12) + 0xabc, seed * 3 >> 31};
+
+    printf("Calculating Integrals ...\n\n");
+
+    float integral_0 = 0.f;
+    float integral_1 = 0.f;
+    float integral_2 = 0.f;
+    for (float phi = 0.f; phi < phi_max; phi += step) {
+        for (float theta = 0.f; theta < theta_max; theta += step) {
+            Ray ray {
+                glm::vec3 {0},
+                glm::vec3 {
+                    sin(theta) * cos(phi),
+                    cos(theta),
+                    sin(theta) * sin(phi)
+                }
+            };
+            const float sum_factor = abs(sin(phi)) * step*step;
+
+            float value_0 = accelerator->calc_light_intersection(ray).light.r;
+            value_0 *= sum_factor;
+            integral_0 += value_0;
+
+            // ggx distrib
+            Ray ggx_ray {
+                glm::vec3 {0},
+                glm::reflect(ray.direction, brdf::ggx_normal(
+                    normal,
+                    tangent,
+                    roughness,
+                    &rng
+                ))
+            };
+            float value_1 = accelerator->calc_light_intersection(ggx_ray).light.r;
+            value_1 *= sum_factor;
+            integral_1 += value_1;
+
+            float value_2 = accelerator->calc_light_influence(
+                glm::vec3 {0},
+                normal,
+                ray.direction,
+                roughness,
+                &rng,
+                brdf::ggx
+            ).r;
+
+            // ggx begin
+            // float a = roughness*roughness;
+            // float c = glm::dot(normal, math::normalize(ray.direction + ray.direction));
+            // float value_2 = a / (c*c * (a*a - 1.f) + 1.f);
+            // value_2 = value_2*value_2 * (1 / 3.141592654f) * a;
+            // ggx end
+
+            // float value_2 = 1.f;
+            // float value_2 = brdf::ggx(ray.direction, ray.direction, normal, roughness);
+            value_2 *= sum_factor;
+            integral_2 += value_2;
+
+            // printf("0: %f\n", value_0);
+            // printf("1: %f\n", value_1);
+            // printf("2: %f\n\n", value_2);
+        }
+        // printf("2: %f\n\n", integral_2);
+    }
+    printf("(0: reference; 1: ggx indirect; 2: ggx direct)\n");
+    printf("integral 0 = %f\n", integral_0);
+    printf("integral 1 = %f\n", integral_1);
+    printf("integral 2 = %f , %f\n", integral_2, roughness*roughness);
+    // printf("integral 2 = %f * %f = %f\n", integral_2, roughness*roughness, roughness*roughness * integral_2);
+    exit(0);
 }
 
 } /* trc */

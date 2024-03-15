@@ -40,7 +40,7 @@ LightSampleData Accelerator::calc_light_intersection(Ray ray) const {
 
     for (auto &light : light_ptr_list) {
         LightSampleData isect = light->calc_ray_intersection(ray);
-        if (isect.distance <= min_dist) {
+        if (isect.light != glm::vec3(0.f) && isect.distance <= min_dist) {
             min_dist = isect.distance;
             min_isect = std::move(isect);
         }
@@ -55,7 +55,7 @@ glm::vec3 Accelerator::calc_light_influence(glm::vec3 shading_point, glm::vec3 n
     for (auto &light : light_ptr_list) {
         LightSampleData light_data = light->sample(shading_point, rng);
 
-        float cos_theta = glm::clamp(glm::dot(normal, light_data.shadow_ray.direction), 0.f, 1.f);
+        float cos_theta = glm::min(glm::dot(normal, light_data.shadow_ray.direction), 1.f);
         if (cos_theta < 0.f) continue;
         float occlusion = calc_light_occlusion(shading_point, light_data.shadow_ray.direction, light_data.distance, 0.f);
         light_color += light_data.light

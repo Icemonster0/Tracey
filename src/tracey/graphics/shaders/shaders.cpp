@@ -63,10 +63,9 @@ TRC_DEFINE_SHADER(ShaderDiffuseIndirect) {
             shader_data.rng
         };
         color = isect.value().shader->evaluate(diffuse_shader_data);
+        color = glm::min(color, {TRC_INDIRECT_LIGHT_CLAMP});
     }
     else color = shader_data.accelerator->get_environment_light(diffuse_ray);
-
-    // color *= brdf::flat(shader_data.normal, shader_data.normal, shader_data.normal, SAMPLE_ATTRIB(roughness));
 
     return glm::vec4 {color, 1.f};
 }
@@ -74,8 +73,8 @@ TRC_DEFINE_SHADER(ShaderDiffuseIndirect) {
 TRC_DEFINE_SHADER(ShaderSpecularDirect) {
     float roughness = SAMPLE_ATTRIB(roughness);
 
-    // if (roughness < TRC_SPECULAR_OPTIMIZE_TRESHOLD)
-    //     return glm::vec4 {glm::vec3 {0.f}, 1.f};
+    if (roughness < TRC_SPECULAR_OPTIMIZE_TRESHOLD)
+        return glm::vec4 {glm::vec3 {0.f}, 1.f};
 
     glm::vec3 light = shader_data.accelerator->calc_light_influence(
         shader_data.pos, // shading point
@@ -92,9 +91,10 @@ TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
     glm::vec3 color;
 
     float roughness = SAMPLE_ATTRIB(roughness);
-    // bool include_lights = (roughness < TRC_SPECULAR_OPTIMIZE_TRESHOLD);
+    bool include_lights = (roughness < TRC_SPECULAR_OPTIMIZE_TRESHOLD);
+    Ray specular_ray {glm::vec3 {0}, glm::vec3 {0}};
 
-    Ray specular_ray {
+    specular_ray = Ray {
         shader_data.pos,
         glm::reflect(shader_data.ray.direction, brdf::ggx_normal(
             shader_data.normal,
@@ -107,7 +107,7 @@ TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
     };
 
     if (glm::dot(specular_ray.direction, shader_data.normal) < 0.f) {
-        specular_ray.direction *= -1.f;
+        return glm::vec4 {0.f};
     }
 
     float obj_isect_distance = std::numeric_limits<float>::infinity();
@@ -128,17 +128,16 @@ TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
             shader_data.rng
         };
         color = obj_isect.value().shader->evaluate(specular_shader_data);
+        color = glm::min(color, {TRC_INDIRECT_LIGHT_CLAMP});
     }
     else color = shader_data.accelerator->get_environment_light(specular_ray);
 
-    // if (include_lights) {
-    //     LightSampleData light_isect = shader_data.accelerator->calc_light_intersection(specular_ray);
-    //     if (light_isect.distance <= obj_isect_distance) {
-    //         color += light_isect.light;
-    //     }
-    // }
-
-    // color *= brdf::ggx(shader_data.normal, shader_data.normal, shader_data.normal, roughness);
+    if (include_lights) {
+        LightSampleData light_isect = shader_data.accelerator->calc_light_intersection(specular_ray);
+        if (light_isect.distance <= obj_isect_distance) {
+            color += light_isect.light;
+        }
+    }
 
     return glm::vec4 {color, 1.f};
 }
@@ -208,10 +207,10 @@ TRC_DEFINE_SHADER(ShaderTransmission) {
     }
     else indirect = shader_data.accelerator->get_environment_light(transmit_ray);
 
-    // LightSampleData light_isect = shader_data.accelerator->calc_light_intersection(transmit_ray);
-    // if (light_isect.distance <= obj_isect_distance) {
-    //     indirect += light_isect.light;
-    // }
+    LightSampleData light_isect = shader_data.accelerator->calc_light_intersection(transmit_ray);
+    if (light_isect.distance <= obj_isect_distance) {
+        indirect += light_isect.light;
+    }
 
     return glm::vec4 {indirect + direct, 1.f};
 }
@@ -269,7 +268,6 @@ TRC_DEFINE_SHADER(ShaderCombined) {
         glm::vec3 transmission_indirect {0.f};
         if (shader_data.ray.index <= TRC_RAY_MAX_BOUNCES) {
             transmission_indirect = EVALUATE_SHADER(shader_transmission, shader_data).rgb();
-            transmission_indirect = glm::min(transmission_indirect, {TRC_INDIRECT_LIGHT_CLAMP});
         }
         glm::vec3 transmission_color {glm::saturate(albedo)}; // saturate = clamp between 0 and 1
         transmission = transmission_indirect * transmission_color;
@@ -285,7 +283,6 @@ TRC_DEFINE_SHADER(ShaderCombined) {
         glm::vec3 diffuse_indirect {0.f};
         if (shader_data.ray.index <= TRC_RAY_MAX_BOUNCES) {
             diffuse_indirect = EVALUATE_SHADER(shader_diffuse_indirect, shader_data).rgb();
-            diffuse_indirect = glm::min(diffuse_indirect, {TRC_INDIRECT_LIGHT_CLAMP});
         }
         glm::vec3 diffuse_color {glm::saturate(albedo * (1.f - metallic))};
         diffuse = (diffuse_direct + diffuse_indirect) * diffuse_color;
@@ -297,7 +294,6 @@ TRC_DEFINE_SHADER(ShaderCombined) {
     glm::vec3 specular_indirect {0.f};
     if (shader_data.ray.index <= TRC_RAY_MAX_BOUNCES) {
         specular_indirect = EVALUATE_SHADER(shader_specular_indirect, shader_data).rgb();
-        specular_indirect = glm::min(specular_indirect, {TRC_INDIRECT_LIGHT_CLAMP});
     }
     glm::vec3 specular_color {glm::saturate(fresnel + (albedo * metallic))};
     specular = (specular_direct + specular_indirect) * specular_color;
