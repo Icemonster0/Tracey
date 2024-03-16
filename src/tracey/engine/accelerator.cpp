@@ -105,4 +105,20 @@ std::optional<Intersection> Accelerator::calc_intersection_in_list(Ray ray, cons
     return min_isect;
 }
 
+Box Accelerator::shape_list_bounds(const std::list<Shape*> *list) const {
+    Box bounds {};
+    if (list->empty()) return bounds;
+
+    auto it = list->begin();
+    bounds = (*it)->calc_bounding_box();
+    ++it;
+
+    while (it != list->end()) {
+        bounds.include((*it)->calc_bounding_box());
+        ++it;
+    }
+
+    return bounds;
+}
+
 } /* trc */

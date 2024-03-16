@@ -12,6 +12,7 @@
 #include "scene.hpp"
 #include "accelerator.hpp"
 #include "bvh.hpp"
+#include "voxel_accel.hpp"
 #include "window_manager.hpp"
 #include "viewer.hpp"
 #include "sampler.hpp"

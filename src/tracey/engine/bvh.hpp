@@ -36,8 +36,6 @@ private:
     void split_BVH_node(BVHnode &node);
 
     std::optional<Intersection> resolve_BVH_node(const BVHnode *node, Ray ray) const;
-
-    Box shape_list_bounds(const std::list<Shape*> *list) const;
 };
 
 } /* trc */

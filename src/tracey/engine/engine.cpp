@@ -41,7 +41,16 @@ int Engine::load_file(std::string file_path) {
         scene = importer.get_loaded_scene();
     }
 
-    accelerator = std::unique_ptr<Accelerator> {new BVH {&scene}};
+    if (cfg.accelerator == "NONE") {
+        accelerator = std::unique_ptr<Accelerator> {new Accelerator {&scene}};
+    } else if (cfg.accelerator == "BVH") {
+        accelerator = std::unique_ptr<Accelerator> {new BVH {&scene}};
+    } else if (cfg.accelerator == "VOXEL") {
+        accelerator = std::unique_ptr<Accelerator> {new VoxelAccel {&scene, cfg.voxel_size}};
+    } else {
+        printf("\n%s is not a valid accelerator type (must be one of NONE, BVH, VOXEL)\n", cfg.accelerator.c_str());
+        return 4;
+    }
 
     printf("\n");
     return 0;

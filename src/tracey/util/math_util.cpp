@@ -143,6 +143,32 @@ glm::vec2 sphere_coords(glm::vec3 dir) {
     return tex_coord;
 }
 
+glm::vec2 intersect_aabb(Ray ray, glm::vec3 pmin, glm::vec3 pmax) {
+    // referene: https://tavianator.com/2022/ray_box_boundary.html
+
+    float tmin = 0.f, tmax = std::numeric_limits<float>::infinity();
+    float t1, t2;
+
+    glm::vec3 inv_dir = 1.f / ray.direction;
+
+    t1 = (pmin.x - ray.origin.x) * inv_dir.x;
+    t2 = (pmax.x - ray.origin.x) * inv_dir.x;
+    tmin = std::min(std::max(t1, tmin), std::max(t2, tmin));
+    tmax = std::max(std::min(t1, tmax), std::min(t2, tmax));
+
+    t1 = (pmin.y - ray.origin.y) * inv_dir.y;
+    t2 = (pmax.y - ray.origin.y) * inv_dir.y;
+    tmin = std::min(std::max(t1, tmin), std::max(t2, tmin));
+    tmax = std::max(std::min(t1, tmax), std::min(t2, tmax));
+
+    t1 = (pmin.z - ray.origin.z) * inv_dir.z;
+    t2 = (pmax.z - ray.origin.z) * inv_dir.z;
+    tmin = std::min(std::max(t1, tmin), std::max(t2, tmin));
+    tmax = std::max(std::min(t1, tmax), std::min(t2, tmax));
+
+    return glm::vec2(tmin, tmax);
+}
+
 float quad_interp(float t) {
     return (t < 0.5f) ?
            (2.f * t*t) :

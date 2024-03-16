@@ -43,6 +43,8 @@ add_library(main_module STATIC
     src/tracey/engine/user_config.hpp
     src/tracey/engine/viewer.cpp
     src/tracey/engine/viewer.hpp
+    src/tracey/engine/voxel_accel.cpp
+    src/tracey/engine/voxel_accel.hpp
     src/tracey/engine/window_manager.cpp
     src/tracey/engine/window_manager.hpp
     src/tracey/geometry/lights/lights.hpp

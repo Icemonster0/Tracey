@@ -112,20 +112,4 @@ std::optional<Intersection> BVH::resolve_BVH_node(const BVHnode *node, Ray ray) 
     }
 }
 
-Box BVH::shape_list_bounds(const std::list<Shape*> *list) const {
-    Box bounds {};
-    if (list->empty()) return bounds;
-
-    auto it = list->begin();
-    bounds = (*it)->calc_bounding_box();
-    ++it;
-
-    while (it != list->end()) {
-        bounds.include((*it)->calc_bounding_box());
-        ++it;
-    }
-
-    return bounds;
-}
-
 } /* trc */

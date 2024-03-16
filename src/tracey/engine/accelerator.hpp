@@ -34,6 +34,8 @@ protected:
     EnvironmentTexture *env_texture_ptr;
 
     std::optional<Intersection> calc_intersection_in_list(Ray ray, const std::list<Shape*> *list) const;
+
+    Box shape_list_bounds(const std::list<Shape*> *list) const;
 };
 
 } /* trc */
