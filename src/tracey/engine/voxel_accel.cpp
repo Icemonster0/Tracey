@@ -113,7 +113,7 @@ void VoxelAccel::populate_grid(float p_voxel_size) {
     voxel_size = p_voxel_size;
 
     Box bounding_box = shape_list_bounds(&object_ptr_list);
-    glm::vec3 volume_size = bounding_box.pmax - bounding_box.pmin;
+    glm::vec3 volume_size = bounding_box.pmax - bounding_box.pmin + voxel_size*0.1f;
     grid_size = glm::ceil(volume_size / voxel_size);
 
     world_to_grid = glm::mat4 {1.f};
@@ -132,6 +132,7 @@ void VoxelAccel::populate_grid(float p_voxel_size) {
             }
         };
     } catch (const std::length_error& e) {
+        // object with infinite (or too big) extent detected
         printf("Floor planes are not supported in VOXEL mode (see --accelerator)\n");
         exit(2);
     }
