@@ -16,7 +16,10 @@ Sampler::Sampler(glm::ivec2 frame_size) : samples(0) {
     fbuf.fill(frame_size, glm::vec3 {0.25f});
 }
 
-void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples, bool preview_mode) {
+void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator,
+        ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples,
+        bool preview_mode, float exposure) {
+
     if (reset) {
         samples = 0;
         clear_fbuf(frame_size, glm::vec3 {0.f});
@@ -26,6 +29,8 @@ void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *a
 
     Buffer<glm::vec3> new_sample = preview_mode ? render_preview_sample(frame_size, camera, accelerator, shader_pack, seed)
                                                 : render_sample(frame_size, camera, accelerator, shader_pack, seed);
+
+    if (preview_mode) exposure = 0.f;
 
     float inv_samples = 1.f / (float)samples;
     float old_pixel_fac = float(samples - 1) * inv_samples;
@@ -38,12 +43,14 @@ void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *a
             glm::vec3 *new_pixel = new_sample.at({x, y});
 
             *old_pixel *= old_pixel_fac;
-            *old_pixel += color::to_sRGB(*new_pixel) * inv_samples;
+            *old_pixel += color::output_transform(*new_pixel, exposure) * inv_samples;
         }
     }
 }
 
-void Sampler::render_image_sample(Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, int sample) {
+void Sampler::render_image_sample(Camera *camera, Accelerator *accelerator,
+        ShaderPack *shader_pack, uint64_t seed, int sample, float exposure) {
+
     Buffer<glm::vec3> new_sample = render_sample(image.get_size(), camera, accelerator, shader_pack, seed);
 
     float inv_sample = 1.f / (float)sample;
@@ -57,7 +64,7 @@ void Sampler::render_image_sample(Camera *camera, Accelerator *accelerator, Shad
             glm::vec3 *new_pixel = new_sample.at({x, y});
 
             *old_pixel *= old_pixel_fac;
-            *old_pixel += color::to_sRGB(*new_pixel) * inv_sample;
+            *old_pixel += color::output_transform(*new_pixel, exposure) * inv_sample;
         }
     }
 }

@@ -1,4 +1,5 @@
 // add two spheres to example4.glb
+// recommended render size: 8/10
 
 EXTERNAL {
     SOURCE {"example4.glb"}
@@ -12,7 +13,8 @@ SPHERE {
     POSITION {-1.05093, -0.2791, 0.601388}
     RADIUS {1}
     MATERIAL {
-        COLOR {0.172862, 0.254619, 0.8}
+        COLOR {0.1, 0.1, 1}
+        // COLOR {0.172862, 0.254619, 0.8}
         ROUGHNESS {0.77}
     }
 }
@@ -24,4 +26,9 @@ SPHERE {
         ROUGHNESS {0}
         METALLIC {1}
     }
+}
+
+CAMERA {
+    POSITION {0, 1.9, 10}
+    FOV {50}
 }

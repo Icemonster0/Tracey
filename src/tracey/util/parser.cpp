@@ -523,11 +523,6 @@ bool TraceyParser::parse_material(std::list<parser::Token>::iterator &i, Materia
 
         if (token.content == "COLOR") {
             PARSE_PARAMETER(albedo, vec3, glm::vec3);
-            for (int x = 0; x < albedo_tex->get_size().x; ++x) {
-                for (int y = 0; y < albedo_tex->get_size().y; ++y) {
-                    albedo_tex->set_pixel({x, y}, color::sRGB_to_flat(albedo_tex->get_pixel({x, y})));
-                }
-            }
         }
         else if (token.content == "ROUGHNESS") {
             PARSE_PARAMETER(roughness, float, float);

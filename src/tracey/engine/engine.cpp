@@ -14,12 +14,24 @@
 #include "../geometry/shapes/shapes.hpp"
 #include "../graphics/image_read_write.hpp"
 #include "../graphics/brdfs.hpp"
+#include "../graphics/color_spaces.hpp"
 
 namespace trc {
 
 Engine::Engine(UserConfig cfg) : cfg(cfg), error(0), preview_mode(true) {}
 
 int Engine::load_file(std::string file_path) {
+    if (cfg.color_mode == "STANDARD") {
+        color::color_mode = color::STANDARD;
+    } else if (cfg.color_mode == "FILMIC") {
+        color::color_mode = color::FILMIC;
+    } else if (cfg.color_mode == "RAW") {
+        color::color_mode = color::RAW;
+    } else {
+        printf("\n%s is not a valid color mode (must be one of STANDARD, FILMIC, RAW)\n", cfg.color_mode.c_str());
+        return 5;
+    }
+
     if(system("clear")) {};
     printf("Loading file '%s'\n", file_path.c_str());
 
@@ -82,7 +94,8 @@ int Engine::run() {
             seed_gen(),
             window_manager.is_update_required(),
             cfg.samples,
-            preview_mode
+            preview_mode,
+            cfg.exposure
         );
         window_manager.draw_frame(sampler.get_frame_buffer());
         InputPackage input = window_manager.handle_events();
@@ -190,7 +203,8 @@ int Engine::render_image(std::mt19937 *seed_gen, bool render_only) {
             accelerator.get(),
             &shader_pack,
             seed_gen->operator()(),
-            sample
+            sample,
+            cfg.exposure
         );
 
         if (!render_only) input = window_manager.handle_events();

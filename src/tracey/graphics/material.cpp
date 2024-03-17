@@ -1,5 +1,7 @@
 #include "material.hpp"
 
+#include "color_spaces.hpp"
+
 namespace trc {
 
 Material::Material(glm::vec3 a, float r, float m, glm::vec3 e, glm::vec3 n, float t, float i, float o) {
@@ -11,7 +13,7 @@ Material::Material(glm::vec3 a, float r, float m, glm::vec3 e, glm::vec3 n, floa
     transmissive = std::shared_ptr<Attrib<float>> {new AttribValue<float> {t}};
     ior = std::shared_ptr<Attrib<float>> {new AttribValue<float> {i}};
     alpha = std::shared_ptr<Attrib<float>> {new AttribValue<float> {o}};
-    clamp_attribs();
+    process_attribs();
 }
 
 Material::Material(std::shared_ptr<Attrib<glm::vec3>> a,
@@ -23,7 +25,7 @@ Material::Material(std::shared_ptr<Attrib<glm::vec3>> a,
                    std::shared_ptr<Attrib<float>> i,
                    std::shared_ptr<Attrib<float>> o)
     : albedo(a), roughness(r), metallic(m), emission(e), normal(n), transmissive(t), ior(i), alpha(o) {
-    clamp_attribs();
+    process_attribs();
 }
 
 Material::Material() {
@@ -37,8 +39,9 @@ Material::Material() {
     alpha = std::shared_ptr<Attrib<float>> {new AttribValue<float> {1.f}};
 }
 
-void Material::clamp_attribs() {
+void Material::process_attribs() {
     albedo->clamp(glm::vec3 {0.001f}, glm::vec3 {0.999f});
+    albedo->color_transform(color::input_transform);
     roughness->clamp(0.0001f, 0.9999f);
     metallic->clamp(0.f, 1.f);
     alpha->clamp(0.f, 1.f);

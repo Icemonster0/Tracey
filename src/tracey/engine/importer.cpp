@@ -207,20 +207,8 @@ void Importer::import_material(const aiMaterial *mat, const aiScene *scene, Scen
     float alpha = 1.f;
 
     // albedo
-    mat->Get(AI_MATKEY_BASE_COLOR, albedo);
-    glm::vec3 trc_albedo {albedo[0], albedo[1], albedo[2]};
     std::shared_ptr<Attrib<glm::vec3>> attrib_albedo;
-    AttribTexture<glm::vec3> albedo_tex = import_texture<glm::vec3>(mat, aiTextureType_BASE_COLOR, scene, path);
-    if (albedo_tex.get_size() != glm::ivec2 {0}) {
-        for (int x = 0; x < albedo_tex.get_size().x; ++x) {
-            for (int y = 0; y < albedo_tex.get_size().y; ++y) {
-                albedo_tex.set_pixel({x, y}, color::sRGB_to_flat(albedo_tex.get_pixel({x, y})));
-            }
-        }
-        attrib_albedo = std::shared_ptr<Attrib<glm::vec3>>(new AttribTexture(albedo_tex));
-    } else {
-        attrib_albedo = std::shared_ptr<Attrib<glm::vec3>>(new AttribValue(trc_albedo));
-    }
+    import_material_attrib(attrib_albedo, albedo, AI_MATKEY_BASE_COLOR, aiTextureType_BASE_COLOR, mat, scene, path);
 
     // roughness
     std::shared_ptr<Attrib<float>> attrib_roughness;
@@ -231,6 +219,8 @@ void Importer::import_material(const aiMaterial *mat, const aiScene *scene, Scen
     import_material_attrib(attrib_metallic, metallic, AI_MATKEY_METALLIC_FACTOR, aiTextureType_METALNESS, mat, scene, path);
 
     // emission
+    // can't use import_material_attrib because all values have to be
+    // multiplied by emission_intensity
     mat->Get(AI_MATKEY_COLOR_EMISSIVE, emission);
     mat->Get(AI_MATKEY_EMISSIVE_INTENSITY, emission_intensity);
     glm::vec3 trc_emission {emission[0], emission[1], emission[2]};
@@ -249,6 +239,8 @@ void Importer::import_material(const aiMaterial *mat, const aiScene *scene, Scen
     }
 
     // normal
+    // can't use import_material_attrib because there is no single normal
+    // atribute, only texture
     glm::vec3 trc_normal {normal[0], normal[1], normal[2]};
     std::shared_ptr<Attrib<glm::vec3>> attrib_normal;
     AttribTexture<glm::vec3> normal_tex = import_texture<glm::vec3>(mat, aiTextureType_NORMALS, scene, path);

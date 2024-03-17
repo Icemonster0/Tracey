@@ -29,7 +29,7 @@ struct Material {
     std::shared_ptr<Attrib<float>> ior;
     std::shared_ptr<Attrib<float>> alpha;
 
-    void clamp_attribs();
+    void process_attribs();
 };
 
 } /* trc */

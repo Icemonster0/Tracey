@@ -3,6 +3,7 @@
 
 #include "../../lib/glm.hpp"
 #include "buffer.hpp"
+#include "color_spaces.hpp"
 #include "../util/math_util.hpp"
 
 namespace trc {
@@ -11,6 +12,7 @@ template <typename T>
 struct Attrib {
     virtual T sample(glm::vec2 tex_coord) = 0;
     virtual void clamp(T min, T max) = 0;
+    virtual void color_transform(T(*transform)(T)) = 0;
 };
 
 template <typename T>
@@ -22,8 +24,10 @@ struct AttribValue : public Attrib<T> {
         return value;
     }
 
-    void clamp(T min, T max) {
-        value = glm::clamp(value, min, max);
+    void clamp(T min, T max) {value = glm::clamp(value, min, max);}
+
+    void color_transform(T(*transform)(T)) {
+        value = transform(value);
     }
 
 private:
@@ -57,6 +61,14 @@ struct AttribTexture : public Attrib<T> {
         for (int x = 0; x < get_size().x; ++x) {
             for (int y = 0; y < get_size().y; ++y) {
                 *texture.at({x, y}) = glm::clamp(*texture.at({x, y}), min, max);
+            }
+        }
+    }
+
+    void color_transform(T(*transform)(T)) {
+        for (int x = 0; x < get_size().x; ++x) {
+            for (int y = 0; y < get_size().y; ++y) {
+                *texture.at({x, y}) = transform(*texture.at({x, y}));
             }
         }
     }
