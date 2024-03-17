@@ -203,10 +203,10 @@ void Importer::import_light(const aiLight *light, const aiScene *scene, const ai
 void Importer::import_camera(const aiCamera *camera, const aiScene *scene, const aiNode *root_node, Scene *trc_scene) {
     float h_fov = camera->mHorizontalFOV;
     float aspect = camera->mAspect;
-    aiVector3D look_at = camera->mLookAt;
+    // aiVector3D look_at = camera->mLookAt;
     aiVector3D pos = camera->mPosition;
 
-    glm::vec3 trc_look_at {look_at[0], look_at[1], look_at[2]};
+    // glm::vec3 trc_look_at {look_at[0], look_at[1], look_at[2]};
     glm::vec3 trc_pos {pos[0], pos[1], pos[2]};
 
     const aiNode *cam_node = root_node->FindNode(camera->mName);
@@ -218,47 +218,88 @@ void Importer::import_camera(const aiCamera *camera, const aiScene *scene, const
         i_node = i_node->mParent;
     }
 
-    trc_look_at = (glm::vec4 {trc_look_at, 1.f} * transform).xyz();
+    // trc_look_at = (glm::vec4 {trc_look_at, 1.f} * transform).xyz();
     trc_pos = (glm::vec4 {trc_pos, 1.f} * transform).xyz();
     // trc_look_at.y *= -1.f;
+    // trc_look_at = math::normalize(trc_look_at);
 
     // orientation
-    float pitch, yaw;
-    if (trc_look_at.x == 0.f) {
-        yaw = 0.f;
-    } else {
-        const float half_pi = 1.570796327f;
-        yaw = atanf(trc_look_at.z / trc_look_at.x) - glm::sign(trc_look_at.x) * half_pi;
-    }
-    float radius_at_height = glm::length(trc_look_at.xz());
-    if (radius_at_height == 0.f) {
-        pitch = 0.f;
-    } else {
-        pitch = atanf(trc_look_at.y / radius_at_height);
-    }
-    pitch = glm::degrees(pitch);
-    yaw = glm::degrees(yaw);
+    // float pitch, yaw;
+    // if (trc_look_at.x == 0.f) {
+    //     yaw = 0.f;
+    // } else {
+    //     const float half_pi = 1.570796327f;
+    //     yaw = atanf(trc_look_at.z / trc_look_at.x) - glm::sign(trc_look_at.x) * half_pi;
+    // }
+    // float radius_at_height = glm::length(trc_look_at.xz());
+    // if (radius_at_height == 0.f) {
+    //     pitch = 0.f;
+    // } else {
+    //     pitch = atanf(trc_look_at.y / radius_at_height);
+    // }
+    // pitch = glm::degrees(pitch);
+    // yaw = glm::degrees(yaw);
     // pitch = glm::degrees(pitch)*-1.f;
     // yaw = glm::degrees(yaw)-180.f;
+
+    aiMatrix4x4 cam_mat;
+    camera->GetCameraMatrix(cam_mat);
+    glm::mat4 trc_cam_mat = glm::transpose(glm::make_mat4(cam_mat[0]));
+
+    glm::vec3 vec3_trash;
+    glm::vec4 vec4_trash;
+    glm::mat4 mat4_trash;
+    glm::quat orientation;
+    glm::decompose(
+        mat4_trash, vec3_trash,
+        orientation,
+        vec3_trash, vec3_trash, vec4_trash
+    );
+    glm::vec3 euler = glm::eulerAngles(orientation);
+    // glm::vec3 look_at = (orientation * glm::vec4 {0, 0, -1, 1}).xyz();
+    // glm::vec3 look_at = (glm::toMat4(orientation) * glm::vec4 {0, 0, -1, 1}).xyz();
+    glm::vec3 look_at = (glm::eulerAngleXYZ(euler.x, euler.y, euler.z) * glm::vec4 {0, 0, -1, 1}).xyz();
+    // look_at = math::normalize(look_at);
+
+    float pitch, yaw;
+    // if (look_at.x == 0.f) {
+    //     yaw = 0.f;
+    // } else {
+    //     const float half_pi = 1.570796327f;
+    //     yaw = atanf(look_at.z / look_at.x) - glm::sign(look_at.x) * half_pi;
+    // }
+    // float radius_at_height = glm::length(look_at.xz());
+    // if (radius_at_height == 0.f) {
+    //     pitch = 0.f;
+    // } else {
+    //     pitch = atanf(look_at.y / radius_at_height);
+    // }
+    // pitch = glm::degrees(pitch);
+    // yaw = glm::degrees(yaw);
+
+    pitch = glm::degrees(euler.x);
+    yaw = glm::degrees(euler.y);
 
     // fov
     float v_fov = atanf(4.f*tanf(h_fov) / aspect);
     v_fov = glm::degrees(fabsf(v_fov));
 
-    Camera trc_camera {trc_pos, yaw, pitch, v_fov, aspect};
+    Camera trc_camera {trc_pos, yaw, pitch, 140, aspect};
+    // Camera trc_camera {trc_pos, yaw, pitch, v_fov, aspect};
     trc_scene->set_camera(trc_camera);
 
-    // glm::vec3 trc_forward = trc_camera.calc_forward_dir();
-    // trc_look_at = math::normalize(trc_look_at);
-    // trc_forward = math::normalize(trc_forward);
+    glm::vec3 trc_forward = trc_camera.calc_forward_dir();
+    look_at = math::normalize(look_at);
+    trc_forward = math::normalize(trc_forward);
     // printf("assimp:  %f %f %f\n", look_at[0], look_at[1], look_at[2]);
-    // printf("look at: %f %f %f\n", trc_look_at.x, trc_look_at.y, trc_look_at.z);
-    // printf("forward: %f %f %f\n", trc_forward.x, trc_forward.y, trc_forward.z);
+    printf("look at: %f %f %f\n", look_at.x, look_at.y, look_at.z);
+    printf("forward: %f %f %f\n", trc_forward.x, trc_forward.y, trc_forward.z);
     // printf("H fov:   %f\n", glm::degrees(h_fov));
     // printf("V fov:   %f\n", v_fov);
     // printf("ai pos:  %f %f %f\n", pos[0], pos[1], pos[2]);
     // printf("trc pos: %f %f %f\n", trc_pos.x, trc_pos.y, trc_pos.z);
-    // exit(1);
+
+    exit(1);
 
     // TODO: debug incorrect camera position
 }
