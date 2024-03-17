@@ -3,3 +3,5 @@ lib/glfw-3.3.8/examples
 lib/glfw-3.3.8/tests
 lib/glm-0.9.9.8/doc
 build
+scenes/example.blend*
+scenes/assets
