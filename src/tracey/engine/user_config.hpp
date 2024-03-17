@@ -25,6 +25,7 @@ struct UserConfig {
     CLOM2_SETTING_STRING(scene_path, --scene, -S, , Path to a 3d model or scene file);
     CLOM2_SETTING_FLOAT(voxel_size, --voxel-size, -vs, 0.1, Size of the voxels when using VOXEL accelerator (see --accelerator));
     CLOM2_GENERAL_SETTING(window_size, --window-size, -ws, glm::ivec2, 400 300, Width and height of the initial window in pixels, trc::cfg_parser::str_to_ivec2);
+    CLOM2_FLAG(render, --render, -r, Render image directly using scene camera (skips interactive interface));
 };
 
 } /* trc */

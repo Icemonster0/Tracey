@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <memory>
+#include <chrono>
 
 #include "../../lib/glfw.hpp"
 #include "../util/math_util.hpp"
@@ -87,7 +88,7 @@ int Engine::run() {
         InputPackage input = window_manager.handle_events();
         viewer.update(input, delta_t, window_manager.get_size());
 
-        if (input.r) error = render_image(cfg.render_size, cfg.samples, &seed_gen);
+        if (input.r) error = render_image(&seed_gen, false);
         if (input.p) preview_mode = !preview_mode;
 
         if (error) break;
@@ -118,34 +119,69 @@ int Engine::run() {
     return error;
 }
 
-int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen) {
-    InputPackage input = window_manager.handle_events();
+int Engine::render() {
+    sampler = Sampler {window_manager.get_size()};
+
+    std::random_device rand_dev;
+    std::mt19937 seed_gen {rand_dev()};
+
+    error = render_image(&seed_gen, true);
+    if (error == 0) printf("Done!\n\n");
+
+    return error;
+}
+
+int Engine::render_image(std::mt19937 *seed_gen, bool render_only) {
+    // render_only: rendering without graphical context,
+    // which means there is no input either
+
+    console.clear();
+
+    InputPackage input;
+    if (!render_only) input = window_manager.handle_events();
+
+    Camera render_camera;
+    if (render_only) {
+        std::optional<Camera> maybe_camera = *scene.get_camera();
+        if (maybe_camera) {
+            render_camera = maybe_camera.value();
+        } else {
+            printf("The scene contains no camera, aborting render\n");
+            return 9;
+        }
+    }
+    else {
+        render_camera = *viewer.get_camera();
+    }
+    render_camera.set_aspect((float)cfg.render_size.x / (float)cfg.render_size.y);
 
     int return_code = 0;
 
-    sampler.initialize_image(image_size);
+    sampler.initialize_image(cfg.render_size);
 
-    Camera render_camera = *viewer.get_camera();
-    render_camera.set_aspect((float)image_size.x / (float)image_size.y);
-
-    float start_t = glfwGetTime();
-    float last_t = glfwGetTime();
-    float this_t = glfwGetTime();
+    std::chrono::high_resolution_clock timer;
+    auto start_t = timer.now();
+    auto last_t = timer.now();
+    auto this_t = timer.now();
     float delta_t = 0.f;
     float render_time = 0.f;
     float sample_rate = 1.f;
 
     int sample = 0;
-    while (!input.i && !window_manager.window_should_close() && sample < samples) {
+    while (true) {
+        if (!render_only && (input.i || window_manager.window_should_close())) {
+            break;
+        }
 
         console.print_render_info(
             cfg.console_frequency,
             delta_t,
             sample,
             cfg.samples,
-            image_size,
+            cfg.render_size,
             render_time,
-            sample_rate
+            sample_rate,
+            render_only
         );
 
         ++sample;
@@ -157,18 +193,18 @@ int Engine::render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_
             sample
         );
 
-        input = window_manager.handle_events();
+        if (!render_only) input = window_manager.handle_events();
 
-        if (sample >= samples || input.r) {
+        if (sample >= cfg.samples || (!render_only && input.r)) {
             if (image_rw::write_png(sampler.get_image(), cfg.output_path) == 0)
                 return_code = 1;
-            if (sample >= samples) break;
+            if (sample >= cfg.samples) break;
         }
 
-        this_t = glfwGetTime();
-        delta_t = this_t - last_t;
+        this_t = timer.now();
+        delta_t = std::chrono::duration_cast<std::chrono::microseconds>(this_t - last_t).count() / 1000000.f;
         last_t = this_t;
-        render_time = this_t - start_t;
+        render_time = std::chrono::duration_cast<std::chrono::microseconds>(this_t - start_t).count() / 1000000.f;
         sample_rate = (float)sample / render_time;
     }
 

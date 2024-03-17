@@ -25,7 +25,8 @@ public:
     Engine(UserConfig cfg);
 
     int load_file(std::string file_path);
-    int run();
+    int run(); // graphical runtime
+    int render(); // render only
 
 private:
     UserConfig cfg;
@@ -40,7 +41,7 @@ private:
     bool preview_mode;
     int error;
 
-    int render_image(glm::ivec2 image_size, int samples, std::mt19937 *seed_gen);
+    int render_image(std::mt19937 *seed_gen, bool render_only);
 
     // Tests
     void test_scene_setup();

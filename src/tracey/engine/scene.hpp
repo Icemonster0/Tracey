@@ -8,6 +8,7 @@
 #include "../geometry/shapes/shapes.hpp"
 #include "../geometry/mesh.hpp"
 #include "../geometry/lights/lights.hpp"
+#include "../geometry/camera.hpp"
 #include "../graphics/environment_texture.hpp"
 
 namespace trc {
@@ -29,6 +30,10 @@ public:
     EnvironmentTexture *set_environment(EnvironmentTexture tex);
     EnvironmentTexture *get_environment();
 
+    std::optional<Camera> *set_camera(Camera cam);
+    void remove_camera();
+    std::optional<Camera> *get_camera();
+
     void append(Scene &other_scene);
 
 private:
@@ -37,6 +42,7 @@ private:
     std::list<std::unique_ptr<Material>> material_list;
     std::list<std::unique_ptr<Mesh>> mesh_list;
     EnvironmentTexture env_texture;
+    std::optional<Camera> camera;
 };
 
 } /* trc */

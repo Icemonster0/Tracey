@@ -54,17 +54,19 @@ private:
 
     bool parse(Scene &scene, ShaderPack *shader_pack, std::string path);
     bool parse_object(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack, Material *material, std::string path);
-    bool parse_floor(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack, Material *materia, std::string pathl);
+    bool parse_floor(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack, Material *material, std::string path);
     bool parse_sphere(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack, Material *material, std::string path);
     bool parse_point_light(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack);
     bool parse_sun_light(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack);
     bool parse_external(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack, std::string path);
     bool parse_environment(std::list<parser::Token>::iterator &i, Scene &scene, ShaderPack *shader_pack, std::string path);
     bool parse_material(std::list<parser::Token>::iterator &i, Material *&mat, Scene &scene, std::string path);
+    bool parse_camera(std::list<parser::Token>::iterator &i, Scene &scene, std::string path);
 
     bool parse_string(std::list<parser::Token>::iterator &i, std::string &str);
     bool parse_float(std::list<parser::Token>::iterator &i, float &val);
     bool parse_float_tex(std::list<parser::Token>::iterator &i, float &val, AttribTexture<float> &tex, std::string path);
+    bool parse_vec2(std::list<parser::Token>::iterator &i, glm::vec2 &val);
     bool parse_vec3(std::list<parser::Token>::iterator &i, glm::vec3 &val);
     bool parse_vec3_tex(std::list<parser::Token>::iterator &i, glm::vec3 &val, AttribTexture<glm::vec3> &tex, std::string path);
 

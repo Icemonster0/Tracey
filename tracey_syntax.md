@@ -46,17 +46,25 @@ A directional light source.
 + `INTENSITY` (1)
 
 ##### `EXTERNAL`
-A scene file. The `SOURCE` field is mandatory and should be a quotation-mark-enclosed string `""` which is a relative path to a 3d scene file.
+A scene file. The `SOURCE` field is mandatory and should be a quotation-mark-enclosed string `""` which is a relative path to a 3d scene file. Environment and camera don't get overwritten.
 + `SOURCE` !
 + `POSITION` (3)
-+ `ROTATION` (3)
++ `ROTATION` (3) *x, y, z euler*
 + `SCALE` (1)
 
 ##### `ENVIRONMENT`
-An HDRI texture (only .hdr is supported) or a color. There can only be one in a scene. If `SOURCE` is not specified, the `COLOR` field is used.
+An HDRI texture (only .hdr is supported) or a color. There can only be one in a scene. If `SOURCE` is not specified, the `COLOR` field is used. There is one environment per scene.
 + `SOURCE`
 + `COLOR` (3)
-+ `ROTATION` (1)
++ `ROTATION` (1) *around y (up) axis*
+
+##### `CAMERA`
+The camera used for rendering when using the `--render` option. There is one camera per scene.
++ `POSITION` (3)
++ `ROTATION` (2) *yaw, pitch*
++ `FOV` (1) *vertical field of view*
++ `FOCAL_LENGTH` (1)
++ `APERTURE` (1)
 
 ### Parameters
 Parameters are declared in an object scope. All parameter names are followed by a scope enclosed in curly-braces `{}`. In this scope, you must provide a number of values separated by commas indicated by the number in parentheses (unless stated otherwise).  

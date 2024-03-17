@@ -52,7 +52,10 @@ void Console::print(float frequency, float delta_t, bool preview_mode, int sampl
     }
 }
 
-void Console::print_render_info(float frequency, float delta_t, int sample, int max_samples, glm::ivec2 image_size, float time, float sample_rate) {
+void Console::print_render_info(float frequency, float delta_t, int sample,
+        int max_samples, glm::ivec2 image_size, float time, float sample_rate,
+        bool render_only) {
+
     print_cooldown -= delta_t;
     if (print_cooldown <= 0.f) {
         std::stringstream s;
@@ -84,13 +87,15 @@ void Console::print_render_info(float frequency, float delta_t, int sample, int 
         if (tl_minutes) s << tl_minutes << "m ";
         if (tl_seconds) s << tl_seconds << "s";
         s << '\n';
-        s << '\n';
 
-        s << "Controls" << '\n';
-        s << " ESC:          Quit" << '\n';
-        s << " ENTER:        Toggle mouse focus" << '\n';
-        s << " R:            Save rendered image (does not interrupt)" << '\n';
-        s << " I:            Interrupt render (does not save)" << '\n';
+        if (!render_only) {
+            s << '\n';
+            s << "Controls" << '\n';
+            s << " ESC:          Quit" << '\n';
+            s << " ENTER:        Toggle mouse focus" << '\n';
+            s << " R:            Save rendered image (does not interrupt)" << '\n';
+            s << " I:            Interrupt render (does not save)" << '\n';
+        }
 
         clear();
         printf("%s\n", s.str().c_str());

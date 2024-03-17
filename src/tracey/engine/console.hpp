@@ -13,7 +13,8 @@ public:
         int max_samples, glm::ivec2 window_size, glm::vec3 view_pos, float yaw,
         float pitch, float fov, float speed, float focal_length, float aperture);
     void print_render_info(float frequency, float delta_t, int sample,
-        int max_samples, glm::ivec2 image_size, float time, float sample_rate);
+        int max_samples, glm::ivec2 image_size, float time, float sample_rate,
+        bool render_only);
     void clear();
 
 private:

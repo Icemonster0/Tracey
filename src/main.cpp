@@ -25,9 +25,13 @@ int main(int argc, char const *argv[]) {
         // Load scene file
         result = engine.load_file(cfg.scene_path);
 
-        // If successful, start the graphical runtime
+        // If successful, start the graphical runtime or render image
         if (result == 0) {
-            result = engine.run();
+            if (cfg.render) {
+                result = engine.render(); // render only
+            } else {
+                result = engine.run(); // graphical runtime
+            }
         }
     }
 

@@ -202,6 +202,8 @@ bool TraceyParser::parse_object(std::list<parser::Token>::iterator &i, Scene &sc
             if (!parse_external(i, scene, shader_pack, path)) return false;
         } else if (token.content == "ENVIRONMENT") {
             if (!parse_environment(i, scene, shader_pack, path)) return false;
+        } else if (token.content == "CAMERA") {
+            if (!parse_camera(i, scene, path)) return false;
         } else {
             error_string = unknown_keyword_str(token, "global scope");
             return false;
@@ -571,6 +573,51 @@ bool TraceyParser::parse_material(std::list<parser::Token>::iterator &i, Materia
     return true;
 }
 
+bool TraceyParser::parse_camera(std::list<parser::Token>::iterator &i, Scene &scene, std::string path) {
+    using namespace parser;
+
+    ADVANCE_IF(i, i->type == BRACE_OPEN); CHECK_I(i);
+
+    glm::vec3 position {0.f};
+    glm::vec2 rotation {0.f};
+    float fov = 90.f;
+    float focal_length = 10.f;
+    float aperture = 0.f;
+
+    while (i != tokens.end()) {
+        Token token = *i;
+        ADVANCE_IF(i, (i->type == WORD || i->type == BRACE_CLOSE));
+
+        if (token.type == BRACE_CLOSE) break;
+
+        CHECK_I(i);
+
+        if (token.content == "POSITION") {
+            if(!parse_vec3(i, position)) return false;
+        }
+        else if (token.content == "ROTATION") {
+            if(!parse_vec2(i, rotation)) return false;
+        }
+        else if (token.content == "FOV") {
+            if(!parse_float(i, fov)) return false;
+        }
+        else if (token.content == "FOCAL_LENGTH") {
+            if(!parse_float(i, focal_length)) return false;
+        }
+        else if (token.content == "APERTURE") {
+            if(!parse_float(i, aperture)) return false;
+        }
+        else {
+            error_string = unknown_keyword_str(token, "CAMERA");
+            return false;
+        }
+    }
+
+    scene.set_camera(Camera {position, rotation.x, glm::clamp(rotation.y, -90.f, 90.f), fov, 1.f, focal_length, aperture});
+
+    return true;
+}
+
 bool TraceyParser::parse_string(std::list<parser::Token>::iterator &i, std::string &str) {
     using namespace parser;
 
@@ -597,7 +644,15 @@ bool TraceyParser::parse_float(std::list<parser::Token>::iterator &i, float &val
 bool TraceyParser::parse_float_tex(std::list<parser::Token>::iterator &i, float &val, AttribTexture<float> &tex, std::string path) {
     std::vector<float> vec;
     if(!parse_value(i, vec, tex, 1, true, path)) return false;
-    if (vec.size() >= 1) val = vec[0];
+    val = vec[0];
+    return true;
+}
+
+bool TraceyParser::parse_vec2(std::list<parser::Token>::iterator &i, glm::vec2 &val) {
+    std::vector<float> vec;
+    AttribTexture<glm::vec3> tmp;
+    if(!parse_value(i, vec, tmp, 2, false, "")) return false;
+    val = glm::vec2 {vec[0], vec[1]};
     return true;
 }
 
