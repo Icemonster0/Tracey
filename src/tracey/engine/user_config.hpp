@@ -16,6 +16,7 @@ namespace cfg_parser {
 struct UserConfig {
     CLOM2_SETTING_STRING(accelerator, --accelerator, -ac, BVH, Accelerator structure to use (one of NONE BVH VOXEL));
     CLOM2_SETTING_FLOAT(aperture, --aperture, -ap, 0.0, Aperture radius of the viewer came);
+    CLOM2_SETTING_INT(bounces, --bounces, -b, 3, Number of indirect light bounces);
     CLOM2_SETTING_STRING(color_mode, --color-mode, -cm, FILMIC, Color management mode (one of STANDARD, FILMIC, RAW));
     CLOM2_SETTING_FLOAT(console_frequency, --console-frequency, -cf, 5.0, Refresh rate for the console interface in hertz);
     CLOM2_SETTING_FLOAT(exposure, --exposure, -ex, 0.0, The exposure to apply to the rendered image);

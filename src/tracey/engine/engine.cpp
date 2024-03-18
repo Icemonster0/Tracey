@@ -95,7 +95,8 @@ int Engine::run() {
             window_manager.is_update_required(),
             cfg.samples,
             preview_mode,
-            cfg.exposure
+            cfg.exposure,
+            cfg.bounces
         );
         window_manager.draw_frame(sampler.get_frame_buffer());
         InputPackage input = window_manager.handle_events();
@@ -204,7 +205,8 @@ int Engine::render_image(std::mt19937 *seed_gen, bool render_only) {
             &shader_pack,
             seed_gen->operator()(),
             sample,
-            cfg.exposure
+            cfg.exposure,
+            cfg.bounces
         );
 
         if (!render_only) input = window_manager.handle_events();

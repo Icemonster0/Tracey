@@ -58,6 +58,7 @@ TRC_DEFINE_SHADER(ShaderDiffuseIndirect) {
             isect.value().material,
             shader_data.distance + isect.value().distance,
             diffuse_ray,
+            shader_data.max_bounces,
             shader_data.accelerator,
             shader_data.shader_pack,
             shader_data.rng
@@ -123,6 +124,7 @@ TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
             obj_isect.value().material,
             shader_data.distance + obj_isect_distance,
             specular_ray,
+            shader_data.max_bounces,
             shader_data.accelerator,
             shader_data.shader_pack,
             shader_data.rng
@@ -199,6 +201,7 @@ TRC_DEFINE_SHADER(ShaderTransmission) {
             obj_isect.value().material,
             shader_data.distance + obj_isect_distance,
             transmit_ray,
+            shader_data.max_bounces,
             shader_data.accelerator,
             shader_data.shader_pack,
             shader_data.rng
@@ -236,6 +239,7 @@ TRC_DEFINE_SHADER(ShaderTransparent) {
             isect.value().material,
             shader_data.distance + isect.value().distance,
             through_ray,
+            shader_data.max_bounces,
             shader_data.accelerator,
             shader_data.shader_pack,
             shader_data.rng
@@ -266,7 +270,7 @@ TRC_DEFINE_SHADER(ShaderCombined) {
     if (SAMPLE_ATTRIB(transmissive) > 0.f) {
         // transmission
         glm::vec3 transmission_indirect {0.f};
-        if (shader_data.ray.index <= TRC_RAY_MAX_BOUNCES) {
+        if (shader_data.ray.index < shader_data.max_bounces) {
             transmission_indirect = EVALUATE_SHADER(shader_transmission, shader_data).rgb();
         }
         glm::vec3 transmission_color {glm::saturate(albedo)}; // saturate = clamp between 0 and 1
@@ -281,7 +285,7 @@ TRC_DEFINE_SHADER(ShaderCombined) {
         // diffuse
         glm::vec3 diffuse_direct = EVALUATE_SHADER(shader_diffuse_direct, shader_data).rgb();
         glm::vec3 diffuse_indirect {0.f};
-        if (shader_data.ray.index <= TRC_RAY_MAX_BOUNCES) {
+        if (shader_data.ray.index < shader_data.max_bounces) {
             diffuse_indirect = EVALUATE_SHADER(shader_diffuse_indirect, shader_data).rgb();
         }
         glm::vec3 diffuse_color {glm::saturate(albedo * (1.f - metallic))};
@@ -292,7 +296,7 @@ TRC_DEFINE_SHADER(ShaderCombined) {
     float fresnel = math::fresnel(1.f, SAMPLE_ATTRIB(ior), -shader_data.ray.direction, shader_data.normal);
     glm::vec3 specular_direct = EVALUATE_SHADER(shader_specular_direct, shader_data).rgb();
     glm::vec3 specular_indirect {0.f};
-    if (shader_data.ray.index <= TRC_RAY_MAX_BOUNCES) {
+    if (shader_data.ray.index < shader_data.max_bounces) {
         specular_indirect = EVALUATE_SHADER(shader_specular_indirect, shader_data).rgb();
     }
     glm::vec3 specular_color {glm::saturate(fresnel + (albedo * metallic))};
@@ -346,7 +350,7 @@ TRC_DEFINE_SHADER(ShaderChecker) {
 TRC_DEFINE_SHADER(ShaderReflect) {
     glm::vec3 color;
 
-    if (shader_data.ray.index > TRC_RAY_MAX_BOUNCES || glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f)
+    if (shader_data.ray.index >= shader_data.max_bounces || glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f)
         color = glm::vec4 {0.f, 0.f, 0.f, 1.f};
     else {
         Ray reflect_ray {
@@ -367,6 +371,7 @@ TRC_DEFINE_SHADER(ShaderReflect) {
                 isect.value().material,
                 shader_data.distance + isect.value().distance,
                 reflect_ray,
+                shader_data.max_bounces,
                 shader_data.accelerator,
                 shader_data.shader_pack,
                 shader_data.rng

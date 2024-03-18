@@ -22,6 +22,7 @@ struct ShaderData {
     Material *material;
     float distance;
     Ray ray;
+    int max_bounces;
     Accelerator *accelerator;
     ShaderPack *shader_pack;
     RNG *rng;

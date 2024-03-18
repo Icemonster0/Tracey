@@ -4,7 +4,6 @@
 #include "../../lib/glm.hpp"
 
 #define TRC_RAY_CLIP_EPSILON 0.0001f
-#define TRC_RAY_MAX_BOUNCES 3
 #define TRC_INDIRECT_LIGHT_CLAMP 10.f
 #define TRC_SPECULAR_OPTIMIZE_TRESHOLD 0.2f
 

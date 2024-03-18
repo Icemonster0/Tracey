@@ -18,7 +18,7 @@ Sampler::Sampler(glm::ivec2 frame_size) : samples(0) {
 
 void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator,
         ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples,
-        bool preview_mode, float exposure) {
+        bool preview_mode, float exposure, int max_bounces) {
 
     if (reset) {
         samples = 0;
@@ -27,8 +27,9 @@ void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *a
     if (samples >= max_samples) return;
     ++samples;
 
-    Buffer<glm::vec3> new_sample = preview_mode ? render_preview_sample(frame_size, camera, accelerator, shader_pack, seed)
-                                                : render_sample(frame_size, camera, accelerator, shader_pack, seed);
+    Buffer<glm::vec3> new_sample = preview_mode
+        ? render_preview_sample(frame_size, camera, accelerator, shader_pack, seed, max_bounces)
+        : render_sample(frame_size, camera, accelerator, shader_pack, seed, max_bounces);
 
     if (preview_mode) exposure = 0.f;
 
@@ -49,9 +50,12 @@ void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *a
 }
 
 void Sampler::render_image_sample(Camera *camera, Accelerator *accelerator,
-        ShaderPack *shader_pack, uint64_t seed, int sample, float exposure) {
+        ShaderPack *shader_pack, uint64_t seed, int sample, float exposure,
+        int max_bounces) {
 
-    Buffer<glm::vec3> new_sample = render_sample(image.get_size(), camera, accelerator, shader_pack, seed);
+    Buffer<glm::vec3> new_sample = render_sample(
+        image.get_size(), camera, accelerator, shader_pack, seed, max_bounces
+    );
 
     float inv_sample = 1.f / (float)sample;
     float old_pixel_fac = float(sample - 1) * inv_sample;
@@ -91,7 +95,9 @@ int Sampler::get_samples() {
 
 /* private */
 
-Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed) {
+Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera,
+        Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, int max_bounces) {
+
     Buffer<glm::vec3> buf {frame_size, glm::vec3 {0.f}};
 
     #pragma omp parallel
@@ -132,6 +138,7 @@ Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera, 
                         isect.value().material,
                         isect.value().distance,
                         ray,
+                        max_bounces,
                         accelerator,
                         shader_pack,
                         &rng
@@ -151,7 +158,10 @@ Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera, 
     return buf;
 }
 
-Buffer<glm::vec3> Sampler::render_preview_sample(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed) {
+Buffer<glm::vec3> Sampler::render_preview_sample(glm::ivec2 frame_size,
+        Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack,
+        uint64_t seed, int max_bounces) {
+
     Buffer<glm::vec3> buf {frame_size, glm::vec3 {0.f}};
 
     #pragma omp parallel for schedule(static) collapse(2)
@@ -183,6 +193,7 @@ Buffer<glm::vec3> Sampler::render_preview_sample(glm::ivec2 frame_size, Camera *
                     isect.value().material,
                     isect.value().distance,
                     ray,
+                    max_bounces,
                     accelerator,
                     shader_pack,
                     nullptr
