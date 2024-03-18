@@ -56,11 +56,11 @@ float raw_to_ACEScg(float color) {
     return color;
 }
 
-// transform for ACEScg to filmic view
+// transform for raw to filmic view
 float T(float x) {
     // parameters
     float S = 1.f; // scale
-    float ga = 0.8f; // slope
+    float ga = 0.7f; // slope
     float t0 = 0.55f; // toe
     float t1 = 0.f; // black clip
     float s0 = 0.26f; // shoulder
@@ -90,13 +90,13 @@ float T(float x) {
         return S * (1.f + s1 - numerator / (1.f + exp(exponent)));
     }
 }
-glm::vec3 ACEScg_to_filmic(glm::vec3 color) {
+glm::vec3 raw_to_filmic(glm::vec3 color) {
     color.r = T(color.r);
     color.g = T(color.g);
     color.b = T(color.b);
     return color;
 }
-float ACEScg_to_filmic(float color) {
+float raw_to_filmic(float color) {
     return T(color);
 }
 
