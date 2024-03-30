@@ -104,6 +104,22 @@ void Console::print_render_info(float frequency, float delta_t, int sample,
     }
 }
 
+void Console::log_render_info(float time, int samples, glm::ivec2 size, float sample_rate, int error) {
+    FILE *file;
+    file = fopen("tracey-render.log", "a");
+
+    if (error) {
+        fprintf(file, "\nRender error:\n%d\n", error);
+        return;
+    }
+
+    fprintf(file, "\nRender info\n");
+    fprintf(file, "time:\t\tsamples:\t\tsize:\t\tsample rate:\n");
+    fprintf(file, "%f\t\t%d\t\t%dx%d\t\t%f\n", time, samples, size.x, size.y, sample_rate);
+
+    fclose(file);
+}
+
 void Console::clear() {
     if(system("clear")) {};
 }

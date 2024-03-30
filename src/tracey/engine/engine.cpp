@@ -180,6 +180,7 @@ int Engine::render_image(std::mt19937 *seed_gen, bool render_only) {
     float delta_t = 0.f;
     float render_time = 0.f;
     float sample_rate = 1.f;
+    float avg_sample_rate = 1.f;
 
     int sample = 0;
     while (true) {
@@ -211,17 +212,19 @@ int Engine::render_image(std::mt19937 *seed_gen, bool render_only) {
 
         if (!render_only) input = window_manager.handle_events();
 
-        if (sample >= cfg.samples || (!render_only && input.r)) {
-            if (image_rw::write_png(sampler.get_image(), cfg.output_path) == 0)
-                return_code = 1;
-            if (sample >= cfg.samples) break;
-        }
-
         this_t = timer.now();
         delta_t = std::chrono::duration_cast<std::chrono::microseconds>(this_t - last_t).count() / 1000000.f;
         last_t = this_t;
         render_time = std::chrono::duration_cast<std::chrono::microseconds>(this_t - start_t).count() / 1000000.f;
         sample_rate = (float)sample / render_time;
+
+        if (sample >= cfg.samples || (!render_only && input.r)) {
+            if (image_rw::write_png(sampler.get_image(), cfg.output_path) == 0)
+                return_code = 1;
+            if (cfg.log_render)
+                console.log_render_info(render_time, sample, cfg.render_size, sample_rate, return_code);
+            if (sample >= cfg.samples) break;
+        }
     }
 
     sampler.destroy_image();

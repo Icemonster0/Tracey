@@ -15,7 +15,7 @@ namespace cfg_parser {
 
 struct UserConfig {
     CLOM2_SETTING_STRING(accelerator, --accelerator, -ac, BVH, Accelerator structure to use (one of NONE BVH VOXEL));
-    CLOM2_SETTING_FLOAT(aperture, --aperture, -ap, 0.0, Aperture radius of the viewer came);
+    CLOM2_SETTING_FLOAT(aperture, --aperture, -ap, 0.0, Aperture radius of the viewer camera);
     CLOM2_SETTING_INT(bounces, --bounces, -b, 3, Number of indirect light bounces);
     CLOM2_SETTING_STRING(color_mode, --color-mode, -cm, FILMIC, Color management mode (one of STANDARD, FILMIC, RAW));
     CLOM2_SETTING_FLOAT(console_frequency, --console-frequency, -cf, 5.0, Refresh rate for the console interface in hertz);
@@ -28,6 +28,7 @@ struct UserConfig {
     CLOM2_SETTING_STRING(scene_path, --scene, -S, , Path to a 3d model or scene file);
     CLOM2_SETTING_FLOAT(voxel_size, --voxel-size, -vs, 0.1, Size of the voxels when using VOXEL accelerator (see --accelerator));
     CLOM2_GENERAL_SETTING(window_size, --window-size, -ws, glm::ivec2, 400 300, Width and height of the initial window in pixels, trc::cfg_parser::str_to_ivec2);
+    CLOM2_FLAG(log_render, --log-render, -lr, Print render info to tracey-render.log);
     CLOM2_FLAG(render, --render, -r, Render image directly using scene camera (skips interactive interface));
 };
 
