@@ -23,6 +23,8 @@ public:
 
     std::optional<Intersection> calc_intersection(Ray ray) const;
 
+    unsigned long get_memory_usage() const;
+
 private:
     std::vector<std::vector<std::vector<std::list<Shape*>>>> grid;
     glm::mat4 world_to_grid;

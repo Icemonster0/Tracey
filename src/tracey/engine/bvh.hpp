@@ -29,6 +29,8 @@ public:
 
     std::optional<Intersection> calc_intersection(Ray ray) const;
 
+    unsigned long get_memory_usage() const;
+
 private:
     BVHnode bvh_root;
 
@@ -36,6 +38,8 @@ private:
     void split_BVH_node(BVHnode &node);
 
     std::optional<Intersection> resolve_BVH_node(const BVHnode *node, Ray ray) const;
+
+    unsigned long count_mem_usage_of_node(const BVHnode &node) const;
 };
 
 } /* trc */

@@ -20,6 +20,15 @@ std::optional<Intersection> BVH::calc_intersection(Ray ray) const {
     return resolve_BVH_node(&bvh_root, ray);
 }
 
+unsigned long BVH::get_memory_usage() const {
+    unsigned long size =
+        sizeof(Shape*) * object_ptr_list.size() +
+        sizeof(Light*) * light_ptr_list.size() +
+        sizeof(BVH);
+    size += count_mem_usage_of_node(bvh_root);
+    return size;
+}
+
 // private
 
 void BVH::construct_BVH() {
@@ -27,6 +36,7 @@ void BVH::construct_BVH() {
     bvh_root.leaves = object_ptr_list;
     bvh_root.bounding_box = shape_list_bounds(&bvh_root.leaves);
     split_BVH_node(bvh_root);
+    object_ptr_list.clear();
 }
 
 void BVH::split_BVH_node(BVHnode &node) {
@@ -110,6 +120,18 @@ std::optional<Intersection> BVH::resolve_BVH_node(const BVHnode *node, Ray ray) 
     else {
         return std::optional<Intersection>();
     }
+}
+
+unsigned long BVH::count_mem_usage_of_node(const BVHnode &node) const {
+    unsigned long size = 0;
+    for (auto &leaf : node.leaves) {
+        size += sizeof(Shape*);
+    }
+    for (auto &child : node.children) {
+        size += sizeof(BVHnode);
+        size += count_mem_usage_of_node(child);
+    }
+    return size;
 }
 
 } /* trc */

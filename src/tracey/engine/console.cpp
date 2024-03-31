@@ -104,7 +104,9 @@ void Console::print_render_info(float frequency, float delta_t, int sample,
     }
 }
 
-void Console::log_render_info(float time, int samples, glm::ivec2 size, float sample_rate, int error) {
+void Console::log_render_info(float time, int samples, glm::ivec2 size, float sample_rate,
+    unsigned long memory_usage, std::string accelerator, float voxel_size, int error) {
+
     FILE *file;
     file = fopen("tracey-render.log", "a");
 
@@ -114,8 +116,8 @@ void Console::log_render_info(float time, int samples, glm::ivec2 size, float sa
     }
 
     fprintf(file, "\nRender info\n");
-    fprintf(file, "time:\t\tsamples:\t\tsize:\t\tsample rate:\n");
-    fprintf(file, "%f\t\t%d\t\t%dx%d\t\t%f\n", time, samples, size.x, size.y, sample_rate);
+    fprintf(file, "%15s%15s%15s%15s%15s%15s%15s%15s\n", "time:", "samples:", "width:", "height:", "sample rate:", "memory usage:", "accelerator:", "voxel size:");
+    fprintf(file, "%15f%15d%15d%15d%15f%15ld%15s%15f\n", time, samples, size.x, size.y, sample_rate, memory_usage, accelerator.c_str(), voxel_size);
 
     fclose(file);
 }

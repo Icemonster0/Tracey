@@ -28,6 +28,8 @@ public:
 
     glm::vec3 get_environment_light(Ray ray) const;
 
+    virtual unsigned long get_memory_usage() const;
+
 protected:
     std::list<Shape*> object_ptr_list;
     std::list<Light*> light_ptr_list;

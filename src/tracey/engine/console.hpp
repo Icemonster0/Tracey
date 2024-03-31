@@ -15,7 +15,8 @@ public:
     void print_render_info(float frequency, float delta_t, int sample,
         int max_samples, glm::ivec2 image_size, float time, float sample_rate,
         bool render_only);
-    void log_render_info(float time, int samples, glm::ivec2 size, float sample_rate, int error);
+    void log_render_info(float time, int samples, glm::ivec2 size, float sample_rate,
+        unsigned long memory_usage, std::string accelerator, float voxel_size, int error);
     void clear();
 
 private:

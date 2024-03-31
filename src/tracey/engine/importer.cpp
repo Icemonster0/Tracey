@@ -98,9 +98,9 @@ void Importer::import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::
         pos_vec.push_back(p.xyz());
     }
 
+    normal_vec.reserve(mesh->mNumVertices);
     if (mesh->HasNormals()) {
         glm::mat4 normal_transform = glm::transpose(glm::inverse(transform));
-        normal_vec.reserve(mesh->mNumVertices);
         for (int i = 0; i < mesh->mNumVertices; ++i) {
             aiVector3D normal = mesh->mNormals[i];
 
@@ -108,11 +108,15 @@ void Importer::import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::
             n = n * normal_transform;
             normal_vec.push_back(math::normalize(n.xyz()));
         }
+    } else {
+        for (int i = 0; i < mesh->mNumVertices; ++i) {
+            normal_vec.push_back(glm::vec3 {0, 1, 0});
+        }
     }
 
+    tan_vec.reserve(mesh->mNumVertices);
+    bitan_vec.reserve(mesh->mNumVertices);
     if (mesh->HasTangentsAndBitangents()) {
-        tan_vec.reserve(mesh->mNumVertices);
-        bitan_vec.reserve(mesh->mNumVertices);
         for (int i = 0; i < mesh->mNumVertices; ++i) {
             aiVector3D tangent = mesh->mTangents[i];
             aiVector3D bitangent = mesh->mBitangents[i];
@@ -124,6 +128,11 @@ void Importer::import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::
             tan_vec.push_back(math::normalize(t.xyz()));
             bitan_vec.push_back(math::normalize(bt.xyz()));
         }
+    } else {
+        for (int i = 0; i < mesh->mNumVertices; ++i) {
+            tan_vec.push_back(glm::vec3 {1, 0, 0});
+            bitan_vec.push_back(glm::vec3 {0, 0, 1});
+        }
     }
 
     if (mesh->GetNumUVChannels() > 0 && mesh->HasTextureCoords(0)) {
@@ -131,6 +140,10 @@ void Importer::import_mesh(const aiMesh *mesh, const aiScene *scene, const glm::
         for (int i = 0; i < mesh->mNumVertices; ++i) {
             aiVector3D tex = mesh->mTextureCoords[0][i];
             tex_vec.emplace_back(tex[0], tex[1]);
+        }
+    } else {
+        for (int i = 0; i < mesh->mNumVertices; ++i) {
+            tex_vec.push_back(glm::vec2 {0, 0});
         }
     }
 

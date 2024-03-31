@@ -222,7 +222,9 @@ int Engine::render_image(std::mt19937 *seed_gen, bool render_only) {
             if (image_rw::write_png(sampler.get_image(), cfg.output_path) == 0)
                 return_code = 1;
             if (cfg.log_render)
-                console.log_render_info(render_time, sample, cfg.render_size, sample_rate, return_code);
+                console.log_render_info(render_time, sample, cfg.render_size,
+                    sample_rate, accelerator->get_memory_usage(), cfg.accelerator,
+                    cfg.voxel_size, return_code);
             if (sample >= cfg.samples) break;
         }
     }

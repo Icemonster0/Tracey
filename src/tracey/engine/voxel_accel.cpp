@@ -18,7 +18,8 @@ VoxelAccel::VoxelAccel() {}
 
 std::optional<Intersection> VoxelAccel::calc_intersection(Ray ray) const {
     // avoid infinite loop
-    if (glm::all(glm::equal(ray.direction, glm::vec3(0.f))))
+    if (glm::all(glm::equal(ray.direction, glm::vec3(0.f))) ||
+        std::isnan(ray.direction.x) || std::isnan(ray.direction.y) || std::isnan(ray.direction.z))
         return std::optional<Intersection>();
     ray.direction = math::normalize(ray.direction);
 
@@ -87,7 +88,7 @@ std::optional<Intersection> VoxelAccel::calc_intersection(Ray ray) const {
 
     // grid traversal
     while (true) {
-        if(tmax.x < tmax.y) {
+        if (tmax.x < tmax.y) {
             if(tmax.x < tmax.z) {
                 TRAVERSE_GRID(x);
             } else {
@@ -103,6 +104,22 @@ std::optional<Intersection> VoxelAccel::calc_intersection(Ray ray) const {
     }
 
 #   undef TRAVERSE_GRID
+}
+
+unsigned long VoxelAccel::get_memory_usage() const {
+    unsigned long size =
+        sizeof(Shape*) * object_ptr_list.size() +
+        sizeof(Light*) * light_ptr_list.size() +
+        sizeof(VoxelAccel);
+    for (int x = 0; x < grid_size.x; ++x) {
+        for (int y = 0; y < grid_size.y; ++y) {
+            for (int z = 0; z < grid_size.z; ++z) {
+                size += sizeof(std::list<Shape*>);
+                size += sizeof(Shape*) * grid[x][y][z].size();
+            }
+        }
+    }
+    return size;
 }
 
 // private
@@ -150,6 +167,8 @@ void VoxelAccel::populate_grid(float p_voxel_size) {
             }
         }
     }
+
+    object_ptr_list.clear();
 }
 
 } /* trc */

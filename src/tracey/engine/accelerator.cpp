@@ -88,6 +88,12 @@ glm::vec3 Accelerator::get_environment_light(Ray ray) const {
     return env_texture_ptr->sample(ray.direction);
 }
 
+unsigned long Accelerator::get_memory_usage() const {
+    return sizeof(Shape*) * object_ptr_list.size() +
+           sizeof(Light*) * light_ptr_list.size() +
+           sizeof(Accelerator);
+}
+
 // private
 
 std::optional<Intersection> Accelerator::calc_intersection_in_list(Ray ray, const std::list<Shape*> *list) const {
