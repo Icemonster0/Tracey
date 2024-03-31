@@ -104,7 +104,7 @@ void Console::print_render_info(float frequency, float delta_t, int sample,
     }
 }
 
-void Console::log_render_info(float time, int samples, glm::ivec2 size, float sample_rate,
+void Console::log_render_info(std::string path, float time, int samples, glm::ivec2 size, float sample_rate, int bounces,
     unsigned long memory_usage, std::string accelerator, float voxel_size, int error) {
 
     FILE *file;
@@ -115,9 +115,15 @@ void Console::log_render_info(float time, int samples, glm::ivec2 size, float sa
         return;
     }
 
-    fprintf(file, "\nRender info\n");
-    fprintf(file, "%15s%15s%15s%15s%15s%15s%15s%15s\n", "time:", "samples:", "width:", "height:", "sample rate:", "memory usage:", "accelerator:", "voxel size:");
-    fprintf(file, "%15f%15d%15d%15d%15f%15ld%15s%15f\n", time, samples, size.x, size.y, sample_rate, memory_usage, accelerator.c_str(), voxel_size);
+    fprintf(file, "\nRender info: %s\n", path.c_str());
+    fprintf(file, "%15s%15s%15s%15s%15s%15s%15s%15s",
+        "time:", "samples:", "width:", "height:", "sample rate:", "bounces:", "memory usage:", "accelerator:");
+    if (accelerator == "VOXEL") fprintf(file, "%15s", "voxel size:");
+    fprintf(file, "\n");
+    fprintf(file, "%15f%15d%15d%15d%15f%15d%15ld%15s",
+        time, samples, size.x, size.y, sample_rate, bounces, memory_usage, accelerator.c_str());
+    if (accelerator == "VOXEL") fprintf(file, "%15f", voxel_size);
+    fprintf(file, "\n");
 
     fclose(file);
 }
