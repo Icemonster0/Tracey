@@ -37,3 +37,6 @@ To render from the camera's point of view (the one that is specified in the scen
 
 All other command line options can be found by running `Tracey help`.  
 Camera navigation and rendering controls are displayed in the console during runtime.
+
+## Credits
+Thanks to *Carlo Bergonzini / Monorender* for the "lone monk" scene!
