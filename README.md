@@ -1,7 +1,9 @@
 # Tracey
-A minimal progressive CPU raytracer.  (Work in progress)
+A minimal progressive CPU raytracer.  
 
-![render example](media/render_example.png)
+| | | | |
+| - | - | - | - |
+| ![chess](media/final_chess.png) | ![diner](media/final_diner.png) | ![lone-monk](media/final_lone-monk.png) | ![test-room](media/final_test-room.png) |
 
 ## Building
 **Currently, you can only build for Linux.** There is a [testing branch](https://github.com/Icemonster0/Tracey/tree/mac-test) for Mac.  
@@ -15,7 +17,7 @@ make
 where `path/to/Tracey` should be the directory in which `CMakeLists.txt` can be found.  
 
 To be able to compile, you need
-- CMake
+- CMake & make
 - a C++ compiler with C++17 support
 - GL library
 - openmp library
@@ -30,6 +32,8 @@ For example:
 Tracey -S scenes/example.tracey
 Tracey -S scenes/example1.glb
 ```
+
+To render from the camera's point of view (the one that is specified in the scene description), use the flag `-r`. This skips the interactive window and prints minimal render info to the console. If you're doing this, I recommend to also set the image size (`-rs '<w> <h>'`) and number of samples (`-s <n>`).
 
 All other command line options can be found by running `Tracey help`.  
 Camera navigation and rendering controls are displayed in the console during runtime.
