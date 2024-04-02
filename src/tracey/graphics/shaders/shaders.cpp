@@ -267,40 +267,34 @@ TRC_DEFINE_SHADER(ShaderCombined) {
     float metallic = SAMPLE_ATTRIB(metallic);
     float alpha = SAMPLE_ATTRIB(alpha);
 
-    if (SAMPLE_ATTRIB(transmissive) > 0.f) {
-        // transmission
-        glm::vec3 transmission_indirect {0.f};
-        if (shader_data.ray.index < shader_data.max_bounces) {
-            transmission_indirect = EVALUATE_SHADER(shader_transmission, shader_data).rgb();
-        }
-        glm::vec3 transmission_color {glm::saturate(albedo)}; // saturate = clamp between 0 and 1
-        transmission = transmission_indirect * transmission_color;
-    }
-    else {
-        // invert backfacing normals
-        if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f) {
-            shader_data.normal *= -1.f;
-        }
-
-        // diffuse
-        glm::vec3 diffuse_direct = EVALUATE_SHADER(shader_diffuse_direct, shader_data).rgb();
-        glm::vec3 diffuse_indirect {0.f};
-        if (shader_data.ray.index < shader_data.max_bounces) {
-            diffuse_indirect = EVALUATE_SHADER(shader_diffuse_indirect, shader_data).rgb();
-        }
-        glm::vec3 diffuse_color {glm::saturate(albedo * (1.f - metallic))};
-        diffuse = (diffuse_direct + diffuse_indirect) * diffuse_color;
-    }
-
-    // specular
-    float fresnel = math::fresnel(1.f, SAMPLE_ATTRIB(ior), -shader_data.ray.direction, shader_data.normal);
-    glm::vec3 specular_direct = EVALUATE_SHADER(shader_specular_direct, shader_data).rgb();
-    glm::vec3 specular_indirect {0.f};
+    // only add reflected or transmitted light if max recursion depth has not been reached
     if (shader_data.ray.index < shader_data.max_bounces) {
-        specular_indirect = EVALUATE_SHADER(shader_specular_indirect, shader_data).rgb();
+        if (SAMPLE_ATTRIB(transmissive) > 0.f) {
+            // transmission
+            glm::vec3 transmission_indirect = EVALUATE_SHADER(shader_transmission, shader_data).rgb();
+            glm::vec3 transmission_color {glm::saturate(albedo)}; // saturate = clamp between 0 and 1
+            transmission = transmission_indirect * transmission_color;
+        }
+        else {
+            // invert backfacing normals
+            if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f) {
+                shader_data.normal *= -1.f;
+            }
+
+            // diffuse
+            glm::vec3 diffuse_direct = EVALUATE_SHADER(shader_diffuse_direct, shader_data).rgb();
+            glm::vec3 diffuse_indirect = EVALUATE_SHADER(shader_diffuse_indirect, shader_data).rgb();
+            glm::vec3 diffuse_color {glm::saturate(albedo * (1.f - metallic))};
+            diffuse = (diffuse_direct + diffuse_indirect) * diffuse_color;
+        }
+
+        // specular
+        float fresnel = math::fresnel(1.f, SAMPLE_ATTRIB(ior), -shader_data.ray.direction, shader_data.normal);
+        glm::vec3 specular_direct = EVALUATE_SHADER(shader_specular_direct, shader_data).rgb();
+        glm::vec3 specular_indirect = EVALUATE_SHADER(shader_specular_indirect, shader_data).rgb();
+        glm::vec3 specular_color {glm::saturate(fresnel + (albedo * metallic))};
+        specular = (specular_direct + specular_indirect) * specular_color;
     }
-    glm::vec3 specular_color {glm::saturate(fresnel + (albedo * metallic))};
-    specular = (specular_direct + specular_indirect) * specular_color;
 
     // emission
     glm::vec3 emission {SAMPLE_ATTRIB(emission)};
