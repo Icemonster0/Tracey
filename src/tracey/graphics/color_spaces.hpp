@@ -2,6 +2,7 @@
 #define COLOR_SPACES_HPP
 
 #include "../../lib/glm.hpp"
+#include "buffer.hpp"
 
 namespace trc::color {
 
@@ -46,6 +47,16 @@ T output_transform(T color, float exposure) {
         // case FILMIC: return raw_to_filmic(raw_to_sRGB(ACEScg_to_raw(color)));
         case RAW: return color;
         default: return color;
+    }
+}
+
+template<typename T>
+void apply_output_transform_to_buffer(Buffer<T> &buf, float exposure) {
+    glm::ivec2 size = buf.get_size();
+    for (int x = 0; x < size.x; ++x) {
+        for (int y = 0; y < size.y; ++y) {
+            *buf.at({x, y}) = output_transform(*buf.at({x, y}), exposure);
+        }
     }
 }
 

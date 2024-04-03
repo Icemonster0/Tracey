@@ -18,7 +18,7 @@ Sampler::Sampler(glm::ivec2 frame_size) : samples(0) {
 
 void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator,
         ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples,
-        bool preview_mode, float exposure, int max_bounces) {
+        bool preview_mode, int max_bounces) {
 
     if (reset) {
         samples = 0;
@@ -31,8 +31,6 @@ void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *a
         ? render_preview_sample(frame_size, camera, accelerator, shader_pack, seed, max_bounces)
         : render_sample(frame_size, camera, accelerator, shader_pack, seed, max_bounces);
 
-    if (preview_mode) exposure = 0.f;
-
     float inv_samples = 1.f / (float)samples;
     float old_pixel_fac = float(samples - 1) * inv_samples;
 
@@ -44,13 +42,13 @@ void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *a
             glm::vec3 *new_pixel = new_sample.at({x, y});
 
             *old_pixel *= old_pixel_fac;
-            *old_pixel += color::output_transform(*new_pixel, exposure) * inv_samples;
+            *old_pixel += *new_pixel * inv_samples;
         }
     }
 }
 
 void Sampler::render_image_sample(Camera *camera, Accelerator *accelerator,
-        ShaderPack *shader_pack, uint64_t seed, int sample, float exposure,
+        ShaderPack *shader_pack, uint64_t seed, int sample,
         int max_bounces) {
 
     Buffer<glm::vec3> new_sample = render_sample(
@@ -68,7 +66,7 @@ void Sampler::render_image_sample(Camera *camera, Accelerator *accelerator,
             glm::vec3 *new_pixel = new_sample.at({x, y});
 
             *old_pixel *= old_pixel_fac;
-            *old_pixel += color::output_transform(*new_pixel, exposure) * inv_sample;
+            *old_pixel += *new_pixel * inv_sample;
         }
     }
 }

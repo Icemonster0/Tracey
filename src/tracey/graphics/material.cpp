@@ -37,6 +37,7 @@ Material::Material() {
     transmissive = std::shared_ptr<Attrib<float>> {new AttribValue<float> {0.f}};
     ior = std::shared_ptr<Attrib<float>> {new AttribValue<float> {1.6f}};
     alpha = std::shared_ptr<Attrib<float>> {new AttribValue<float> {1.f}};
+    process_attribs();
 }
 
 void Material::process_attribs() {

@@ -95,10 +95,11 @@ int Engine::run() {
             window_manager.is_update_required(),
             cfg.samples,
             preview_mode,
-            cfg.exposure,
             cfg.bounces
         );
-        window_manager.draw_frame(sampler.get_frame_buffer());
+        Buffer<glm::vec3> transformed_fb = *sampler.get_frame_buffer();
+        color::apply_output_transform_to_buffer(transformed_fb, cfg.exposure);
+        window_manager.draw_frame(&transformed_fb);
         InputPackage input = window_manager.handle_events();
         viewer.update(input, delta_t, window_manager.get_size());
 
@@ -206,7 +207,6 @@ int Engine::render_image(std::mt19937 *seed_gen, bool render_only) {
             &shader_pack,
             seed_gen->operator()(),
             sample,
-            cfg.exposure,
             cfg.bounces
         );
 
@@ -219,7 +219,9 @@ int Engine::render_image(std::mt19937 *seed_gen, bool render_only) {
         sample_rate = (float)sample / render_time;
 
         if (sample >= cfg.samples || (!render_only && input.r)) {
-            if (image_rw::write_png(sampler.get_image(), cfg.output_path) == 0)
+            Buffer<glm::vec3> transformed_image = *sampler.get_image();
+            color::apply_output_transform_to_buffer(transformed_image, cfg.exposure);
+            if (image_rw::write_png(&transformed_image, cfg.output_path) == 0)
                 return_code = 1;
             if (cfg.log_render)
                 console.log_render_info(cfg.scene_path, render_time, sample, cfg.render_size,

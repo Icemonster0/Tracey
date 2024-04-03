@@ -23,9 +23,9 @@ public:
 
     void render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *accelerator,
         ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples,
-        bool preview_mode, float exposure, int max_bounces);
+        bool preview_mode, int max_bounces);
     void render_image_sample(Camera *camera, Accelerator *accelerator,
-        ShaderPack *shader_pack, uint64_t seed, int sample, float exposure,
+        ShaderPack *shader_pack, uint64_t seed, int sample,
         int max_bounces);
 
     void initialize_image(glm::ivec2 size);
