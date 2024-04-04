@@ -312,6 +312,42 @@ TRC_DEFINE_SHADER(ShaderCombined) {
 }
 
 
+TRC_DEFINE_SHADER(ShaderDenoiseAlbedo) {
+    // invert backfacing normals
+    if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f) {
+        shader_data.normal *= -1.f;
+    }
+
+    glm::vec3 tan_space_normal = SAMPLE_ATTRIB(normal)*2.f-1.f;
+    shader_data.normal = glm::vec3 {
+        shader_data.tangent * tan_space_normal.x +
+        shader_data.bitangent * tan_space_normal.y +
+        shader_data.normal * tan_space_normal.z
+    };
+
+    glm::vec3 albedo = SAMPLE_ATTRIB(albedo);
+    float fresnel = math::fresnel(1.f, SAMPLE_ATTRIB(ior), -shader_data.ray.direction, shader_data.normal);
+
+    return glm::vec4 {albedo + fresnel, 1.f};
+}
+
+TRC_DEFINE_SHADER(ShaderDenoiseNormal) {
+    // invert backfacing normals
+    if (glm::dot(shader_data.normal, -shader_data.ray.direction) < 0.f) {
+        shader_data.normal *= -1.f;
+    }
+
+    glm::vec3 tan_space_normal = SAMPLE_ATTRIB(normal)*2.f-1.f;
+    shader_data.normal = glm::vec3 {
+        shader_data.tangent * tan_space_normal.x +
+        shader_data.bitangent * tan_space_normal.y +
+        shader_data.normal * tan_space_normal.z
+    };
+
+    return glm::vec4 {shader_data.normal*0.5f+0.5f, 1.f};
+}
+
+
 TRC_DEFINE_SHADER(ShaderRed) {
     return glm::vec4 {1.f, 0.f, 0.f, 1.f};
 }

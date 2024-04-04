@@ -21,8 +21,10 @@ int main(int argc, char const *argv[]) {
     std::size_t last_sep = cfg.output_path.find_last_of("\\/");
     std::string out_dir = (last_sep == std::string::npos) ? "." : cfg.output_path.substr(0, last_sep);
 
+    // If certain options are incorrect, abort
+    if (result = engine.validate_options()) {}
     // If output directory doesn't exist, abort
-    if (!std::filesystem::is_directory(std::filesystem::path(out_dir))) {
+    else if (!std::filesystem::is_directory(std::filesystem::path(out_dir))) {
         printf("Directory doesn't exist: %s\n", out_dir.c_str());
         result = 7;
     }

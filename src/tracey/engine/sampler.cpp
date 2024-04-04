@@ -29,7 +29,7 @@ void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *a
 
     Buffer<glm::vec3> new_sample = preview_mode
         ? render_preview_sample(frame_size, camera, accelerator, shader_pack, seed, max_bounces)
-        : render_sample(frame_size, camera, accelerator, shader_pack, seed, max_bounces);
+        : render_sample(frame_size, camera, accelerator, shader_pack, shader_pack->shader_combined.get(), seed, max_bounces);
 
     float inv_samples = 1.f / (float)samples;
     float old_pixel_fac = float(samples - 1) * inv_samples;
@@ -48,11 +48,11 @@ void Sampler::render_frame(glm::ivec2 frame_size, Camera *camera, Accelerator *a
 }
 
 void Sampler::render_image_sample(Camera *camera, Accelerator *accelerator,
-        ShaderPack *shader_pack, uint64_t seed, int sample,
+        ShaderPack *shader_pack, Shader *main_shader, uint64_t seed, int sample,
         int max_bounces) {
 
     Buffer<glm::vec3> new_sample = render_sample(
-        image.get_size(), camera, accelerator, shader_pack, seed, max_bounces
+        image.get_size(), camera, accelerator, shader_pack, main_shader, seed, max_bounces
     );
 
     float inv_sample = 1.f / (float)sample;
@@ -94,7 +94,8 @@ int Sampler::get_samples() {
 /* private */
 
 Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera,
-        Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, int max_bounces) {
+        Accelerator *accelerator, ShaderPack *shader_pack, Shader *main_shader,
+        uint64_t seed, int max_bounces) {
 
     Buffer<glm::vec3> buf {frame_size, glm::vec3 {0.f}};
 
@@ -141,7 +142,7 @@ Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera,
                         shader_pack,
                         &rng
                     };
-                    color = isect.value().shader->evaluate(shader_data).rgb();
+                    color = main_shader->evaluate(shader_data).rgb();
                 }
                 else color = accelerator->get_environment_light(ray);
 

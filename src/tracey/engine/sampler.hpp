@@ -25,7 +25,7 @@ public:
         ShaderPack *shader_pack, uint64_t seed, bool reset, int max_samples,
         bool preview_mode, int max_bounces);
     void render_image_sample(Camera *camera, Accelerator *accelerator,
-        ShaderPack *shader_pack, uint64_t seed, int sample,
+        ShaderPack *shader_pack, Shader *main_shader, uint64_t seed, int sample,
         int max_bounces);
 
     void initialize_image(glm::ivec2 size);
@@ -42,7 +42,8 @@ private:
     Buffer<glm::vec3> image;
 
     Buffer<glm::vec3> render_sample(glm::ivec2 frame_size, Camera *camera,
-        Accelerator *accelerator, ShaderPack *shader_pack, uint64_t seed, int max_bounces);
+        Accelerator *accelerator, ShaderPack *shader_pack, Shader *main_shader,
+        uint64_t seed, int max_bounces);
     Buffer<glm::vec3> render_preview_sample(glm::ivec2 frame_size,
         Camera *camera, Accelerator *accelerator, ShaderPack *shader_pack,
         uint64_t seed, int max_bounces);

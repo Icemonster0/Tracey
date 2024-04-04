@@ -24,6 +24,7 @@ class Engine {
 public:
     Engine(UserConfig cfg);
 
+    int validate_options();
     int load_file(std::string file_path);
     int run(); // graphical runtime
     int render(); // render only

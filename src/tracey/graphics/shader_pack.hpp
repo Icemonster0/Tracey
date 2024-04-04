@@ -20,6 +20,9 @@ struct ShaderPack {
     std::unique_ptr<Shader> shader_transparent;
     std::unique_ptr<Shader> shader_combined;
 
+    std::unique_ptr<Shader> shader_denoise_albedo;
+    std::unique_ptr<Shader> shader_denoise_normal;
+
     std::unique_ptr<Shader> shader_red;
     std::unique_ptr<Shader> shader_normal;
     std::unique_ptr<Shader> shader_distance;

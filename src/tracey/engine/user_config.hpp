@@ -19,6 +19,7 @@ struct UserConfig {
     CLOM2_SETTING_INT(bounces, --bounces, -b, 3, Number of indirect light bounces);
     CLOM2_SETTING_STRING(color_mode, --color-mode, -cm, FILMIC, Color management mode (one of STANDARD, FILMIC, RAW));
     CLOM2_SETTING_FLOAT(console_frequency, --console-frequency, -cf, 5.0, Refresh rate for the console interface in hertz);
+    CLOM2_SETTING_STRING(denoise_data, --denoise-data, -dd, OFF, Denoising passes to be used with NVIDIA OptiX or OpenImage denoise (one of OFF ALBEDO NORMAL) (ALBEDO sets --color-mode to STANDARD, NORMAL sets it to RAW));
     CLOM2_SETTING_FLOAT(exposure, --exposure, -ex, 0.0, The exposure to apply to the rendered image);
     CLOM2_SETTING_FLOAT(focal_length, --focal-length, -fl, 10.0, Focus distance of the viewer camera);
     CLOM2_SETTING_FLOAT(fov, --fov, -fov, 70.0, Vertical field of view of the viewer camera in degrees);

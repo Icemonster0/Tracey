@@ -15,6 +15,9 @@ TRC_DECLARE_SHADER(ShaderTransmission)
 TRC_DECLARE_SHADER(ShaderTransparent)
 TRC_DECLARE_SHADER(ShaderCombined)
 
+TRC_DECLARE_SHADER(ShaderDenoiseAlbedo)
+TRC_DECLARE_SHADER(ShaderDenoiseNormal)
+
 TRC_DECLARE_SHADER(ShaderRed)
 TRC_DECLARE_SHADER(ShaderNormal)
 TRC_DECLARE_SHADER(ShaderDistance)

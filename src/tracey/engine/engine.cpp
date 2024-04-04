@@ -20,16 +20,29 @@ namespace trc {
 
 Engine::Engine(UserConfig cfg) : cfg(cfg), error(0), preview_mode(true) {}
 
-int Engine::load_file(std::string file_path) {
-    if (cfg.color_mode == "STANDARD") {
-        color::color_mode = color::STANDARD;
-    } else if (cfg.color_mode == "FILMIC") {
-        color::color_mode = color::FILMIC;
-    } else if (cfg.color_mode == "RAW") {
-        color::color_mode = color::RAW;
-    } else {
+int Engine::validate_options() {
+    if (cfg.denoise_data != "OFF" && cfg.denoise_data != "ALBEDO" && cfg.denoise_data != "NORMAL") {
+        printf("\n%s is not a valid denoise data type (must be one of OFF, ALBEDO, NORMAL)\n", cfg.denoise_data.c_str());
+        return 8;
+    }
+    if (cfg.color_mode != "STANDARD" && cfg.color_mode != "FILMIC" && cfg.color_mode != "RAW") {
         printf("\n%s is not a valid color mode (must be one of STANDARD, FILMIC, RAW)\n", cfg.color_mode.c_str());
         return 5;
+    }
+    if (cfg.accelerator != "NONE" && cfg.accelerator != "BVH" && cfg.accelerator != "VOXEL") {
+        printf("\n%s is not a valid accelerator type (must be one of NONE, BVH, VOXEL)\n", cfg.accelerator.c_str());
+        return 4;
+    }
+    return 0;
+}
+
+int Engine::load_file(std::string file_path) {
+    if (cfg.color_mode == "RAW" || cfg.denoise_data == "NORMAL") {
+        color::color_mode = color::RAW;
+    } else if (cfg.color_mode == "STANDARD" || cfg.denoise_data == "ALBEDO") {
+        color::color_mode = color::STANDARD;
+    } else {
+        color::color_mode = color::FILMIC;
     }
 
     if(system("clear")) {};
@@ -56,13 +69,10 @@ int Engine::load_file(std::string file_path) {
 
     if (cfg.accelerator == "NONE") {
         accelerator = std::unique_ptr<Accelerator> {new Accelerator {&scene}};
-    } else if (cfg.accelerator == "BVH") {
-        accelerator = std::unique_ptr<Accelerator> {new BVH {&scene}};
     } else if (cfg.accelerator == "VOXEL") {
         accelerator = std::unique_ptr<Accelerator> {new VoxelAccel {&scene, cfg.voxel_size}};
     } else {
-        printf("\n%s is not a valid accelerator type (must be one of NONE, BVH, VOXEL)\n", cfg.accelerator.c_str());
-        return 4;
+        accelerator = std::unique_ptr<Accelerator> {new BVH {&scene}};
     }
 
     printf("\n");
@@ -174,6 +184,15 @@ int Engine::render_image(std::mt19937 *seed_gen, bool render_only) {
 
     sampler.initialize_image(cfg.render_size);
 
+    Shader *main_shader;
+    if (cfg.denoise_data == "ALBEDO") {
+        main_shader = shader_pack.shader_denoise_albedo.get();
+    } else if (cfg.denoise_data == "NORMAL") {
+        main_shader = shader_pack.shader_denoise_normal.get();
+    } else {
+        main_shader = shader_pack.shader_combined.get();
+    }
+
     std::chrono::high_resolution_clock timer;
     auto start_t = timer.now();
     auto last_t = timer.now();
@@ -205,6 +224,7 @@ int Engine::render_image(std::mt19937 *seed_gen, bool render_only) {
             &render_camera,
             accelerator.get(),
             &shader_pack,
+            main_shader,
             seed_gen->operator()(),
             sample,
             cfg.bounces

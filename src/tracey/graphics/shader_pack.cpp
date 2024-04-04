@@ -13,6 +13,9 @@ ShaderPack::ShaderPack()
       shader_transparent(std::unique_ptr<Shader>(new ShaderTransparent())),
       shader_combined(std::unique_ptr<Shader>(new ShaderCombined())),
 
+      shader_denoise_albedo(std::unique_ptr<Shader>(new ShaderDenoiseAlbedo())),
+      shader_denoise_normal(std::unique_ptr<Shader>(new ShaderDenoiseNormal())),
+
       shader_red(std::unique_ptr<Shader>(new ShaderRed())),
       shader_normal(std::unique_ptr<Shader>(new ShaderNormal())),
       shader_distance(std::unique_ptr<Shader>(new ShaderDistance())),
