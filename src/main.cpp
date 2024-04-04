@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <filesystem>
 
 #include "tracey/engine/engine.hpp"
 #include "tracey/engine/user_config.hpp"
@@ -16,8 +17,17 @@ int main(int argc, char const *argv[]) {
     trc::Engine engine {cfg};
     int result = 0;
 
+    // Process output directory string
+    std::size_t last_sep = cfg.output_path.find_last_of("\\/");
+    std::string out_dir = (last_sep == std::string::npos) ? "." : cfg.output_path.substr(0, last_sep);
+
+    // If output directory doesn't exist, abort
+    if (!std::filesystem::is_directory(std::filesystem::path(out_dir))) {
+        printf("Directory doesn't exist: %s\n", out_dir.c_str());
+        result = 7;
+    }
     // If no scene file is specified, abort
-    if (cfg.scene_path.length() == 0) {
+    else if (cfg.scene_path.length() == 0) {
         printf("Usage: Tracey -S path/to/scene/file\n");
         return 1;
     }

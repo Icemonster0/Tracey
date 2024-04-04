@@ -64,7 +64,7 @@ TRC_DEFINE_SHADER(ShaderDiffuseIndirect) {
             shader_data.rng
         };
         color = isect.value().shader->evaluate(diffuse_shader_data);
-        color = glm::min(color, {TRC_INDIRECT_LIGHT_CLAMP});
+        // color = glm::min(color, {TRC_INDIRECT_LIGHT_CLAMP});
     }
     else color = shader_data.accelerator->get_environment_light(diffuse_ray);
 
@@ -130,7 +130,7 @@ TRC_DEFINE_SHADER(ShaderSpecularIndirect) {
             shader_data.rng
         };
         color = obj_isect.value().shader->evaluate(specular_shader_data);
-        color = glm::min(color, {TRC_INDIRECT_LIGHT_CLAMP});
+        // color = glm::min(color, {TRC_INDIRECT_LIGHT_CLAMP});
     }
     else color = shader_data.accelerator->get_environment_light(specular_ray);
 
