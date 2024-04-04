@@ -131,7 +131,8 @@ int Engine::run() {
             viewer.get_camera()->get_fov(),
             viewer.get_speed(),
             viewer.get_camera()->get_focal_length(),
-            viewer.get_camera()->get_aperture()
+            viewer.get_camera()->get_aperture(),
+            cfg.scene_path
         );
 
         this_frame_t = glfwGetTime();
@@ -216,7 +217,8 @@ int Engine::render_image(std::mt19937 *seed_gen, bool render_only) {
             cfg.render_size,
             render_time,
             sample_rate,
-            render_only
+            render_only,
+            cfg.scene_path
         );
 
         ++sample;

@@ -144,7 +144,9 @@ Buffer<glm::vec3> Sampler::render_sample(glm::ivec2 frame_size, Camera *camera,
                     };
                     color = main_shader->evaluate(shader_data).rgb();
                 }
-                else color = accelerator->get_environment_light(ray);
+                // don't get environment light for denoising normal pass
+                else if (main_shader != shader_pack->shader_denoise_normal.get())
+                    color = accelerator->get_environment_light(ray);
 
                 if (std::isnan(color.r) || std::isnan(color.g) || std::isnan(color.b))
                     color = glm::vec3 {0.f};

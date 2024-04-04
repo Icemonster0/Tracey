@@ -14,7 +14,8 @@ Console::Console() : print_cooldown(0.f) {}
 
 void Console::print(float frequency, float delta_t, bool preview_mode, int samples,
         int max_samples, glm::ivec2 window_size, glm::vec3 view_pos, float yaw,
-        float pitch, float fov, float speed, float focal_length, float aperture) {
+        float pitch, float fov, float speed, float focal_length, float aperture,
+        std::string scene) {
 
     print_cooldown -= delta_t;
     if (print_cooldown <= 0.f) {
@@ -24,6 +25,7 @@ void Console::print(float frequency, float delta_t, bool preview_mode, int sampl
         s << '\n';
 
         s << "Info" << '\n';
+        s << " scene:        " << scene << '\n';
         s << " mode:         " << PADDED << (preview_mode ? "Preview" : "Rendered") << '\n';
         s << " fps:          " << PADDED << int(1.f / delta_t) << '\n';
         s << " samples:      " << PADDED << samples << " / " << max_samples << '\n';
@@ -54,7 +56,7 @@ void Console::print(float frequency, float delta_t, bool preview_mode, int sampl
 
 void Console::print_render_info(float frequency, float delta_t, int sample,
         int max_samples, glm::ivec2 image_size, float time, float sample_rate,
-        bool render_only) {
+        bool render_only, std::string scene) {
 
     print_cooldown -= delta_t;
     if (print_cooldown <= 0.f) {
@@ -75,6 +77,7 @@ void Console::print_render_info(float frequency, float delta_t, int sample,
         s << '\n';
 
         s << "Info" << '\n';
+        s << " scene:        " << scene << '\n';
         s << " image size:   " << PADDED << image_size.x << "x" << image_size.y << '\n';
         s << " samples:      " << PADDED << sample << " / " << max_samples << " (" << DECIMAL << percentage << "%)" << '\n';
         s << " time:         " << PADDED;
